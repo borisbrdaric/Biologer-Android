@@ -1,0 +1,106 @@
+<resources>
+    <string name="app_name">Biologer</string>
+
+    <!--  Login  -->
+    <string name="username">Username (email)</string>
+    <string name="password">Password</string>
+    <string name="login">Log in</string>
+    <string name="valid_email">Email is mistyped</string>
+    <string name="valid_pass">No password provided</string>
+    <string name="wrong_creds">Wrong email or password</string>
+    <string name="nemas_nalog">Don\'t have an account?</string>
+    <string name="napravi_nalog">Register</string>
+    <string name="zaboravljena_lozinka">Forgot password?</string>
+    <string name="email_wrong_format">Wrong email format</string>
+    <string name="devDatabase">This is only for developers!</string>
+
+    <!--  Unos  -->
+    <string name="GPSaccuracy">Coordinate accuracy:</string>
+    <string name="latitude">Latitude:</string>
+    <string name="longitude">Longitude:</string>
+    <string name="unknown">unavailable</string>
+    <string name="taxon_hint">Start typing…</string>
+    <string name="more">More…</string>
+    <string name="naziv_taksona">Taxon name</string>
+    <string name="pleaseSelect">Please select</string>
+    <string name="broj_jedinki">Number</string>
+    <string name="pol">Sex</string>
+    <string name="M">Male</string>
+    <string name="Z">Female</string>
+    <string name="razvojni_stadijum">Stage</string>
+    <string name="stage_hint">Please select taxon first</string>
+    <string name="jedinka_je">Found dead?</string>
+    <string name="ziva">live</string>
+    <string name="mrtva">dead</string>
+    <string name="razlog_smrti">Cause of death</string>
+    <string name="komentar">Comment</string>
+    <string name="cancel">Cancel</string>
+    <string name="sacuvaj">Save</string>
+    <string name="title_activity_map">Map</string>
+    <string name="entry_title">Data entry</string>
+    <string name="taxa_mandatory">You must enter the valid taxon name.</string>
+    <string name="please_select">Please select</string>
+    <string name="enable_location">Location setting must be enabled on your device.</string>
+    <string name="enable_location_yes">Enable</string>
+    <string name="enable_location_no">Cancel</string>
+    <string name="saved">The entry is saved.</string>
+    <string name="location_is_zero">Location is not retrived yet. Would you like to wait for location or cancel this entry?</string>
+    <string name="wait">Wait</string>
+
+    <!--picture dialog-->
+    <string name="choose_picture">Choose picture</string>
+    <string name="choose_picture_gallery">Choose from gallery</string>
+    <string name="choose_picture_camera">Take photo by camera</string>
+    <!--map-->
+    <string name="accurcy">Enter accuracy</string>
+
+    <!--LandingActivity-->
+    <string name="confirmExit">Do you want to exit application?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+
+    <!--Details-->
+    <string name="gps_update"><b>Warning:</b> You are about to overwrite original location with your current location! Are you sure?</string>
+
+    <!-- navigation drawer -->
+    <string name="logout_btn">Logout</string>
+    <string name="setup">Setup</string>
+    <string name="about">About Biologer</string>
+    <string name="about_us">About us</string>
+    <string name="list">List of findings</string>
+    <string name="nav_open_drawer">Open navigation drawer</string>
+    <string name="nav_close_drawer">Close navigation drawer</string>
+    <string name="help">Help</string>
+
+    <!--About-->
+    <string name="textAbout">Biologer is an Open Source application issued under MIT license and designed to collect data on biodiversity in Eastern Europe.</string>
+    <string name="textAbout1">Biologer was developed with funds from Rufford Small Grants (project Nos. 20507-B and 24652-B) and MAVA (project No. 15097).</string>
+    <string name="version">Version: </string>
+    <string name="textAbout2">To find out more details about Biologer, please visit <a href="https://biologer.org">biologer.org</a>.</string>
+
+    <!--Logout-->
+    <string name="currently_logged_data">You are currently logged into a database:</string>
+    <string name="currently_logged_uname">Као user:</string>
+    <string name="realy">Do you want to logout from this Biologer database?</string>
+
+    <!--Setup-->
+    <string name="note">In order to keep the list of taxa up to date you should regularly refresh data.</string>
+    <string name="button_update">Update data</string>
+    <string name="database_updated">Taxon database is updated.</string>
+    <string name="database_connect_error">Application was unable to connect with database!</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <!--First time run-->
+    <string name="Slide1_title">First time here?</string>
+    <string name="first_slide">You are running Biologer for the first time. If you don\'t have the account, please register at biologer.org and use the email and password to login into the application.</string>
+    <string name="Slide2_title">Navigation is easy</string>
+    <string name="second_slide">Side panel provides all the shortcuts you need for navigation. For start ensure that you always have recent list of taxons by chosing the Setup.</string>
+    <string name="Slide3_title">The main screen</string>
+    <string name="third_slide">The main screen is simple and easy to use. Here you can add, edit or delete your observations and send the data to our server.</string>
+    <string name="Slide4_title">Adding new data</string>
+    <string name="fourth_slide">Adding data is easy! Select the species or photos and Biologer will do the rest. Here you can also tune the location with the map or better describe your finding.</string>
+    <string name="unprecise_coordinates">The coordate precision is less than 25 m. Would you like to wait for precise location?</string>
+    <string name="save_anyway">Save anyway</string>
+</resources>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="org.biologer.biologer.EntryActivity">
+
+    <fragment
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context="org.biologer.biologer.MapActivity">
+
+        <EditText
+            android:id="@+id/et_setAccuracy"
+            android:layout_width="180dp"
+            android:layout_height="45dp"
+            android:hint="@string/accurcy"
+            android:inputType="number"
+            android:background="@drawable/roundshape_gray"
+            android:layout_gravity="bottom|left"
+            android:gravity="center"
+            android:layout_marginLeft="25dp"
+            android:layout_marginBottom="20dp"/>
+
+        <ImageView
+            android:id="@+id/fbtn_mapType"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_gravity="right|top"
+            android:src="@drawable/ic_map_type"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="20dp"
+            android:clickable="true"/>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fbtn_set"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_gravity="end|bottom"
+            android:layout_marginTop="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginBottom="20dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_thumb_up_black_24dp"
+            app:backgroundTint="#1d592c"/>
+
+        <!--<android.support.design.widget.FloatingActionButton-->
+            <!--android:id="@+id/fbtn_mapType"-->
+            <!--android:layout_width="60dp"-->
+            <!--android:layout_height="60dp"-->
+            <!--android:layout_gravity="right|top"-->
+            <!--android:layout_marginBottom="90dp"-->
+            <!--android:layout_marginRight="20dp"-->
+            <!--android:scaleType="fitCenter"-->
+            <!--android:src="@drawable/ic_thumb_up_black_24dp"-->
+            <!--app:backgroundTint="#1d592c" />-->
+    </fragment>
+
+
+</LinearLayout>

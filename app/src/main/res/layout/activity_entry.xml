@@ -1,0 +1,396 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/drawer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <include
+            layout="@layout/toolbar_main"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:id="@+id/swipe"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <android.support.v4.widget.NestedScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:padding="8dp"
+                        android:verticalScrollbarPosition="right">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginTop="16dp"
+                            android:paddingStart="6dp"
+                            android:paddingEnd="6dp">
+
+                            <!--levi deo-->
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_vertical"
+                                android:orientation="vertical">
+
+                                <LinearLayout
+                                    android:layout_width="260dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginBottom="6dp"
+                                    android:gravity="start"
+                                    android:orientation="horizontal">
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="@string/latitude"/>
+                                    <TextView
+                                        android:id="@+id/tv_latitude"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:paddingStart="16dp"
+                                        android:paddingEnd="0dp"
+                                        android:text="@string/unknown" />
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:layout_width="260dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginBottom="6dp"
+                                    android:gravity="start"
+                                    android:orientation="horizontal">
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="@string/longitude"/>
+                                    <TextView
+                                        android:id="@+id/tv_longitude"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:paddingStart="16dp"
+                                        android:paddingEnd="0dp"
+                                        android:text="@string/unknown" />
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:layout_width="260dp"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="start"
+                                    android:orientation="horizontal">
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="@string/GPSaccuracy"/>
+                                    <TextView
+                                        android:id="@+id/tv_gps"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:paddingStart="16dp"
+                                        android:paddingEnd="0dp"
+                                        android:text="@string/unknown"/>
+                                </LinearLayout>
+
+                            </LinearLayout>
+
+                            <!--desni deo(mapa)-->
+                            <ImageView
+                                android:id="@+id/iv_map"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:layout_marginEnd="5dp"
+                                android:layout_marginStart="16dp"
+                                android:adjustViewBounds="true"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:src="@drawable/mapicon_192dp"/>
+
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginTop="16dp"
+                            android:layout_marginBottom="16dp"
+                            android:background="@color/colorDivider"/>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:gravity="center_horizontal">
+
+                            <AutoCompleteTextView
+                                android:id="@+id/tvTakson_auto"
+                                android:layout_width="280dp"
+                                android:layout_height="56dp"
+                                android:background="@drawable/gray_border"
+                                android:hint="@string/naziv_taksona"
+                                android:paddingStart="14dp"
+                                android:paddingEnd="14dp"
+                                android:textColor="@color/black"
+                                android:textSize="16sp"/>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center">
+
+                            <ImageView
+                                android:id="@+id/ib_pic1"
+                                android:layout_width="80dp"
+                                android:layout_height="80dp"
+                                android:layout_marginEnd="5dp"
+                                android:adjustViewBounds="true"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:scaleType="centerInside"
+                                android:src="@drawable/ic_add_a_photo_black_24dp" />
+
+                            <ImageView
+                                android:id="@+id/ib_pic2"
+                                android:layout_width="80dp"
+                                android:layout_height="80dp"
+                                android:layout_marginEnd="5dp"
+                                android:adjustViewBounds="true"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:scaleType="centerInside"
+                                android:src="@drawable/ic_add_a_photo_black_24dp" />
+
+                            <ImageView
+                                android:id="@+id/ib_pic3"
+                                android:layout_width="80dp"
+                                android:layout_height="80dp"
+                                android:adjustViewBounds="true"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:scaleType="centerInside"
+                                android:src="@drawable/ic_add_a_photo_black_24dp" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/tv_more"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="end"
+                            android:layout_marginBottom="6dp"
+                            android:layout_marginStart="6dp"
+                            android:layout_marginEnd="6dp"
+                            android:layout_marginTop="8dp"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:text="@string/more"
+                            android:textSize="14sp"
+                            android:textStyle="italic|bold" />
+
+                        <LinearLayout
+                            android:id="@+id/more"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:orientation="vertical"
+                                android:padding="5dp">
+
+                                <org.biologer.biologer.CustomTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="8dp"
+                                    android:text="@string/komentar" />
+
+                                <org.biologer.biologer.CustomEditText
+                                    android:id="@+id/et_komentar"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:orientation="horizontal"
+                                android:padding="5dp">
+
+                                <org.biologer.biologer.CustomTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginEnd="10dp"
+                                    android:text="@string/broj_jedinki" />
+
+                                <View
+                                    android:layout_width="0dp"
+                                    android:layout_height="0dp"
+                                    android:layout_weight="1" />
+
+                                <org.biologer.biologer.CustomEditText
+                                    android:id="@+id/et_brojJedinki"
+                                    android:layout_width="80dp"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center"
+                                    android:inputType="number" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:orientation="horizontal"
+                                android:padding="5dp">
+
+                                <org.biologer.biologer.CustomTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center_vertical"
+                                    android:layout_marginEnd="10dp"
+                                    android:text="@string/pol" />
+
+                                <View
+                                    android:layout_width="0dp"
+                                    android:layout_height="0dp"
+                                    android:layout_weight="1" />
+
+                                <RadioGroup
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal">
+
+                                    <RadioButton
+                                        android:id="@+id/rb_musko"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginEnd="15dp"
+                                        android:text="@string/M" />
+
+                                    <RadioButton
+                                        android:id="@+id/rb_zensko"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="@string/Z" />
+                                </RadioGroup>
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:orientation="vertical"
+                                android:padding="5dp">
+
+                                <org.biologer.biologer.CustomTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/razvojni_stadijum">
+                                </org.biologer.biologer.CustomTextView>
+
+                                <TextView
+                                    android:id="@+id/tvStage"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="35dp"
+                                    android:layout_marginTop="10dp"
+                                    android:background="@drawable/gray_border"
+                                    android:clickable="true"
+                                    android:drawableEnd="@drawable/ic_arrow_drop_down"
+                                    android:focusable="true"
+                                    android:gravity="center_vertical"
+                                    android:hint="@string/stage_hint"
+                                    android:paddingStart="5dp"
+                                    android:paddingEnd="5dp"
+                                    android:textColor="@color/black"
+                                    android:textSize="16sp" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:orientation="horizontal"
+                                android:padding="5dp">
+
+                                <org.biologer.biologer.CustomTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/jedinka_je" />
+
+                                <View
+                                    android:layout_width="0dp"
+                                    android:layout_height="0dp"
+                                    android:layout_weight="1" />
+
+                                <org.biologer.biologer.CustomTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginEnd="6dp"
+                                    android:text="@string/mrtva" />
+
+                                <Switch
+                                    android:id="@+id/sw_ziva"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:checked="true"
+                                    android:textOff="@string/mrtva"
+                                    android:textOn="@string/ziva" />
+
+                                <org.biologer.biologer.CustomTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="6dp"
+                                    android:text="@string/ziva" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:id="@+id/smrt"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:orientation="vertical"
+                                android:padding="5dp">
+
+                                <org.biologer.biologer.CustomTextView
+                                    android:id="@+id/tv_razlogSmrti"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="8dp"
+                                    android:text="@string/razlog_smrti" />
+
+                                <org.biologer.biologer.CustomEditText
+                                    android:id="@+id/et_razlogSmrti"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content" />
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+                </android.support.v4.widget.NestedScrollView>
+
+            </android.support.v4.widget.SwipeRefreshLayout>
+
+        </FrameLayout>
+    </LinearLayout>
+</android.support.v4.widget.DrawerLayout>

@@ -1,0 +1,94 @@
+apply plugin: 'com.android.application'
+apply plugin: 'org.greenrobot.greendao'
+
+repositories {
+    mavenCentral()
+    maven {url 'https://maven.google.com'}
+    maven {url 'https://jitpack.io'}
+    jcenter()
+}
+
+android {
+    compileSdkVersion 28
+    buildToolsVersion "28.0.3"
+    defaultConfig {
+        applicationId "org.biologer.biologer"
+        minSdkVersion 20
+        targetSdkVersion 28
+        versionCode 4
+        versionName "0.3"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+
+    applicationVariants.all { variant ->
+        variant.resValue "string", "versionName", variant.versionName
+    }
+
+    buildTypes {
+        debug {
+            buildConfigField 'String', "BiologerRS_Key", Biologer_BiologerRS_client_secret
+            buildConfigField 'String', "BiologerHR_Key", Biologer_BiologerHR_client_secret
+            // Add the key here if you need to access it from XML files
+            //resValue 'string', "BiologerRS_key", Biologer_BiologerRS_client_secret
+        }
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            buildConfigField 'String', "BiologerRS_Key", Biologer_BiologerRS_client_secret
+            buildConfigField 'String', "BiologerHR_Key", Biologer_BiologerHR_client_secret
+            // Add the key here if you need to access it from XML files
+            //resValue 'string', "BiologerRS_key", Biologer_BiologerRS_client_secret
+        }
+    }
+
+
+
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES.txt'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/notice.txt'
+        exclude 'META-INF/license.txt'
+        exclude 'META-INF/dependencies.txt'
+        exclude 'META-INF/LGPL2.1'
+    }
+}
+
+//ako menjam strukturu baze povecam verziju za 1
+greendao {
+    schemaVersion 109
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    implementation 'com.android.support:appcompat-v7:28.0.0'
+    implementation 'com.android.support:support-v4:28.0.0'
+    implementation 'com.android.support:recyclerview-v7:28.0.0'
+    implementation 'com.android.support:design:28.0.0'
+    implementation 'com.android.support.constraint:constraint-layout:2.0.0-alpha2'
+    implementation 'com.google.android.gms:play-services-location:16.0.0'
+    implementation 'com.google.android.gms:play-services-maps:16.0.0'
+    implementation 'com.google.firebase:firebase-crash:16.2.1'
+    implementation 'com.google.firebase:firebase-core:16.0.6'
+    implementation 'com.google.firebase:firebase-iid:17.0.4'
+    implementation 'com.squareup.retrofit2:retrofit:2.3.0'
+    implementation 'com.squareup.retrofit2:converter-jackson:2.3.0'
+    implementation 'com.github.bumptech.glide:glide:4.6.1'
+    implementation 'org.greenrobot:greendao-generator:3.2.2'
+    implementation 'org.greenrobot:greendao:3.2.2'
+    implementation 'com.auth0.android:jwtdecode:1.1.1'
+    implementation 'org.greenrobot:eventbus:3.1.1'
+    implementation 'com.baoyz.swipemenulistview:library:1.3.0'
+    implementation 'com.github.apl-devs:appintro:v4.2.3'
+    testImplementation 'junit:junit:4.12'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.6.1'
+}
+
+
+apply plugin: 'com.google.gms.google-services'

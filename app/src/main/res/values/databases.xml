@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="databases">
+        <item>https://biologer.org</item>
+        <item>https://biologer.hr</item>
+        <item>https://dev.biologer.org</item>
+    </string-array>
+</resources>
