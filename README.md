@@ -1,4 +1,4 @@
-# Biologer-android
+# Biologer Android
 Android application to be used together with Biologer web software.
 
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE)
@@ -18,7 +18,7 @@ The installation and deployment process is typical for a Android application, an
 Download the master branch
 
 ```bash
-git clone https://github.com/Biologer-android/Biologer-android.git
+git clone https://github.com/Biologer/Biologer-Android.git
 ```
 
 ## Licence
