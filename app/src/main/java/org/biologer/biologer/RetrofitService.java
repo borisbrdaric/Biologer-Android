@@ -17,6 +17,7 @@ import retrofit2.http.Headers;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
+import retrofit2.http.Query;
 
 /**
  * Created by brjovanovic on 12/24/2017.
@@ -39,7 +40,8 @@ public interface RetrofitService {
                               @Field("password") String password);
 
     @GET("api/taxa")
-    Call<TaksoniResponse> getTaxons();
+    Call<TaksoniResponse> getTaxons(@Query("page") int page_number,
+                                    @Query("per_page") int page_per_page);
 
     @Multipart
     @POST("api/uploads/photos")

@@ -48,13 +48,13 @@ public class UserData {
     public int getData_license() {
         return this.data_license;
     }
-    public void setImage_license(int data_license) {
+    public void setData_license(int data_license) {
         this.data_license = data_license;
     }
     public int getImage_license() {
-        return this.data_license;
+        return this.image_license;
     }
-    public void setData_license(int image_license) {
+    public void setImage_license(int image_license) {
         this.image_license = image_license;
     }
 

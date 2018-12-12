@@ -1,5 +1,6 @@
 package org.biologer.biologer.model;
 
+import org.biologer.biologer.App;
 import org.biologer.biologer.SettingsManager;
 
 /**
@@ -25,6 +26,9 @@ public class User {
     }
 
     public void logOut(){
+        // Delete user token
         SettingsManager.deleteToken();
+        // Delete data from greengao database
+        App.get().getDaoSession().getStageDao().deleteAll();
     }
 }

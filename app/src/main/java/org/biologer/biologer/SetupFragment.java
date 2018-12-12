@@ -1,26 +1,27 @@
 package org.biologer.biologer;
 
-import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.fasterxml.jackson.databind.BeanDescription;
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.introspect.BeanPropertyDefinition;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import org.biologer.biologer.model.Stage;
-import org.biologer.biologer.model.Taxon;
-import org.biologer.biologer.model.UserData;
 import org.biologer.biologer.model.network.TaksoniResponse;
 import org.biologer.biologer.model.network.Taxa;
-import org.biologer.biologer.model.network.UserDataResponse;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -42,13 +43,13 @@ public class SetupFragment extends Fragment {
             public void onClick(View view) {
 
                 pbLoading.setVisibility(View.VISIBLE);
-                Call<TaksoniResponse> call = App.get().getService().getTaxons();
+                Call<TaksoniResponse> call = App.get().getService().getTaxons(100, 5);
                 call.enqueue(new Callback<TaksoniResponse>() {
                     @Override
                     public void onResponse(Call<TaksoniResponse> call, Response<TaksoniResponse> response) {
-                        //  App.get().getDaoSession().getTaxonDao()
-                        //Toast.makeText(getActivity(), "Updating..." + response.body().getData().size(), Toast.LENGTH_SHORT).show();
                         App.get().getDaoSession().getStageDao().deleteAll();
+                        // Log.w("Izlaz za logcat",new Gson().toJson(response));
+                        // Log.w("Izlaz za logcat",new GsonBuilder().setPrettyPrinting().create().toJson(response.body()));
                         for (int i = 0; i < response.body().getData().size(); i++) {
                             Taxa taxa = response.body().getData().get(i);
                             App.get().getDaoSession().getTaxonDao().insertOrReplace(taxa.toTaxon());
@@ -63,7 +64,7 @@ public class SetupFragment extends Fragment {
                             @Override
                             public void run() {
                                 pbLoading.setVisibility(View.GONE);
-                                Toast.makeText(getActivity(), getString(R.string.database_updated), Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(getActivity(), getString(R.string.database_updated), Toast.LENGTH_SHORT).show();
                             }
                         });
                     }
