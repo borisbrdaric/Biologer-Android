@@ -32,14 +32,12 @@
     <string name="taxon_hint">Počnite upisivati…</string>
     <string name="more">Još…</string>
     <string name="naziv_taksona">Naziv vrste</string>
-    <string name="razvojni_stadij">Stadij</string>
     <string name="stage_hint">Morate izabrati stadij</string>
     <string name="jedinka_je">Nađena mrtva?</string>
     <string name="choose_picture">Izaberite fotografiju</string>
     <string name="confirmExit">Želite li napustiti aplikaciju?</string>
     <string name="choose_picture_camera">Napravi sliku kamerom</string>
     <string name="choose_picture_gallery">Izaberi sliku iz galerije</string>
-    <string name="accuracy">Unesite preciznost</string>
     <string name="wrong_creds">Pogrešna e-pošta ili lozinka</string>
     <string name="nemas_nalog">Imate li nalog?</string>
     <string name="napravi_nalog">Registrirajte se</string>
@@ -81,4 +79,6 @@
     <string name="wait">Pričekaj</string>
     <string name="unprecise_coordinates">Preciznost lokacije je manja od 25 m. Želite li pričekati na dohvat točnije lokacije? </string>
     <string name="save_anyway">Ipak spremi</string>
+    <string name="razvojni_stadijum">Stadij</string>
+    <string name="accurcy">Unesite preciznost</string>
 </resources>
