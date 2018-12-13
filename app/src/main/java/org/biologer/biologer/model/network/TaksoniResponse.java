@@ -9,13 +9,17 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-    "data"
+    "data",
+    "meta"
 })
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TaksoniResponse {
 
     @JsonProperty("data")
     private List<Taxa> data = null;
+
+    @JsonProperty("meta")
+    public TaxaMeta meta = null;
 
     @JsonProperty("data")
     public List<Taxa> getData() {
@@ -25,6 +29,18 @@ public class TaksoniResponse {
     @JsonProperty("data")
     public void setData(List<Taxa> data) {
         this.data = data;
+    }
+
+    @JsonProperty("meta")
+    public TaxaMeta getMeta() {
+        return meta;
+    }
+
+    @JsonProperty("meta")
+    public void setMeta(TaxaMeta meta) {
+        this.meta = meta;
+
+        TaxaMeta test = meta;
     }
 
 }
