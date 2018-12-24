@@ -12,7 +12,7 @@ public class SettingsManager {
     private static final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(App.get());
 
     public enum KEY {
-        token, FIRST_LAUNCH, DATABASE_NAME
+        token, FIRST_LAUNCH, DATABASE_NAME, DATABASE_VERSION
     }
 
     public static boolean isFirstLaunch()
@@ -35,6 +35,16 @@ public class SettingsManager {
 
     public static String getDatabaseName() {
         return prefs.getString(KEY.DATABASE_NAME.toString(),"https://biologer.org");
+    }
+
+    public static void setDatabaseVersion(String databaseVersion) {
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString(SettingsManager.KEY.DATABASE_VERSION.toString(), databaseVersion);
+        editor.commit();
+    }
+
+    public static String getDatabaseVersion() {
+        return prefs.getString(KEY.DATABASE_VERSION.toString(),"0");
     }
 
     public static void deleteToken(){

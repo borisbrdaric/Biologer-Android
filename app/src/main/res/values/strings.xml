@@ -58,6 +58,8 @@
     <string name="confirmExit">Do you want to exit application?</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="updating_database">Updating taxonomic database…</string>
+    <string name="new_database_available">New version of taxonomic database is available online. Would you like to update your database?</string>
 
     <!--Details-->
     <string name="gps_update"><b>Warning:</b> You are about to overwrite original location with your current location! Are you sure?</string>

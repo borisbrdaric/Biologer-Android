@@ -2,6 +2,7 @@ package org.biologer.biologer;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.provider.Settings;
 import android.support.design.widget.NavigationView;
 
 import android.support.v4.app.Fragment;
@@ -18,7 +19,9 @@ import android.view.MenuItem;
 import android.view.Menu;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,9 +29,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.biologer.biologer.bus.DeleteEntryFromList;
 import org.biologer.biologer.model.Entry;
 import org.biologer.biologer.model.APIEntry;
+import org.biologer.biologer.model.Stage;
 import org.biologer.biologer.model.UploadFileResponse;
 import org.biologer.biologer.model.UserData;
 import org.biologer.biologer.model.network.APIEntryResponse;
+import org.biologer.biologer.model.network.Stage6;
+import org.biologer.biologer.model.network.TaksoniResponse;
+import org.biologer.biologer.model.network.Taxa;
 import org.biologer.biologer.model.network.UserDataResponse;
 import org.greenrobot.eventbus.EventBus;
 
@@ -57,6 +64,12 @@ public class LandingActivity extends AppCompatActivity
 
     private FrameLayout progressBar;
 
+    private FrameLayout progressBar4Taxa;
+    private String lastUpdatedAt;
+    private ProgressBar progressBarTaxa;
+    private int oldProgress = 0;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,6 +81,8 @@ public class LandingActivity extends AppCompatActivity
         //navDrawerFill();
 
         progressBar = findViewById(R.id.progress);
+        progressBar4Taxa = findViewById(R.id.progress_taxa);
+        progressBarTaxa = findViewById(R.id.progress_bar_taxa1);
 
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.nav_open_drawer, R.string.nav_close_drawer);
@@ -94,6 +109,33 @@ public class LandingActivity extends AppCompatActivity
         ft.add(R.id.content_frame, fragment);
         ft.addToBackStack("fragment");
         ft.commit();
+
+        updateTaxa();
+    }
+
+    private void updateTaxa() {
+
+        Call<TaksoniResponse> call = App.get().getService().getTaxons(1, 1);
+        call.enqueue(new Callback<TaksoniResponse>() {
+            @Override
+            public void onResponse(Call<TaksoniResponse> call, Response<TaksoniResponse> response) {
+                // Get the version of the taxa database from server
+                lastUpdatedAt = Long.toString(response.body().getMeta().getLastUpdatedAt());
+                String previousVersion = SettingsManager.getDatabaseVersion();
+                if (lastUpdatedAt.equals(previousVersion)) {
+                    Log.i("TAXA DATABASE ","It looks like this taxonomic database is already up to date. Nothing to do here!");
+                } else {
+                    Log.i("TAXA DATABASE ","Taxa database on the server and android app didn’t match!");
+                    buildAlertMessageNewTaxa();
+                }
+            }
+            @Override
+            public void onFailure(Call<TaksoniResponse> call, Throwable t) {
+                // Inform the user on failure and write log message
+                //Toast.makeText(getActivity(), getString(R.string.database_connect_error), Toast.LENGTH_LONG).show();
+                Log.e("Fetching taxa > ", "Application could not get data from a server!");
+            }
+        });
     }
 
     @Override
@@ -375,5 +417,55 @@ public class LandingActivity extends AppCompatActivity
                 }
             }
         }
+    }
+
+    protected void buildAlertMessageNewTaxa() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(getString(R.string.new_database_available))
+                .setCancelable(false)
+                .setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, final int id) {
+                        progressBar4Taxa.setVisibility(View.VISIBLE);
+
+                        Thread updateStatusBar = new Thread() {
+
+                            @Override
+                            public void run() {
+                                try {
+                                    sleep(1000);
+                                    while (progressBarTaxa.getProgress() < 100) {
+                                        int progress_value = FetchTaxa.getProgressStatus();
+                                        if (progress_value != oldProgress) {
+                                            oldProgress = progress_value;
+                                            progressBarTaxa.setProgress(progress_value);
+                                        }
+                                    }
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                } finally {
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            progressBar4Taxa.setVisibility(View.GONE);
+                                        }
+                                    });
+                                }
+                            }
+                        };
+
+                        updateStatusBar.start();
+
+                        FetchTaxa.fetchAll(1);
+
+                        SettingsManager.setDatabaseVersion(lastUpdatedAt);
+                    }
+                })
+                .setNegativeButton(getString(R.string.no), new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, final int id) {
+                        dialog.cancel();
+                    }
+                });
+        final AlertDialog alert = builder.create();
+        alert.show();
     }
 }

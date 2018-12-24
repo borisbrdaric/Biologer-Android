@@ -81,4 +81,6 @@
     <string name="wait">Сачекај</string>
     <string name="unprecise_coordinates">The coordate precision is less than 25 m. Would you like to wait for precise location?</string>
     <string name="save_anyway">Ипак сачувај</string>
+    <string name="updating_database">Ажурирам базу таксона…</string>
+    <string name="new_database_available">База таксона на серверу је новија од ваше. Да ли желите да ажурирате базу таксона?</string>
 </resources>
