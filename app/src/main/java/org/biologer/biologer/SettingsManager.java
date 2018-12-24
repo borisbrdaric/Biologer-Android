@@ -50,7 +50,7 @@ public class SettingsManager {
     public static void deleteToken(){
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString(KEY.token.toString(), null);
-        editor.apply();
+        editor.commit();
     }
 
     public static void setToken(String token){

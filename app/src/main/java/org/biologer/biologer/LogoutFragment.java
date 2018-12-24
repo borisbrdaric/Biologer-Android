@@ -60,7 +60,9 @@ public class LogoutFragment extends Fragment {
                     SettingsManager.deleteToken();
                     // Maybe also to delete database!
                     App.get().getDaoSession().getStageDao().deleteAll();
+                    SettingsManager.setDatabaseVersion("0");
                     Intent intent = new Intent(getActivity(), LoginActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                 }
             });

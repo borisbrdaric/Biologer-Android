@@ -131,7 +131,6 @@ public class LoginActivity extends AppCompatActivity {
                     LoginResponse response1 = response.body();
                     SettingsManager.setToken(response1.getAccessToken());
                     fillUserData();
-                //    fillUserSettings();
                 }
 
                 else {
@@ -170,36 +169,16 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
     }
-/*
-    private void fillUserSettings(){
-        Call<UserSettings> serv_a = App.get().getService().getUserData();
-        serv_a.enqueue(new Callback<UserSettings>() {
-            @Override
-            public void onResponse(Call<UserSettings> serv, Response<UserSettings> response) {
-                App.get().getDaoSession().getUserDataDao().deleteAll();
-                String email = response.body().getDataLicense();
-                String name = response.body().getData().getFullName();
-                UserData uData = new UserData(null, email, name);
-                App.get().getDaoSession().getUserDataDao().insertOrReplace(uData);
-                Intent intent = new Intent(LoginActivity.this, LandingActivity.class);
-                startActivity(intent);
-            }
 
-            @Override
-            public void onFailure(Call<UserSettings> call, Throwable t) {
-                String s = "ff";
-            }
-        });
-    }
-
-*/
     public void onRegister(View view) {
-        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://biologer.org/register"));
+        String url_register = SettingsManager.getDatabaseName() + "/register";
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url_register));
         startActivity(browserIntent);
     }
 
     public void onForgotPass(View view) {
-        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://biologer.org/password/reset"));
+        String url_reset_pass = SettingsManager.getDatabaseName() + "/password/reset";
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url_reset_pass));
         startActivity(browserIntent);
     }
 

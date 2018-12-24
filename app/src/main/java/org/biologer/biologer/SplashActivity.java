@@ -10,7 +10,7 @@ import org.biologer.biologer.model.User;
 
 public class SplashActivity extends AppCompatActivity {
 
-    int SPLASH_TIME_OUT = 1500;
+    int SPLASH_TIME_OUT = 500;
     SharedPreferences prefs = null;
 
     @Override
