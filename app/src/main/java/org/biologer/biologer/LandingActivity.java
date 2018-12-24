@@ -2,7 +2,6 @@ package org.biologer.biologer;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.provider.Settings;
 import android.support.design.widget.NavigationView;
 
 import android.support.v4.app.Fragment;
@@ -29,13 +28,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.biologer.biologer.bus.DeleteEntryFromList;
 import org.biologer.biologer.model.Entry;
 import org.biologer.biologer.model.APIEntry;
-import org.biologer.biologer.model.Stage;
 import org.biologer.biologer.model.UploadFileResponse;
 import org.biologer.biologer.model.UserData;
 import org.biologer.biologer.model.network.APIEntryResponse;
-import org.biologer.biologer.model.network.Stage6;
 import org.biologer.biologer.model.network.TaksoniResponse;
-import org.biologer.biologer.model.network.Taxa;
 import org.biologer.biologer.model.network.UserDataResponse;
 import org.greenrobot.eventbus.EventBus;
 
@@ -58,7 +54,7 @@ public class LandingActivity extends AppCompatActivity
     int m = 0;
     ArrayList<Entry> entryList;
     List<APIEntry.Photo> photos = null;
-    private UserData loggedUser = new UserData();
+    UserData loggedUser = new UserData();
 
     private DrawerLayout drawer;
 
@@ -110,7 +106,12 @@ public class LandingActivity extends AppCompatActivity
         ft.addToBackStack("fragment");
         ft.commit();
 
-        updateTaxa();
+        if (SettingsManager.getDatabaseVersion().equals("0")){
+            // Default value of 0 means that the taxa database was never updated.
+            updateTaxa();
+        }
+
+
     }
 
     private void updateTaxa() {
@@ -123,17 +124,21 @@ public class LandingActivity extends AppCompatActivity
                 lastUpdatedAt = Long.toString(response.body().getMeta().getLastUpdatedAt());
                 String previousVersion = SettingsManager.getDatabaseVersion();
                 if (lastUpdatedAt.equals(previousVersion)) {
-                    Log.i("TAXA DATABASE ","It looks like this taxonomic database is already up to date. Nothing to do here!");
-                } else {
-                    Log.i("TAXA DATABASE ","Taxa database on the server and android app didn’t match!");
-                    buildAlertMessageNewTaxa();
+                    Log.i("Taxa database: ","It looks like this taxonomic database is already up to date. Nothing to do here!");
+                } else  {
+                    Log.i("Taxa database: ","Taxa database on the server and android app didn’t match!");
+                    if (previousVersion.equals("0")) {
+                        buildAlertMessageEmptyTaxaDb();
+                    } else {
+                        buildAlertMessageNewerTaxaDb();
+                    }
                 }
             }
             @Override
             public void onFailure(Call<TaksoniResponse> call, Throwable t) {
                 // Inform the user on failure and write log message
-                //Toast.makeText(getActivity(), getString(R.string.database_connect_error), Toast.LENGTH_LONG).show();
-                Log.e("Fetching taxa > ", "Application could not get data from a server!");
+                //Toast.makeText(LandingActivity.this, getString(R.string.database_connect_error), Toast.LENGTH_LONG).show();
+                Log.e("Taxa database: ", "Application could not get data from a server!");
             }
         });
     }
@@ -419,48 +424,68 @@ public class LandingActivity extends AppCompatActivity
         }
     }
 
-    protected void buildAlertMessageNewTaxa() {
+    Thread updateStatusBar = new Thread() {
+
+        @Override
+        public void run() {
+            try {
+                sleep(1000);
+                while (progressBarTaxa.getProgress() < 100) {
+                    int progress_value = FetchTaxa.getProgressStatus();
+                    if (progress_value != oldProgress) {
+                        oldProgress = progress_value;
+                        progressBarTaxa.setProgress(progress_value);
+                    }
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } finally {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        progressBar4Taxa.setVisibility(View.GONE);
+                    }
+                });
+            }
+        }
+    };
+
+    protected void buildAlertMessageNewerTaxaDb() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(getString(R.string.new_database_available))
                 .setCancelable(false)
                 .setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
                     public void onClick(final DialogInterface dialog, final int id) {
                         progressBar4Taxa.setVisibility(View.VISIBLE);
-
-                        Thread updateStatusBar = new Thread() {
-
-                            @Override
-                            public void run() {
-                                try {
-                                    sleep(1000);
-                                    while (progressBarTaxa.getProgress() < 100) {
-                                        int progress_value = FetchTaxa.getProgressStatus();
-                                        if (progress_value != oldProgress) {
-                                            oldProgress = progress_value;
-                                            progressBarTaxa.setProgress(progress_value);
-                                        }
-                                    }
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                } finally {
-                                    runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            progressBar4Taxa.setVisibility(View.GONE);
-                                        }
-                                    });
-                                }
-                            }
-                        };
-
                         updateStatusBar.start();
-
                         FetchTaxa.fetchAll(1);
-
                         SettingsManager.setDatabaseVersion(lastUpdatedAt);
                     }
                 })
                 .setNegativeButton(getString(R.string.no), new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, final int id) {
+                        // If user don’t update just ignore updates until the next version of the database
+                        SettingsManager.setDatabaseVersion(lastUpdatedAt);
+                        dialog.cancel();
+                    }
+                });
+        final AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+    protected void buildAlertMessageEmptyTaxaDb() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(getString(R.string.database_empty))
+                .setCancelable(false)
+                .setPositiveButton(getString(R.string.contin), new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, final int id) {
+                        progressBar4Taxa.setVisibility(View.VISIBLE);
+                        updateStatusBar.start();
+                        FetchTaxa.fetchAll(1);
+                        SettingsManager.setDatabaseVersion(lastUpdatedAt);
+                    }
+                })
+                .setNegativeButton(getString(R.string.skip), new DialogInterface.OnClickListener() {
                     public void onClick(final DialogInterface dialog, final int id) {
                         dialog.cancel();
                     }

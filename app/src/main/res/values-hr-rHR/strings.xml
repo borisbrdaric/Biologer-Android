@@ -79,5 +79,4 @@
     <string name="razvojni_stadijum">Stadij</string>
     <string name="accurcy">Unesite preciznost</string>
     <string name="updating_database">Nadograđujem bazu taksona…</string>
-    <string name="new_database_available">Baza taksona na serveru je novija od vaše. Da li želite da ažurirate vašu bazu?</string>
 </resources>

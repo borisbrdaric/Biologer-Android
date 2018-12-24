@@ -59,7 +59,7 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="updating_database">Updating taxonomic database…</string>
-    <string name="new_database_available">New version of taxonomic database is available online. Would you like to update your database?</string>
+    <string name="new_database_available">New version of taxonomic database is available online. You can update it now or later from the application Setup. Would you like to update your database?</string>
 
     <!--Details-->
     <string name="gps_update"><b>Warning:</b> You are about to overwrite original location with your current location! Are you sure?</string>
@@ -105,4 +105,7 @@
     <string name="fourth_slide">Adding data is easy! Select the species or photos and Biologer will do the rest. Here you can also tune the location with the map or better describe your finding.</string>
     <string name="unprecise_coordinates">The coordate precision is less than 25 m. Would you like to wait for precise location?</string>
     <string name="save_anyway">Save anyway</string>
+    <string name="database_empty">Biologer’s taxa database is not downloaded from the server yet. Ensure that you have a stabile internet connection to continue.</string>
+    <string name="contin">Continue</string>
+    <string name="skip">Skip for now</string>
 </resources>

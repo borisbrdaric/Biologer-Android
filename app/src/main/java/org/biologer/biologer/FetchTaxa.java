@@ -17,7 +17,6 @@ public abstract class FetchTaxa extends Activity {
 
     private static int totalPages = 1;
     private static int progressStatus = 0;
-    private static long lastUpdatedAt;
 
     public static void fetchAll(final int page) {
         if (page > totalPages) {
@@ -57,7 +56,7 @@ public abstract class FetchTaxa extends Activity {
                 if (isLastPage(page)) {
                     // Inform the user of success
                     //Toast.makeText(getActivity(), getString(R.string.database_updated), Toast.LENGTH_LONG).show();
-                    Log.i("Fetching taxa > ", "All taxa were successfully updated from the server!");
+                    Log.i("Taxa database: ", "All taxa were successfully updated from the server!");
                 } else {
                     fetchAll(page + 1);
                 }
@@ -67,9 +66,10 @@ public abstract class FetchTaxa extends Activity {
             public void onFailure(Call<TaksoniResponse> call, Throwable t) {
                 // Remove partially retrieved data from the database
                 App.get().getDaoSession().getStageDao().deleteAll();
+                SettingsManager.setDatabaseVersion("0");
                 // Inform the user on failure and write log message
                 //Toast.makeText(getActivity(), getString(R.string.database_connect_error), Toast.LENGTH_LONG).show();
-                Log.e("Fetching taxa > ", "Application could not get data from a server!");
+                Log.e("Taxa database: ", "Application could not get data from a server!");
             }
         });
     }

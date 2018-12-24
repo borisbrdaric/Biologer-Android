@@ -82,5 +82,8 @@
     <string name="unprecise_coordinates">The coordate precision is less than 25 m. Would you like to wait for precise location?</string>
     <string name="save_anyway">Ипак сачувај</string>
     <string name="updating_database">Ажурирам базу таксона…</string>
-    <string name="new_database_available">База таксона на серверу је новија од ваше. Да ли желите да ажурирате базу таксона?</string>
+    <string name="new_database_available">База таксона на серверу је новија од ваше. Можете је преузети сада или касније из Подешавања апликације. Да ли желите да ажурирате базу таксона?</string>
+    <string name="database_empty">Биологер још није преузео базу таксона са сервера. Уверите се да имате стабилан интернет како би наставили ову радњу.</string>
+    <string name="contin">Настави</string>
+    <string name="skip">Други пут</string>
 </resources>
