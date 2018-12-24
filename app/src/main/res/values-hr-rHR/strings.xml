@@ -56,12 +56,9 @@
     <string name="textAbout1">Biologer je razvijen zahvaljujući sredstvima Rufford fondacije za male grantove (projekti br. 20507-B i 24652-B) i MAVA fondacije (projekat br. 15097).</string>
     <string name="note">Kako bi uvijek imali najnoviji popis vrsta, redovito ažurirajte podatke.</string>
     <string name="hello_blank_fragment">Pozdrav</string>
-    <string name="Slide1_title">Prvi put ste ovdje?</string>
-    <string name="first_slide">Pokrenuli ste Biologer po prvi put. Ako nemate račun, registrirajte se na biologer.org i koristite vašu e-adresu i lozinku za prijavu u aplikaciju.</string>
     <string name="Slide2_title">Navigacija je jednostavna</string>
-    <string name="second_slide">Bočna površina sadrži sve prečice koje su vam potrebne. Za početak provjerite imate li najnoviji popis vrsta tako što ćete otići u Postavke.</string>
-    <string name="third_slide">Početni zaslon je jednostavan za korištenje. Odavde možete urediti ili obrisati vaše nalaze i poslati podatke na server.</string>
-    <string name="Slide4_title">Dodavanje novih podataka</string>
+    <string name="third_slide">Sa početnog zaslona možete urediti ili obrisati vaše nalaze i poslati podatke na neki od naših server.</string>
+    <string name="Slide4_title">Novi nalazi</string>
     <string name="fourth_slide">Dodavanje podataka je jednostavno! Izaberite vrste ili fotografije i Biologer će sve odraditi sam. Odavde možete podesiti vašu lokaciju sa karte ili bolje opisati nalaz.</string>
     <string name="textAbout2">Za više informacija o biologeru, posjetite adresu <a href="https://biologer.org">biologer.org</a>.</string>
     <string name="database_updated">Baza podataka je ažurirana.</string>

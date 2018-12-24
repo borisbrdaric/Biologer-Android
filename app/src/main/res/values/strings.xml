@@ -95,13 +95,13 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
     <!--First time run-->
-    <string name="Slide1_title">First time here?</string>
-    <string name="first_slide">You are running Biologer for the first time. If you don\'t have the account, please register at biologer.org and use the email and password to login into the application.</string>
+    <string name="Slide1_title">Database options</string>
+    <string name="first_slide">This appliation can connect to multiple Biologer databases. You can start by choosing your prefered database and registering online.</string>
     <string name="Slide2_title">Navigation is easy</string>
-    <string name="second_slide">Side panel provides all the shortcuts you need for navigation. For start ensure that you always have recent list of taxons by chosing the Setup.</string>
+    <string name="second_slide">Side panel provides all the shortcuts you need and setup your application.</string>
     <string name="Slide3_title">The main screen</string>
-    <string name="third_slide">The main screen is simple and easy to use. Here you can add, edit or delete your observations and send the data to our server.</string>
-    <string name="Slide4_title">Adding new data</string>
+    <string name="third_slide">From the main screen you can add, edit or delete your observations and send the data to one of our servers.</string>
+    <string name="Slide4_title">New observations</string>
     <string name="fourth_slide">Adding data is easy! Select the species or photos and Biologer will do the rest. Here you can also tune the location with the map or better describe your finding.</string>
     <string name="unprecise_coordinates">The coordate precision is less than 25 m. Would you like to wait for precise location?</string>
     <string name="save_anyway">Save anyway</string>
