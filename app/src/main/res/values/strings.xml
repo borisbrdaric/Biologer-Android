@@ -78,7 +78,7 @@
     <string name="textAbout">Biologer is an Open Source application issued under MIT license and designed to collect data on biodiversity in Eastern Europe.</string>
     <string name="textAbout1">Biologer was developed with funds from Rufford Small Grants (project Nos. 20507-B and 24652-B) and MAVA (project No. 15097).</string>
     <string name="version">Version: </string>
-    <string name="textAbout2">To find out more details about Biologer, please visit <a href="https://biologer.org">biologer.org</a>.</string>
+    <string name="textAbout2">To find out more details about Biologer, visit our web page: </string>
 
     <!--Logout-->
     <string name="currently_logged_data">You are currently logged into a database:</string>

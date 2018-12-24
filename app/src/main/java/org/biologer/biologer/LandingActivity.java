@@ -106,16 +106,11 @@ public class LandingActivity extends AppCompatActivity
         ft.addToBackStack("fragment");
         ft.commit();
 
-        if (SettingsManager.getDatabaseVersion().equals("0")){
-            // Default value of 0 means that the taxa database was never updated.
-            updateTaxa();
-        }
-
-
+        updateTaxa();
     }
 
+    // Send a short request to the server that will return if the taxonomic tree is up to date.
     private void updateTaxa() {
-
         Call<TaksoniResponse> call = App.get().getService().getTaxons(1, 1);
         call.enqueue(new Callback<TaksoniResponse>() {
             @Override
@@ -128,8 +123,10 @@ public class LandingActivity extends AppCompatActivity
                 } else  {
                     Log.i("Taxa database: ","Taxa database on the server and android app didn’t match!");
                     if (previousVersion.equals("0")) {
+                        // If the database was never updated...
                         buildAlertMessageEmptyTaxaDb();
                     } else {
+                        // If the online database is more recent...
                         buildAlertMessageNewerTaxaDb();
                     }
                 }

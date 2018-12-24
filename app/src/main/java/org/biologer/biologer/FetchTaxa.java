@@ -65,6 +65,7 @@ public abstract class FetchTaxa extends Activity {
             @Override
             public void onFailure(Call<TaksoniResponse> call, Throwable t) {
                 // Remove partially retrieved data from the database
+                App.get().getDaoSession().getTaxonDao().deleteAll();
                 App.get().getDaoSession().getStageDao().deleteAll();
                 SettingsManager.setDatabaseVersion("0");
                 // Inform the user on failure and write log message

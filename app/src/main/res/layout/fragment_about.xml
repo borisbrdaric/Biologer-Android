@@ -16,11 +16,11 @@
 
         <ImageView
             android:layout_width="wrap_content"
-            android:layout_height="190dp"
+            android:layout_height="160dp"
             android:layout_gravity="center"
             android:layout_marginLeft="40dp"
             android:layout_marginRight="40dp"
-            android:layout_marginBottom="40dp"
+            android:layout_marginBottom="10dp"
             android:src="@drawable/banner" />
 
         <TextView
@@ -60,6 +60,7 @@
             android:gravity="center"
             android:text="@string/textAbout1" />
 
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -68,6 +69,17 @@
             android:layout_marginBottom="10dp"
             android:gravity="center"
             android:text="@string/textAbout2" />
+
+        <org.biologer.biologer.CustomTextView
+            android:id="@+id/biologerorg_url"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true"
+            android:layout_gravity="center"
+            android:text="https://biologer.org"
+            android:textColor="@color/colorPrimary"
+            android:textStyle="bold"/>
 
         <LinearLayout
             android:layout_width="wrap_content"

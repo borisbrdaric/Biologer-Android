@@ -60,7 +60,7 @@
     <string name="third_slide">Sa početnog zaslona možete urediti ili obrisati vaše nalaze i poslati podatke na neki od naših server.</string>
     <string name="Slide4_title">Novi nalazi</string>
     <string name="fourth_slide">Dodavanje podataka je jednostavno! Izaberite vrste ili fotografije i Biologer će sve odraditi sam. Odavde možete podesiti vašu lokaciju sa karte ili bolje opisati nalaz.</string>
-    <string name="textAbout2">Za više informacija o biologeru, posjetite adresu <a href="https://biologer.org">biologer.org</a>.</string>
+    <string name="textAbout2">"Za više informacija o biologeru, posjetite adresu: "</string>
     <string name="database_updated">Baza podataka je ažurirana.</string>
     <string name="database_connect_error">Aplikacija se nije uspjela povezati sa bazom podataka!</string>
     <string name="entry_title">Unos podatka</string>

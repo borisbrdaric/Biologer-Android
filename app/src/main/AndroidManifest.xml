@@ -69,7 +69,8 @@
             android:windowSoftInputMode="stateAlwaysHidden|adjustResize" />
         <activity android:name=".RegisterActivity" />
         <activity android:name=".ForgotPassword" />
-        <activity android:name=".LandingActivity" />
+        <activity android:name=".LandingActivity"
+            android:launchMode="singleTask"/>
         <activity
             android:name=".DetailActivity"
             android:windowSoftInputMode="stateAlwaysHidden|adjustResize">
