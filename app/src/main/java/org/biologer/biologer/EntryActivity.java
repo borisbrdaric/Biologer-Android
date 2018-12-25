@@ -101,7 +101,6 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
     private RadioButton rb_male, rb_female;
     private Uri contentURI;
     private String slika1, slika2, slika3;
-    //private String contentURI1, contentURI2, contentURI3;
     private SwipeRefreshLayout swipe;
 
     Calendar calendar;

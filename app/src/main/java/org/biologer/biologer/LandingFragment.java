@@ -138,6 +138,7 @@ public class LandingFragment extends Fragment {
     public void onResume() {
         super.onResume();
         entries = (ArrayList<Entry>) App.get().getDaoSession().getEntryDao().loadAll();
+        adapter.addAll(entries, true);
     }
 
     public void updateData() {

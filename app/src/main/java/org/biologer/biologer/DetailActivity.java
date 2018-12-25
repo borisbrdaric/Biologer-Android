@@ -1,25 +1,19 @@
 package org.biologer.biologer;
 
 import android.Manifest;
-import android.app.Activity;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.media.Image;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Environment;
-import android.os.Handler;
 import android.provider.MediaStore;
 import android.provider.Settings;
-import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -36,20 +30,15 @@ import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
-import android.widget.Spinner;
 import android.view.View;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.model.LatLng;
 
 import org.biologer.biologer.model.Entry;
@@ -57,29 +46,16 @@ import org.biologer.biologer.model.Stage;
 import org.biologer.biologer.model.StageDao;
 import org.biologer.biologer.model.Taxon;
 import org.biologer.biologer.model.TaxonDao;
-import org.biologer.biologer.model.UploadFileResponse;
-import org.biologer.biologer.model.UserData;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
 import java.util.Locale;
-
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
-import okhttp3.RequestBody;
-import okhttp3.ResponseBody;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class DetailActivity extends AppCompatActivity implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
 
@@ -125,7 +101,6 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 
         // Find selected record
         Bundle bundle = getIntent().getExtras();
-        String m = bundle.getString("extra_obj");
         Long id = bundle.getLong("ID_nalaza");
         currentItem = App.get().getDaoSession().getEntryDao().load(id);
         // Get the latitude, longitude, coordinate precision and elevation
@@ -135,8 +110,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         elev = currentItem.getElevation();
         acc = currentItem.getAccuracy();
 
-
-        //liste taksona i stage-ova iz baze
+        // Define variables to hold the values of taxa and stages
         taksoni = (ArrayList<Taxon>) App.get().getDaoSession().getTaxonDao().loadAll();
         stages = (ArrayList<Stage>) App.get().getDaoSession().getStageDao().loadAll();
 
@@ -164,6 +138,8 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         tv_gps = findViewById(R.id.tv_gps);
         tv_gps.setText(String.format(Locale.ENGLISH, "%.0f", currentItem.getAccuracy()));
         tvStage = findViewById(R.id.tvStage);
+        tvStage.setOnClickListener(this);
+        tvStage.setEnabled(true);
 
         // Autocomplete textbox for Taxon entry
         final String[] taksonometrija1 = new String[taksoni.size()];
@@ -206,16 +182,18 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                     invalidateOptionsMenu();
                 }            }
         });
+
+        // Get the name of the taxon for this entry from the database
         String taxonName = (App.get().getDaoSession().getTaxonDao().queryBuilder().where(TaxonDao.Properties.Id.eq(currentItem.getTaxon())).unique()).getName();
         acTextView.setText(taxonName);
 
-        tvStage.setOnClickListener(this);
-        String stageName = "";
+        // Get the name of the stage for the entry from the database
         if (currentItem.getStage() != null) {
-            stageName = stages.get(currentItem.getStage().intValue()-1).getName();
-            tvStage.setTag(stages.get(currentItem.getStage().intValue()-1));
+            String stageName = (App.get().getDaoSession().getStageDao().queryBuilder().where(StageDao.Properties.StageId.eq(currentItem.getStage())).list().get(1).getName());
+            long Id = (App.get().getDaoSession().getStageDao().queryBuilder().where(StageDao.Properties.StageId.eq(currentItem.getStage())).list().get(1).getId());
+            tvStage.setTag(Id);
+            tvStage.setText(stageName);
         }
-        tvStage.setText(stageName);
 
         et_razlogSmrti = (CustomEditText) findViewById(R.id.et_razlogSmrti);
         if (currentItem.getCauseOfDeath().length() != 0){

@@ -2,7 +2,6 @@ package org.biologer.biologer.adapters;
 
 import android.content.Context;
 import android.net.Uri;
-import android.os.Parcel;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,11 +17,7 @@ import org.biologer.biologer.model.Entry;
 import org.biologer.biologer.model.Stage;
 import org.biologer.biologer.model.StageDao;
 import org.biologer.biologer.model.Taxon;
-import org.biologer.biologer.model.TaxonDao;
-import org.greenrobot.greendao.query.QueryBuilder;
 
-import java.lang.reflect.Array;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,7 +30,7 @@ import static org.biologer.biologer.R.id.slika;
 public class Adapter extends BaseAdapter {
     private Context mContext;
     private ArrayList<Entry> mList;
-    public String koristiSliku;
+    private String koristiSliku;
 
     public Adapter(Context mContext, ArrayList<Entry> mList) {
         this.mContext = mContext;
