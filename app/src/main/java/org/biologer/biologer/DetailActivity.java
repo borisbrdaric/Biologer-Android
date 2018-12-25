@@ -180,12 +180,14 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                     // Enable/disable save button from Toolbar
                     save_enabled = false;
                     invalidateOptionsMenu();
-                }            }
+                }
+            }
         });
 
         // Get the name of the taxon for this entry from the database
         String taxonName = (App.get().getDaoSession().getTaxonDao().queryBuilder().where(TaxonDao.Properties.Id.eq(currentItem.getTaxon())).unique()).getName();
         acTextView.setText(taxonName);
+        acTextView.dismissDropDown();
 
         // Get the name of the stage for the entry from the database
         if (currentItem.getStage() != null) {
