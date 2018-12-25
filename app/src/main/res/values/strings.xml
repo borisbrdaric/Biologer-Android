@@ -86,7 +86,7 @@
     <string name="realy">Do you want to logout from this Biologer database?</string>
 
     <!--Setup-->
-    <string name="note">In order to keep the list of taxa up to date you should regularly refresh data.</string>
+    <string name="note">Here you can update the list of taxa.</string>
     <string name="button_update">Update data</string>
     <string name="database_updated">Taxon database is updated.</string>
     <string name="database_connect_error">Application was unable to connect with database!</string>
@@ -106,6 +106,6 @@
     <string name="unprecise_coordinates">The coordate precision is less than 25 m. Would you like to wait for precise location?</string>
     <string name="save_anyway">Save anyway</string>
     <string name="database_empty">Biologer’s taxa database is not downloaded from the server yet. Ensure that you have a stabile internet connection to continue.</string>
-    <string name="contin">Continue</string>
+    <string name="contin">Download</string>
     <string name="skip">Skip for now</string>
 </resources>

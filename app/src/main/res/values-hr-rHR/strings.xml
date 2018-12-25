@@ -54,7 +54,6 @@
     <string name="textAbout">Biologer je aplikacija koju pokreće slobodan softver, izdan je pod MIT licencom i napravljen kako bi prikupljao podatke o bioraznolikosti na području Istočne Europe.</string>
     <string name="Slide3_title">Početni zaslon</string>
     <string name="textAbout1">Biologer je razvijen zahvaljujući sredstvima Rufford fondacije za male grantove (projekti br. 20507-B i 24652-B) i MAVA fondacije (projekat br. 15097).</string>
-    <string name="note">Kako bi uvijek imali najnoviji popis vrsta, redovito ažurirajte podatke.</string>
     <string name="hello_blank_fragment">Pozdrav</string>
     <string name="Slide2_title">Navigacija je jednostavna</string>
     <string name="third_slide">Sa početnog zaslona možete urediti ili obrisati vaše nalaze i poslati podatke na neki od naših server.</string>
@@ -79,4 +78,11 @@
     <string name="razvojni_stadijum">Stadij</string>
     <string name="accurcy">Unesite preciznost</string>
     <string name="updating_database">Nadograđujem bazu taksona…</string>
+    <string name="Slide1_title">Database options</string>
+    <string name="first_slide">This appliation can connect to multiple Biologer databases. You can start by choosing your prefered database and registering online.</string>
+    <string name="second_slide">Side panel provides all the shortcuts you need and setup your application.</string>
+    <string name="database_empty">Biologer’s taxa database is not downloaded from the server yet. Ensure that you have a stabile internet connection to continue.</string>
+    <string name="contin">Download</string>
+    <string name="skip">Skip for now</string>
+    <string name="note">Here you can update the list of taxa.</string>
 </resources>
