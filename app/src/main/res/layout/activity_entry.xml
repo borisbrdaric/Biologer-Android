@@ -214,85 +214,70 @@
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="8dp"
-                                android:orientation="vertical"
-                                android:padding="5dp">
+                                android:orientation="horizontal">
 
-                                <org.biologer.biologer.CustomTextView
+                                <LinearLayout
                                     android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="8dp"
-                                    android:text="@string/komentar" />
+                                    android:layout_height="56dp"
+                                    android:orientation="horizontal"
+                                    android:padding="5dp">
 
-                                <org.biologer.biologer.CustomEditText
-                                    android:id="@+id/et_komentar"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content" />
-                            </LinearLayout>
+                                    <org.biologer.biologer.CustomTextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_gravity="center_vertical"
+                                        android:layout_marginEnd="10dp"
+                                        android:text="@string/broj_jedinki" />
 
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="8dp"
-                                android:orientation="horizontal"
-                                android:padding="5dp">
+                                    <org.biologer.biologer.CustomEditText
+                                        android:id="@+id/et_brojJedinki"
+                                        android:layout_width="60dp"
+                                        android:layout_height="wrap_content"
+                                        android:gravity="center"
+                                        android:inputType="number" />
+                                </LinearLayout>
 
-                                <org.biologer.biologer.CustomTextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginEnd="10dp"
-                                    android:text="@string/broj_jedinki" />
 
                                 <View
                                     android:layout_width="0dp"
                                     android:layout_height="0dp"
                                     android:layout_weight="1" />
 
-                                <org.biologer.biologer.CustomEditText
-                                    android:id="@+id/et_brojJedinki"
-                                    android:layout_width="80dp"
-                                    android:layout_height="wrap_content"
-                                    android:gravity="center"
-                                    android:inputType="number" />
-                            </LinearLayout>
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="8dp"
-                                android:orientation="horizontal"
-                                android:padding="5dp">
-
-                                <org.biologer.biologer.CustomTextView
+                                <LinearLayout
                                     android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_gravity="center_vertical"
-                                    android:layout_marginEnd="10dp"
-                                    android:text="@string/pol" />
+                                    android:layout_height="56dp"
+                                    android:orientation="horizontal"
+                                    android:layout_gravity="end"
+                                    android:padding="5dp">
 
-                                <View
-                                    android:layout_width="0dp"
-                                    android:layout_height="0dp"
-                                    android:layout_weight="1" />
-
-                                <RadioGroup
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:orientation="horizontal">
-
-                                    <RadioButton
-                                        android:id="@+id/rb_musko"
+                                    <org.biologer.biologer.CustomTextView
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:layout_marginEnd="15dp"
-                                        android:text="@string/M" />
+                                        android:layout_gravity="center_vertical"
+                                        android:layout_marginEnd="10dp"
+                                        android:text="@string/pol" />
 
-                                    <RadioButton
-                                        android:id="@+id/rb_zensko"
+                                    <RadioGroup
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="@string/Z" />
-                                </RadioGroup>
+                                        android:layout_gravity="center_vertical"
+                                        android:orientation="horizontal">
+
+                                        <RadioButton
+                                            android:id="@+id/rb_musko"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginEnd="6dp"
+                                            android:text="@string/M" />
+
+                                        <RadioButton
+                                            android:id="@+id/rb_zensko"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:text="@string/Z" />
+                                    </RadioGroup>
+                                </LinearLayout>
+
                             </LinearLayout>
 
                             <LinearLayout
@@ -329,38 +314,40 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="8dp"
-                                android:orientation="horizontal"
+                                android:orientation="vertical"
                                 android:padding="5dp">
 
                                 <org.biologer.biologer.CustomTextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
+                                    android:layout_marginTop="8dp"
+                                    android:text="@string/komentar" />
+
+                                <org.biologer.biologer.CustomEditText
+                                    android:id="@+id/et_komentar"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="32dp"
+                                android:layout_marginTop="8dp"
+                                android:orientation="horizontal"
+                                android:padding="5dp">
+
+                                <android.support.v7.widget.AppCompatCheckBox
+                                    android:id="@+id/dead_specimen"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="match_parent"
+                                    android:layout_marginEnd="8dp"/>
+
+                                <org.biologer.biologer.CustomTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="match_parent"
+                                    android:gravity="center"
                                     android:text="@string/jedinka_je" />
 
-                                <View
-                                    android:layout_width="0dp"
-                                    android:layout_height="0dp"
-                                    android:layout_weight="1" />
-
-                                <org.biologer.biologer.CustomTextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginEnd="6dp"
-                                    android:text="@string/mrtva" />
-
-                                <Switch
-                                    android:id="@+id/sw_ziva"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:checked="true"
-                                    android:textOff="@string/mrtva"
-                                    android:textOn="@string/ziva" />
-
-                                <org.biologer.biologer.CustomTextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginStart="6dp"
-                                    android:text="@string/ziva" />
                             </LinearLayout>
 
                             <LinearLayout

@@ -33,6 +33,7 @@ import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
@@ -93,7 +94,7 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
     private CustomEditText et_razlogSmrti, et_komentar, et_brojJedinki;
     AutoCompleteTextView acTextView;
     private ImageView ib_pic1, ib_pic2, ib_pic3, iv_map;
-    private Switch sw_ziva;
+    private CheckBox check_dead;
     private LinearLayout more, smrt;
     private ArrayList<Taxon> taksoni;
     private boolean save_enabled = false;
@@ -164,8 +165,11 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
         params_more.height = 0;
         more.setLayoutParams(params_more);
 
-        sw_ziva = (Switch) findViewById(R.id.sw_ziva);
-        sw_ziva.setOnClickListener(this);
+        /*
+        * This adds a checkbox for dead specimen and the comment on dead specimen.
+        */
+        check_dead = (CheckBox) findViewById(R.id.dead_specimen);
+        check_dead.setOnClickListener(this);
         smrt = (LinearLayout) findViewById(R.id.smrt);
         ViewGroup.LayoutParams params = smrt.getLayoutParams();
         params.height = 0;
@@ -326,8 +330,8 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
             case R.id.tv_more:
                 showMore();
                 break;
-            case R.id.sw_ziva:
-                showAdditionalFields();
+            case R.id.dead_specimen:
+                showDeadComment();
                 break;
             case R.id.iv_map:
                 showMap();
@@ -381,7 +385,7 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
 
         // Get the data structure and save it into a database
         Entry entry1 = new Entry(null, taxon_id, taxon_name, year, month, day,
-                komentar, brojJedinki, maleFemale(), selectedStage, deadOrAlive(), razlogSmrti,
+                komentar, brojJedinki, maleFemale(), selectedStage, String.valueOf(!check_dead.isChecked()), razlogSmrti,
                 nLokacija.latitude, nLokacija.longitude, acc, elev, "", slika1, slika2, slika3,
                 "", "", String.valueOf(user_data_license), String.valueOf(user_image_license), time);
         App.get().getDaoSession().getEntryDao().insertOrReplace(entry1);
@@ -393,22 +397,12 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
 
     private String maleFemale() {
         String sex = "";
-        if (rb_male.isChecked() == true) {
+        if (rb_male.isChecked()) {
             sex = "male";
-        } else if (rb_female.isChecked() == true) {
+        } else if (rb_female.isChecked()) {
             sex = "female";
         }
         return sex;
-    }
-
-    private String deadOrAlive() {
-        String dead = "";
-        if (sw_ziva.isChecked() == true) {
-            dead = "true";
-        } else {
-            dead = "false";
-        }
-        return dead;
     }
 
     private void showTaksoniDialog() {
@@ -668,14 +662,14 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
         more.setLayoutParams(params);
     }
 
-    public void showAdditionalFields() {
-        if (sw_ziva.isChecked()) {
+    public void showDeadComment() {
+        if (check_dead.isChecked()) {
             ViewGroup.LayoutParams params = smrt.getLayoutParams();
-            params.height = 0;
+            params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
             smrt.setLayoutParams(params);
         } else {
             ViewGroup.LayoutParams params = smrt.getLayoutParams();
-            params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+            params.height = 0;
             smrt.setLayoutParams(params);
         }
     }

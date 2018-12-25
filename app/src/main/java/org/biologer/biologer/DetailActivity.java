@@ -30,6 +30,7 @@ import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
@@ -77,7 +78,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
     private CustomEditText et_razlogSmrti, et_komentar, et_brojJedinki;
     AutoCompleteTextView acTextView;
     private ImageView ib_pic1, ib_pic2, ib_pic3, iv_map;
-    private Switch sw_ziva;
+    private CheckBox check_dead;
     private LinearLayout more, smrt;
     private ArrayList<Taxon> taksoni;
     private boolean save_enabled = true;
@@ -221,13 +222,18 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         params_more.height = 0;
         more.setLayoutParams(params_more);
 
-        sw_ziva = (Switch) findViewById(R.id.sw_ziva);
-        sw_ziva.setOnClickListener(this);
-        if (currentItem.getDeadOrAlive()=="true"){
-            sw_ziva.setChecked(true);
+        /*
+         * This adds a checkbox for dead specimen and the comment on dead specimen.
+         */
+        check_dead = (CheckBox) findViewById(R.id.dead_specimen);
+        check_dead.setOnClickListener(this);
+        if (currentItem.getDeadOrAlive().equals("true")){
+            // Specimen is a live
+            check_dead.setChecked(false);
         }
         else {
-            sw_ziva.setChecked(false);
+            // Specimen is dead, checkbox should be activated
+            check_dead.setChecked(true);
         }
         smrt = (LinearLayout) findViewById(R.id.smrt);
         ViewGroup.LayoutParams params = smrt.getLayoutParams();
@@ -356,10 +362,10 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                 break;
             case R.id.tv_more:
                 showMore();
-                showAdditionalFields();
+                showDeadComment();
                 break;
-            case R.id.sw_ziva:
-                showAdditionalFields();
+            case R.id.dead_specimen:
+                showDeadComment();
                 break;
             case R.id.iv_map:
                 showMap();
@@ -416,7 +422,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         currentItem.setNumber(brojJedinki);
         currentItem.setSex(maleFemale());
         currentItem.setStage(selectedStage);
-        currentItem.setDeadOrAlive(deadOrAlive());
+        currentItem.setDeadOrAlive(String.valueOf(!check_dead.isChecked()));
         currentItem.setCauseOfDeath(razlogSmrti);
         currentItem.setLattitude(nLokacija.latitude);
         currentItem.setLongitude(nLokacija.longitude);
@@ -435,22 +441,12 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 
     private String maleFemale() {
         String sex = "";
-        if (rb_male.isChecked() == true) {
+        if (rb_male.isChecked()) {
             sex = "male";
-        } else if (rb_female.isChecked() == true) {
+        } else if (rb_female.isChecked()) {
             sex = "female";
         }
         return sex;
-    }
-
-    private String deadOrAlive() {
-        String dead = "";
-        if (sw_ziva.isChecked() == true) {
-            dead = "true";
-        } else {
-            dead = "false";
-        }
-        return dead;
     }
 
     private void showStageDialog() {
@@ -662,14 +658,14 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         more.setLayoutParams(params);
     }
 
-    public void showAdditionalFields() {
-        if (sw_ziva.isChecked()) {
+    public void showDeadComment() {
+        if (check_dead.isChecked()) {
             ViewGroup.LayoutParams params = smrt.getLayoutParams();
-            params.height = 0;
+            params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
             smrt.setLayoutParams(params);
         } else {
             ViewGroup.LayoutParams params = smrt.getLayoutParams();
-            params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+            params.height = 0;
             smrt.setLayoutParams(params);
         }
     }
