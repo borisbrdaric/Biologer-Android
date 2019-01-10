@@ -38,7 +38,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.view.View;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -51,6 +50,7 @@ import org.biologer.biologer.model.StageDao;
 import org.biologer.biologer.model.Taxon;
 import org.biologer.biologer.model.TaxonDao;
 import org.biologer.biologer.model.UserData;
+import org.json.JSONException;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -231,7 +231,7 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
 
         // Define locatonListener and locationManager in order to
         // to receive the Location.
-        // Call the function updateLocatio() to do all the magic...
+        // Call the function updateLocation() to do all the magic...
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
@@ -369,7 +369,7 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
     private void entrySaver(final Taxon taxon) {
         Stage stage = (tvStage.getTag() != null) ? (Stage) tvStage.getTag() : null;
         String komentar = (et_komentar.getText().toString() != null) ? et_komentar.getText().toString() : "";
-        Integer brojJedinki = (et_brojJedinki.getText().toString().trim().length() > 0) ? new Integer(et_brojJedinki.getText().toString()) : 0;
+        Integer brojJedinki = (et_brojJedinki.getText().toString().trim().length() > 0) ? Integer.valueOf(et_brojJedinki.getText().toString()) : 0;
         Long selectedStage = (stage != null) ? stage.getStageId() : null;
         String razlogSmrti = (et_razlogSmrti.getText() != null) ? et_razlogSmrti.getText().toString() : "";
 
@@ -587,11 +587,27 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
 
             Toast.makeText(EntryActivity.this, "Image Saved!", Toast.LENGTH_SHORT).show();
         }
+
         if (requestCode == MAP) {
             nLokacija = data.getParcelableExtra("nLoc");
-            String acc = (String) data.getExtras().getString("acc");
             setLocationValues(nLokacija.latitude, nLokacija.longitude);
-            tv_gps.setText(acc);
+            acc = Double.valueOf(data.getExtras().getString("acc"));
+            if (data.getExtras().getString("acc").equals("0.0")) {
+                tv_gps.setText(R.string.not_available);
+            } else {
+                tv_gps.setText(String.format(Locale.ENGLISH, "%.0f", acc));
+            }
+            Location map_location = new Location("lokacija");
+            map_location.setLongitude(nLokacija.latitude);
+            map_location.setLongitude(nLokacija.longitude);
+            try {
+                GoogleElevation.getElevation(map_location, this);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            elev = map_location.getAltitude();
         }
     }
 

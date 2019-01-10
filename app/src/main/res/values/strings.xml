@@ -18,6 +18,7 @@
     <string name="GPSaccuracy">Coordinate accuracy:</string>
     <string name="latitude">Latitude:</string>
     <string name="longitude">Longitude:</string>
+    <string name="not_available">unknown</string>
     <string name="unknown">unavailable</string>
     <string name="taxon_hint">Start typing…</string>
     <string name="more">More…</string>

@@ -312,7 +312,11 @@ public class LandingActivity extends AppCompatActivity
         apiEntry.setDay(entry.getDay());
         apiEntry.setLatitude(entry.getLattitude());
         apiEntry.setLongitude(entry.getLongitude());
-        apiEntry.setAccuracy((int) entry.getAccuracy());
+        if (entry.getAccuracy() == 0.0) {
+            apiEntry.setAccuracy(null);
+        } else {
+            apiEntry.setAccuracy((int) entry.getAccuracy());
+        }
         apiEntry.setLocation(entry.getLocationDesc());
         apiEntry.setElevation((int) entry.getElevation());
         apiEntry.setNote(entry.getComment());

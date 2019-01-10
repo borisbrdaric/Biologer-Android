@@ -398,11 +398,10 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         }
     }
 
-
     private void entrySaver(final Taxon taxon) {
         Stage stage = (tvStage.getTag() != null) ? (Stage) tvStage.getTag() : null;
         String komentar = (et_komentar.getText().toString() != null) ? et_komentar.getText().toString() : "";
-        Integer brojJedinki = (et_brojJedinki.getText().toString().trim().length() > 0) ? new Integer(et_brojJedinki.getText().toString()) : 0;
+        Integer brojJedinki = (et_brojJedinki.getText().toString().trim().length() > 0) ? Integer.valueOf(et_brojJedinki.getText().toString()) : 0;
         Long selectedStage = (stage != null) ? stage.getStageId() : null;
         String razlogSmrti = (et_razlogSmrti.getText() != null) ? et_razlogSmrti.getText().toString() : "";
 
@@ -614,9 +613,13 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         }
         if (requestCode == MAP) {
             nLokacija = data.getParcelableExtra("nLoc");
-            String acc = (String) data.getExtras().getString("acc");
             setLocationValues(nLokacija.latitude, nLokacija.longitude);
-            tv_gps.setText(acc);
+            acc = Double.valueOf(data.getExtras().getString("acc"));
+            if (data.getExtras().getString("acc").equals("")) {
+                tv_gps.setText(R.string.not_available);
+            } else {
+                tv_gps.setText(String.format(Locale.ENGLISH, "%.0f", acc));
+            }
         }
     }
 

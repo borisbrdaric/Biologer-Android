@@ -8,9 +8,7 @@ import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -23,7 +21,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 public class MapActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
-    private String acc = "0";
+    private String acc = "0.0";
     private FloatingActionButton fbtn_set;
     private ImageView fbtn_mapType;
     private EditText et_acc;

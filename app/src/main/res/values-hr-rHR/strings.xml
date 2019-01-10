@@ -85,4 +85,5 @@
     <string name="contin">Download</string>
     <string name="skip">Skip for now</string>
     <string name="note">Here you can update the list of taxa.</string>
+    <string name="not_available">nepoznato</string>
 </resources>

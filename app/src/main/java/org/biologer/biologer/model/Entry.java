@@ -32,26 +32,23 @@ public class Entry {
     private String causeOfDeath;
     private double lattitude;
     private double longitude;
-    private double accuracy;
+    private Double accuracy;
     private double elevation;
     private String locationDesc;
     private String slika1;
-  //  private String contentURI1;
     private String slika2;
-  //  private String contentURI2;
     private String slika3;
-   // private String contentURI3;
     private String projectId;
     private String foundOn;
     private String data_licence;
     private String image_licence;
     private String time;
 
-    @Generated(hash = 644198826)
+    @Generated(hash = 258120634)
     public Entry(Long id, long taxon, String taxon_suggestion, String year,
             String month, String day, String comment, Integer number, String sex,
             Long stage, String deadOrAlive, String causeOfDeath, double lattitude,
-            double longitude, double accuracy, double elevation,
+            double longitude, Double accuracy, double elevation,
             String locationDesc, String slika1, String slika2, String slika3,
             String projectId, String foundOn, String data_licence,
             String image_licence, String time) {
@@ -172,7 +169,7 @@ public class Entry {
     public double getAccuracy() {
         return this.accuracy;
     }
-    public void setAccuracy(double accuracy) {
+    public void setAccuracy(Double accuracy) {
         this.accuracy = accuracy;
     }
     public double getElevation() {
@@ -193,37 +190,19 @@ public class Entry {
     public void setSlika1(String slika1) {
         this.slika1 = slika1;
     }
-    /*public String getContentURI1() {
-        return this.contentURI1;
-    }
-    public void setContentURI1(String contentURI1) {
-        this.contentURI1 = contentURI1;
-    }*/
     public String getSlika2() {
         return this.slika2;
     }
     public void setSlika2(String slika2) {
         this.slika2 = slika2;
     }
-   /* public String getContentURI2() {
-        return this.contentURI2;
-    }
-    public void setContentURI2(String contentURI2) {
-        this.contentURI2 = contentURI2;
-    }
-   */ public String getSlika3() {
+    public String getSlika3() {
         return this.slika3;
     }
     public void setSlika3(String slika3) {
         this.slika3 = slika3;
     }
-    /*public String getContentURI3() {
-        return this.contentURI3;
-    }
-    public void setContentURI3(String contentURI3) {
-        this.contentURI3 = contentURI3;
-    }
-   */ public String getProjectId() {
+    public String getProjectId() {
         return this.projectId;
     }
     public void setProjectId(String projectId) {
@@ -253,6 +232,5 @@ public class Entry {
     public void setTime(String time) {
         this.time = time;
     }
-
 
 }

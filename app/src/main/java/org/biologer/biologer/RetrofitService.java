@@ -55,5 +55,4 @@ public interface RetrofitService {
 
     @GET("/api/my/profile")
     Call<UserDataResponse> getUserData();
-
 }
