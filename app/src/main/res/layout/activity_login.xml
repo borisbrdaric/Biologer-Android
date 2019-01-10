@@ -8,7 +8,6 @@
     android:orientation="vertical"
     android:layout_gravity="top"
     android:gravity="top"
-    android:paddingTop="50dp"
     android:background="@color/white">
 
     <LinearLayout
@@ -170,52 +169,52 @@
                 android:onClick="onLogin"
                 android:background="@drawable/roundshapebtn"/>
 
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_gravity="bottom"
-        android:gravity="center"
-        android:paddingBottom="50dp">
-
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal"
-            android:gravity="center">
-
-        <org.biologer.biologer.CustomTextView
-            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="14sp"
-            android:text="@string/nemas_nalog"
-            android:layout_marginEnd="8dp"/>
+            android:orientation="vertical"
+            android:layout_gravity="bottom"
+            android:gravity="center"
+            android:paddingTop="30dp">
 
-        <org.biologer.biologer.CustomTextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="14sp"
-            android:text="@string/napravi_nalog"
-            android:textColor="@color/colorPrimary"
-            android:textStyle="bold"
-            android:clickable="true"
-            android:focusable="true"
-            android:onClick="onRegister"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:gravity="center">
+
+                <org.biologer.biologer.CustomTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp"
+                    android:text="@string/nemas_nalog"
+                    android:layout_marginEnd="8dp"/>
+
+                <org.biologer.biologer.CustomTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp"
+                    android:text="@string/napravi_nalog"
+                    android:textColor="@color/colorPrimary"
+                    android:textStyle="bold"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:onClick="onRegister"/>
+            </LinearLayout>
+
+            <org.biologer.biologer.CustomTextView
+                android:id="@+id/customTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:layout_marginTop="14dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:onClick="onForgotPass"
+                android:text="@string/zaboravljena_lozinka"
+                android:textColor="@color/colorPrimary"
+                android:textStyle="bold"/>
         </LinearLayout>
 
-        <org.biologer.biologer.CustomTextView
-            android:id="@+id/customTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="14sp"
-            android:layout_marginTop="14dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:onClick="onForgotPass"
-            android:text="@string/zaboravljena_lozinka"
-            android:textColor="@color/colorPrimary"
-            android:textStyle="bold"/>
     </LinearLayout>
 </FrameLayout>

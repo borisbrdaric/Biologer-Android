@@ -8,6 +8,11 @@
     android:orientation="vertical"
     tools:context="org.biologer.biologer.EntryActivity">
 
+    <include
+        layout="@layout/toolbar_main"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
     <fragment
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
@@ -18,37 +23,27 @@
         <EditText
             android:id="@+id/et_setAccuracy"
             android:layout_width="180dp"
-            android:layout_height="45dp"
+            android:layout_height="40dp"
             android:hint="@string/accurcy"
             android:inputType="number"
-            android:background="@color/colorPrimaryLight"
-            android:layout_gravity="bottom|start"
+            android:background="@color/white"
+            android:layout_gravity="start|top"
             android:gravity="center"
-            android:layout_marginStart="25dp"
-            android:layout_marginBottom="20dp"/>
-
-        <ImageView
-            android:id="@+id/fbtn_mapType"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_gravity="end|top"
-            android:src="@drawable/ic_map_type"
-            android:layout_marginEnd="20dp"
-            android:layout_marginTop="20dp"
-            android:clickable="true"
-            android:focusable="true"/>
+            android:textSize="12sp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"/>
 
         <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fbtn_set"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_gravity="end|bottom"
-            android:layout_marginTop="20dp"
-            android:layout_marginEnd="20dp"
-            android:layout_marginBottom="20dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/ic_thumb_up_black_24dp"
-            app:backgroundTint="#1d592c"/>
+            android:id="@+id/fbtn_mapType"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            app:fabCustomSize="40dp"
+            android:src="@drawable/ic_layers"
+            android:scaleType="center"
+            android:layout_gravity="end|top"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            app:backgroundTint="@color/white"/>
     </fragment>
 
 

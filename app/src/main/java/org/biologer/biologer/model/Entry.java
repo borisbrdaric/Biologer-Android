@@ -1,14 +1,8 @@
 package org.biologer.biologer.model;
 
-import android.net.Uri;
-
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Generated;
-
-import java.io.Serializable;
-import java.net.URI;
-
 
 /**
  * Created by brjovanovic on 2/22/2018.
@@ -34,7 +28,7 @@ public class Entry {
     private double longitude;
     private Double accuracy;
     private double elevation;
-    private String locationDesc;
+    private String location;
     private String slika1;
     private String slika2;
     private String slika3;
@@ -43,15 +37,16 @@ public class Entry {
     private String data_licence;
     private String image_licence;
     private String time;
+    private String types;
 
-    @Generated(hash = 258120634)
+    @Generated(hash = 1983397767)
     public Entry(Long id, long taxon, String taxon_suggestion, String year,
             String month, String day, String comment, Integer number, String sex,
             Long stage, String deadOrAlive, String causeOfDeath, double lattitude,
-            double longitude, Double accuracy, double elevation,
-            String locationDesc, String slika1, String slika2, String slika3,
-            String projectId, String foundOn, String data_licence,
-            String image_licence, String time) {
+            double longitude, Double accuracy, double elevation, String location,
+            String slika1, String slika2, String slika3, String projectId,
+            String foundOn, String data_licence, String image_licence, String time,
+            String types) {
         this.id = id;
         this.taxon = taxon;
         this.taxon_suggestion = taxon_suggestion;
@@ -68,7 +63,7 @@ public class Entry {
         this.longitude = longitude;
         this.accuracy = accuracy;
         this.elevation = elevation;
-        this.locationDesc = locationDesc;
+        this.location = location;
         this.slika1 = slika1;
         this.slika2 = slika2;
         this.slika3 = slika3;
@@ -77,6 +72,7 @@ public class Entry {
         this.data_licence = data_licence;
         this.image_licence = image_licence;
         this.time = time;
+        this.types = types;
     }
     @Generated(hash = 1759844922)
     public Entry() {
@@ -178,11 +174,11 @@ public class Entry {
     public void setElevation(double elevation) {
         this.elevation = elevation;
     }
-    public String getLocationDesc() {
-        return this.locationDesc;
+    public String getLocation() {
+        return this.location;
     }
-    public void setLocationDesc(String locationDesc) {
-        this.locationDesc = locationDesc;
+    public void setLocation(String location) {
+        this.location = location;
     }
     public String getSlika1() {
         return this.slika1;
@@ -232,5 +228,10 @@ public class Entry {
     public void setTime(String time) {
         this.time = time;
     }
-
+    public String getTypes() {
+        return this.types;
+    }
+    public void setTypes(String types) {
+        this.types = types;
+    }
 }

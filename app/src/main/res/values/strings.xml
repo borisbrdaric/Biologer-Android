@@ -53,7 +53,7 @@
     <string name="choose_picture_gallery">Choose from gallery</string>
     <string name="choose_picture_camera">Take photo by camera</string>
     <!--map-->
-    <string name="accurcy">Enter accuracy</string>
+    <string name="accurcy">Location precision (m)</string>
 
     <!--LandingActivity-->
     <string name="confirmExit">Do you want to exit application?</string>
@@ -109,4 +109,11 @@
     <string name="database_empty">Biologer’s taxa database is not downloaded from the server yet. Ensure that you have a stabile internet connection to continue.</string>
     <string name="contin">Download</string>
     <string name="skip">Skip for now</string>
+    <string name="google_maps_title">Google Map</string>
+    <string name="select_map_type">Select map type</string>
+    <string name="you_are_here">You are here!</string>
+    <string name="normal">Normal</string>
+    <string name="hybrid">Hybrid</string>
+    <string name="terrain">Terrain</string>
+    <string name="sattelite">Sattelite</string>
 </resources>

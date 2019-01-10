@@ -12,7 +12,7 @@ public class SettingsManager {
     private static final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(App.get());
 
     public enum KEY {
-        token, FIRST_LAUNCH, DATABASE_NAME, DATABASE_VERSION
+        token, FIRST_LAUNCH, DATABASE_NAME, DATABASE_VERSION, GOOGLE_MAP_TYPE
     }
 
     public static boolean isFirstLaunch()
@@ -61,5 +61,15 @@ public class SettingsManager {
 
     public static String getToken(){
         return prefs.getString(KEY.token.toString(),null);
+    }
+
+    public static void setGoogleMapType(String google_map_type) {
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString(SettingsManager.KEY.GOOGLE_MAP_TYPE.toString(), google_map_type);
+        editor.apply();
+    }
+
+    public static String getGoogleMapType() {
+        return prefs.getString(KEY.GOOGLE_MAP_TYPE.toString(),"NORMAL");
     }
 }

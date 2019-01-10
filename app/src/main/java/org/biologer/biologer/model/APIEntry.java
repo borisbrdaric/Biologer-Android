@@ -10,7 +10,6 @@ import java.util.List;
 
 public class APIEntry {
 
-
     @JsonProperty("taxon_id")
     private Integer taxonId;
     @JsonProperty("taxon_suggestion")
@@ -55,6 +54,8 @@ public class APIEntry {
     private String imageLicense;
     @JsonProperty("time")
     private String time;
+    @JsonProperty("types")
+    private String types;
 
     @JsonProperty("taxon_id")
     public Integer getTaxonId() {
@@ -274,6 +275,16 @@ public class APIEntry {
     @JsonProperty("time")
     public void setTime(String time) {
         this.time = time;
+    }
+
+    @JsonProperty("types")
+    public String getTypes() {
+        return types;
+    }
+
+    @JsonProperty("types")
+    public void setTypes(String types) {
+        this.types = types;
     }
 
     public static class Photo {

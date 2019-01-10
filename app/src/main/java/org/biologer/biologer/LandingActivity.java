@@ -317,7 +317,7 @@ public class LandingActivity extends AppCompatActivity
         } else {
             apiEntry.setAccuracy((int) entry.getAccuracy());
         }
-        apiEntry.setLocation(entry.getLocationDesc());
+        apiEntry.setLocation(entry.getLocation());
         apiEntry.setElevation((int) entry.getElevation());
         apiEntry.setNote(entry.getComment());
         apiEntry.setSex(entry.getSex());

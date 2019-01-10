@@ -39,7 +39,7 @@
     <string name="confirmExit">Да ли желите да напустите апликацију?</string>
     <string name="choose_picture_camera">Направи слику камером</string>
     <string name="choose_picture_gallery">Изабери слику из галерије</string>
-    <string name="accurcy">Унесите прецизност</string>
+    <string name="accurcy">Прецизност локације (m)</string>
     <string name="wrong_creds">Погрешна е-пошта или лозинка</string>
     <string name="nemas_nalog">Да ли имате налог?</string>
     <string name="napravi_nalog">Региструјте се</string>
@@ -87,4 +87,11 @@
     <string name="contin">Настави</string>
     <string name="skip">Други пут</string>
     <string name="not_available">непознато</string>
+    <string name="google_maps_title">Google карта</string>
+    <string name="select_map_type">Изаберите врсту мапе</string>
+    <string name="you_are_here">Налазите се овде</string>
+    <string name="normal">Уобичајена</string>
+    <string name="hybrid">Хибридна</string>
+    <string name="terrain">Приказ терена</string>
+    <string name="sattelite">Сателитска слика</string>
 </resources>

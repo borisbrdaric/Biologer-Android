@@ -76,7 +76,7 @@
     <string name="unprecise_coordinates">Preciznost lokacije je manja od 25 m. Želite li pričekati na dohvat točnije lokacije? </string>
     <string name="save_anyway">Ipak spremi</string>
     <string name="razvojni_stadijum">Stadij</string>
-    <string name="accurcy">Unesite preciznost</string>
+    <string name="accurcy">Preciznost lokacije (m)</string>
     <string name="updating_database">Nadograđujem bazu taksona…</string>
     <string name="Slide1_title">Database options</string>
     <string name="first_slide">This appliation can connect to multiple Biologer databases. You can start by choosing your prefered database and registering online.</string>
@@ -86,4 +86,11 @@
     <string name="skip">Skip for now</string>
     <string name="note">Here you can update the list of taxa.</string>
     <string name="not_available">nepoznato</string>
+    <string name="google_maps_title">Google mapa</string>
+    <string name="select_map_type">Select map type</string>
+    <string name="you_are_here">You are here!</string>
+    <string name="normal">Normal</string>
+    <string name="hybrid">Hybrid</string>
+    <string name="terrain">Terrain</string>
+    <string name="sattelite">Sattelite</string>
 </resources>
