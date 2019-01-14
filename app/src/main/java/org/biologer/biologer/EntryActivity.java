@@ -68,6 +68,8 @@ import java.util.Locale;
 
 public class EntryActivity extends AppCompatActivity implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
 
+    private static final String TAG = "Biologer.Entry";
+
     private static final int REQUEST_POL = 1001;
     private static final int REQUEST_TAKSON = 1002;
     private static final int REQUEST_RAZVOJNI_STADIJUM = 1003;
@@ -80,15 +82,14 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
 
     private LocationManager locationManager;
     private LocationListener locationListener;
-    private String lattitude = "0", longitude = "0";
+    String latitude = "0", longitude = "0";
     private double elev = 0.0;
     private LatLng nLokacija = new LatLng(0.0, 0.0);
     private Double acc = 0.0;
     private int IMAGE_VIEW = 0;
     private static int mInterval = 5000;
     private static final String IMAGE_DIRECTORY = "/biologer";
-    private int GALLERY = 1, CAMERA = 2;
-    private int MAP = 3;
+    private int GALLERY = 1, CAMERA = 2, MAP = 3;
 
     private TextView tvTakson, tv_gps, tvStage, tv_more, tv_latitude, tv_longitude;
     private CustomEditText et_razlogSmrti, et_komentar, et_brojJedinki;
@@ -195,7 +196,6 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
         acTextView = findViewById(R.id.tvTakson_auto);
         acTextView.setAdapter(adapter);
         acTextView.addTextChangedListener(new TextWatcher() {
-
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (acTextView.getText().toString().length() != 0) {
@@ -210,11 +210,9 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
                     invalidateOptionsMenu();
                 }
             }
-
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
-
             @Override
             public void afterTextChanged(Editable s) {
                 if (acTextView.getText().toString().length() != 0) {
@@ -339,6 +337,10 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
+    /*
+    This calls other functions to get the values, check the validity of
+    the data and to finally save it into the entry
+     */
     private void saveEntry() {
         String naziv = acTextView.getText().toString();
         Taxon taxon = App.get().getDaoSession().getTaxonDao().queryBuilder().where(TaxonDao.Properties.Name.eq(naziv)).unique();
@@ -365,7 +367,9 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
-
+    /*
+    This gathers all the data into the entry
+     */
     private void entrySaver(final Taxon taxon) {
         Stage stage = (tvStage.getTag() != null) ? (Stage) tvStage.getTag() : null;
         String komentar = (et_komentar.getText().toString() != null) ? et_komentar.getText().toString() : "";
@@ -393,7 +397,6 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
         setResult(RESULT_OK);
         finish();
     }
-
 
     private String maleFemale() {
         String sex = "";
@@ -455,10 +458,7 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
 
     private void showMap() {
         Intent intent = new Intent(this, MapActivity.class);
-        intent.putExtra("LAT", lattitude);
-        intent.putExtra("LON", longitude);
-        LatLng loc = nLokacija;
-        intent.putExtra("komplet", loc);
+        intent.putExtra("latlong", nLokacija);
         startActivityForResult(intent, MAP);
     }
 
@@ -588,26 +588,18 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
             Toast.makeText(EntryActivity.this, "Image Saved!", Toast.LENGTH_SHORT).show();
         }
 
+        // Get data from Google MapActivity.java and save it as local variables
         if (requestCode == MAP) {
-            nLokacija = data.getParcelableExtra("nLoc");
+            locationManager.removeUpdates(locationListener);
+            nLokacija = data.getParcelableExtra("google_map_latlong");
             setLocationValues(nLokacija.latitude, nLokacija.longitude);
-            acc = Double.valueOf(data.getExtras().getString("acc"));
-            if (data.getExtras().getString("acc").equals("0.0")) {
+            acc = Double.valueOf(data.getExtras().getString("google_map_accuracy"));
+            elev = Double.valueOf(data.getExtras().getString("google_map_elevation"));
+            if (data.getExtras().getString("google_map_accuracy").equals("0.0")) {
                 tv_gps.setText(R.string.not_available);
             } else {
                 tv_gps.setText(String.format(Locale.ENGLISH, "%.0f", acc));
             }
-            Location map_location = new Location("lokacija");
-            map_location.setLongitude(nLokacija.latitude);
-            map_location.setLongitude(nLokacija.longitude);
-            try {
-                GoogleElevation.getElevation(map_location, this);
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            elev = map_location.getAltitude();
         }
     }
 
@@ -721,16 +713,14 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(EntryActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION);
         } else {
-
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, time, distance, locationListener);
-
         }
     }
 
     private void setLocationValues(double latti, double longi) {
-        lattitude = String.format(Locale.ENGLISH, "%.4f", (latti));
+        latitude = String.format(Locale.ENGLISH, "%.4f", (latti));
         longitude = String.format(Locale.ENGLISH, "%.4f", (longi));
-        tv_latitude.setText(lattitude);
+        tv_latitude.setText(latitude);
         tv_longitude.setText(longitude);
     }
 

@@ -20,7 +20,6 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -107,6 +106,7 @@ public class LandingActivity extends AppCompatActivity
         ft.commit();
 
         updateTaxa();
+        updateLicense();
     }
 
     // Send a short request to the server that will return if the taxonomic tree is up to date.
@@ -135,9 +135,51 @@ public class LandingActivity extends AppCompatActivity
             public void onFailure(Call<TaksoniResponse> call, Throwable t) {
                 // Inform the user on failure and write log message
                 //Toast.makeText(LandingActivity.this, getString(R.string.database_connect_error), Toast.LENGTH_LONG).show();
-                Log.e("Taxa database: ", "Application could not get data from a server!");
+                Log.e("Taxa database: ", "Application could not get taxon version data from a server!");
             }
         });
+    }
+
+    // Check if user selected custom Data and Image Licenses. If not, update them from the server.
+    private void updateLicense() {
+        if (SettingsManager.getCustomDataLicense().equals("0") || SettingsManager.getCustomImageLicense().equals("0")) {
+            // Get User data from a local database
+            List<UserData> list = App.get().getDaoSession().getUserDataDao().loadAll();
+            UserData userdata = list.get(0);
+            final Long uid = userdata.getId();
+            final int data_license_local = userdata.getData_license();
+            final int image_license_local = userdata.getImage_license();
+            // Get User data from a server
+            Call<UserDataResponse> call = App.get().getService().getUserData();
+            call.enqueue(new Callback<UserDataResponse>() {
+                @Override
+                public void onResponse(Call<UserDataResponse> call, Response<UserDataResponse> response) {
+                    String email = response.body().getData().getEmail();
+                    String name = response.body().getData().getFullName();
+                    int data_license = response.body().getData().getSettings().getDataLicense();
+                    int image_license = response.body().getData().getSettings().getImageLicense();
+                    // If both data and image licence should be retrieved from server
+                    if (SettingsManager.getCustomDataLicense().equals("0") && SettingsManager.getCustomImageLicense().equals("0")) {
+                        UserData uData = new UserData(uid, email, name, data_license, image_license);
+                        App.get().getDaoSession().getUserDataDao().insertOrReplace(uData);
+                    }
+                    // If only Data License should be retreived from server
+                    if (SettingsManager.getCustomDataLicense().equals("0") && !SettingsManager.getCustomImageLicense().equals("0")) {
+                        UserData uData = new UserData(uid, email, name, data_license, image_license_local);
+                        App.get().getDaoSession().getUserDataDao().insertOrReplace(uData);
+                    }
+                    // If only Image License should be retreived from server
+                    if (!SettingsManager.getCustomDataLicense().equals("0") && SettingsManager.getCustomImageLicense().equals("0")) {
+                        UserData uData = new UserData(uid, email, name, data_license_local, image_license);
+                        App.get().getDaoSession().getUserDataDao().insertOrReplace(uData);
+                    }
+                }
+                @Override
+                public void onFailure(Call<UserDataResponse> call, Throwable t) {
+                    Log.e("Taxa database: ", "Application could not get user data from a server!");
+                }
+            });
+        }
     }
 
     @Override
@@ -146,10 +188,9 @@ public class LandingActivity extends AppCompatActivity
         android.support.v4.app.Fragment fragment = null;
         Intent intent = null;
 
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+
         switch (id) {
-            case R.id.nav_setup:
-                fragment = new SetupFragment();
-                break;
             case R.id.nav_about:
                 fragment = new AboutFragment();
                 break;
@@ -160,8 +201,14 @@ public class LandingActivity extends AppCompatActivity
                 fragment = new LogoutFragment();
                 break;
             case R.id.nav_help:
-                Intent intent1 = new Intent(LandingActivity.this, IntroActivity.class);
-                startActivity(intent1);
+                startActivity(new Intent(LandingActivity.this, IntroActivity.class));
+                finish();
+                drawer.closeDrawer(GravityCompat.START);
+                return true;
+            case R.id.nav_setup:
+                startActivity(new Intent(LandingActivity.this, SetupActivity.class));
+                drawer.closeDrawer(GravityCompat.START);
+                return true;
             default:
                 fragment = new LandingFragment();
         }
@@ -178,7 +225,6 @@ public class LandingActivity extends AppCompatActivity
 
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }

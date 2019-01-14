@@ -97,7 +97,7 @@
 
     <!--First time run-->
     <string name="Slide1_title">Database options</string>
-    <string name="first_slide">This appliation can connect to multiple Biologer databases. You can start by choosing your prefered database and registering online.</string>
+    <string name="first_slide">This appliation can connect to multiple Biologer databases. You can start by choosing your preferred database and registering online.</string>
     <string name="Slide2_title">Navigation is easy</string>
     <string name="second_slide">Side panel provides all the shortcuts you need and setup your application.</string>
     <string name="Slide3_title">The main screen</string>
@@ -115,5 +115,14 @@
     <string name="normal">Normal</string>
     <string name="hybrid">Hybrid</string>
     <string name="terrain">Terrain</string>
-    <string name="sattelite">Sattelite</string>
+    <string name="sattelite">Satellite</string>
+    <string name="title_setup_activity">Biologer Setup</string>
+    <string name="license10">Free (CC BY-SA 4.0)</string>
+    <string name="license_default">Get from Biologer server</string>
+    <string name="license20">Free, noncomertial (CC BY-NC-SA 4.0)</string>
+    <string name="license30">Partially open</string>
+    <string name="license40">Closed</string>
+    <string name="setup_title">Setup Biologer</string>
+    <string name="choose_dlicense">Choose different license for your data</string>
+    <string name="choose_ilicense">Choose different license for your images</string>
 </resources>

@@ -94,4 +94,13 @@
     <string name="hybrid">Хибридна</string>
     <string name="terrain">Приказ терена</string>
     <string name="sattelite">Сателитска слика</string>
+    <string name="title_setup_activity">Подешавања Биологера</string>
+    <string name="license10">Слободна (CC BY-SA 4.0)</string>
+    <string name="license_default">Get from Biologer server</string>
+    <string name="license20">Слободна, некомерцијална (CC BY-NC-SA 4.0)</string>
+    <string name="license30">Делимично отворена</string>
+    <string name="license40">Затворена</string>
+    <string name="setup_title">Подешавања биологера</string>
+    <string name="choose_dlicense">Изаберите другачију лиценцу за податке</string>
+    <string name="choose_ilicense">Изаберите другачију лиценцу за слике</string>
 </resources>

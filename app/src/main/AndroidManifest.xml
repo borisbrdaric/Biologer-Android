@@ -27,14 +27,13 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
         <uses-library
             android:name="org.apache.http.legacy"
             android:required="false" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyB_LNOvpi3XK6U3eU2IoAtCrlcr_pjqkro" />
+            android:value="AIzaSyDsLjNreiHg47Mif-CheIYB3uGtXQekTtY" />
 
         <provider
             android:name="android.support.v4.content.FileProvider"
@@ -54,6 +53,9 @@
                 android:value="org.biologer.biologer.EntryActivity" />
         </activity>
         <activity
+            android:name=".SetupActivity"
+            android:label="@string/title_setup_activity" />
+        <activity
             android:name=".EntryActivity"
             android:windowSoftInputMode="stateAlwaysHidden|adjustResize">
             <meta-data
@@ -63,15 +65,26 @@
         <activity android:name=".SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name=".LoginActivity"
             android:windowSoftInputMode="stateAlwaysHidden|adjustResize" />
-        <activity android:name=".LandingActivity"
-            android:launchMode="singleTask"/>
+        <activity
+            android:name=".LandingActivity"
+            android:launchMode="singleTask">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:scheme="https"
+                    android:host="biologer.org" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".DetailActivity"
             android:windowSoftInputMode="stateAlwaysHidden|adjustResize">
@@ -79,7 +92,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="org.biologer.biologer.LandingActivity" />
         </activity>
-        <activity android:name=".IntroActivity"/>
+        <activity android:name=".IntroActivity" />
 
         <provider
             android:name="android.support.v4.content.FileProvider"
@@ -88,9 +101,7 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths">
-
-            </meta-data>
+                android:resource="@xml/file_paths"/>
         </provider>
 
     </application>

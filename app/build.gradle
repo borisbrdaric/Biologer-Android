@@ -3,8 +3,8 @@ apply plugin: 'org.greenrobot.greendao'
 
 repositories {
     mavenCentral()
-    maven {url 'https://maven.google.com'}
-    maven {url 'https://jitpack.io'}
+    maven { url 'https://maven.google.com' }
+    maven { url 'https://jitpack.io' }
     jcenter()
 }
 
@@ -16,8 +16,8 @@ android {
         // API level 21 = Android 5.0
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 8
-        versionName "0.4.2"
+        versionCode 9
+        versionName "0.4.3"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 

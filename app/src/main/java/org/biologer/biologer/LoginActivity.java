@@ -152,7 +152,6 @@ public class LoginActivity extends AppCompatActivity {
         serv.enqueue(new Callback<UserDataResponse>() {
             @Override
             public void onResponse(Call<UserDataResponse> serv, Response<UserDataResponse> response) {
-                App.get().getDaoSession().getUserDataDao().deleteAll();
                 String email = response.body().getData().getEmail();
                 String name = response.body().getData().getFullName();
                 int data_license = response.body().getData().getSettings().getDataLicense();

@@ -24,7 +24,7 @@ public class SplashActivity extends AppCompatActivity {
             public void run() {
 
                 if (prefs.getBoolean("firstrun", true)){
-                    prefs.edit().putBoolean("firstrun", false).commit();
+                    prefs.edit().putBoolean("firstrun", false).apply();
                     Intent intent = new Intent(SplashActivity.this, IntroActivity.class);
                     startActivity(intent);
                 }

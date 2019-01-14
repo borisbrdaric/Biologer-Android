@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -22,15 +23,30 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+
+import javax.net.ssl.HttpsURLConnection;
+
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
+
+    private static final String TAG = "Biologer.GoogleMaps";
 
     private GoogleMap mMap;
     private String acc = "0.0";
+    private String elevation = "0.0";
     private FloatingActionButton fbtn_set;
-    private ImageView fbtn_mapType;
-    private EditText et_acc;
-    private LatLng komplet;
+    ImageView fbtn_mapType;
+    private EditText text_imput_acc;
+    private LatLng latlong;
     String google_map_type = SettingsManager.getGoogleMapType();
+    private static final int cTimeOutMs = 30 * 1000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,10 +60,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setTitle(R.string.google_maps_title);
 
-        et_acc = findViewById(R.id.et_setAccuracy);
+        text_imput_acc = findViewById(R.id.et_setAccuracy);
 
         Bundle bundle = getIntent().getExtras();
-        komplet = bundle.getParcelable("komplet");
+        latlong = bundle.getParcelable("latlong");
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -61,6 +77,16 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 showMapTypeSelectorDialog();
             }
         });
+    }
+
+    // Add Save button in the right part of the toolbar
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.save_menu, menu);
+        MenuItem item = menu.findItem(R.id.action_save);
+        item.getIcon().setAlpha(255);
+        return true;
     }
 
     @Override
@@ -78,12 +104,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
         }
 
-
         if (mMap != null) {
-            // Dodaj marker - trenutna lokacija
-            LatLng lokacija = new LatLng(komplet.latitude, komplet.longitude);
-            mMap.addMarker(new MarkerOptions().position(lokacija).title(getString(R.string.you_are_here)).draggable(true));
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(lokacija, 16));
+            // Add marker at the GPS position on the map
+            mMap.addMarker(new MarkerOptions().position(latlong).title(getString(R.string.you_are_here)).draggable(true));
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latlong, 16));
             mMap.animateCamera(CameraUpdateFactory.zoomIn());
             mMap.animateCamera(CameraUpdateFactory.zoomTo(16), 1000, null);
 
@@ -98,7 +122,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
                 @Override
                 public void onMarkerDragEnd(Marker marker) {
-                    setKomplet(marker.getPosition().latitude, marker.getPosition().longitude);
+                    setlatlong(marker.getPosition().latitude, marker.getPosition().longitude);
                 }
 
             });
@@ -141,16 +165,16 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                         // Perform an action depending on which item was selected.
                         switch (item) {
                             case 1:
-                                mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
-                                SettingsManager.setGoogleMapType("SATELLITE");
+                                mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+                                SettingsManager.setGoogleMapType("HYBRID");
                                 break;
                             case 2:
                                 mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
                                 SettingsManager.setGoogleMapType("TERRAIN");
                                 break;
                             case 3:
-                                mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
-                                SettingsManager.setGoogleMapType("HYBRID");
+                                mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+                                SettingsManager.setGoogleMapType("SATELLITE");
                                 break;
                             default:
                                 mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
@@ -167,18 +191,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         fMapTypeDialog.show();
     }
 
-    // Add Save button in the right part of the toolbar
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu){
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.save_menu, menu);
-        MenuItem item = menu.findItem(R.id.action_save);
-        item.getIcon().setAlpha(255);
-        return true;
-    }
-
-
-    // Process running after clicking the toolbar buttons
+    // Process running after clicking the toolbar buttons (back and save)
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
         int id = item.getItemId();
@@ -187,16 +200,100 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             return true;
         }
         if (id == R.id.action_save) {
-            Intent _result = new Intent();
-            if (et_acc.getText().toString().length() != 0) {
-                setAcc(et_acc.getText().toString());
+            // Get the accuracy value from the text field
+            if (text_imput_acc.getText().toString().length() != 0) {
+                setAcc(text_imput_acc.getText().toString());
             }
-            _result.putExtra("acc", acc);
-            _result.putExtra("nLoc", komplet);
-            setResult(3, _result);
+            // Get the elevation data form Google Elevation API
+            try {
+                getElevation(latlong);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            // Foward the result to previous Activity
+            Intent returnLocation = new Intent();
+            returnLocation.putExtra("google_map_accuracy", acc);
+            returnLocation.putExtra("google_map_latlong", latlong);
+            returnLocation.putExtra("google_map_elevation", elevation);
+            setResult(3, returnLocation);
+
+            Log.d(TAG, "Latitude: " + latlong.latitude);
+            Log.d(TAG, "Longitude: " + latlong.longitude);
+            Log.d(TAG, "Accuracy: " + acc);
+            Log.d(TAG, "Elevation: " + elevation);
+
             finish();
         }
         return true;
+    }
+
+    // This function calls Google Elevation API
+    public void getElevation(LatLng location) throws IOException, JSONException {
+
+        final URL url = new URL("https://maps.googleapis.com/maps/api/elevation/json?locations=" +
+                String.valueOf(location.latitude) + "," +
+                String.valueOf(location.longitude) +
+                "&key=AIzaSyDsLjNreiHg47Mif-CheIYB3uGtXQekTtY");
+        Log.d(TAG, "url=" + url);
+
+        Thread query_altitude = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
+
+                    urlConnection.setConnectTimeout(cTimeOutMs);
+                    urlConnection.setReadTimeout(cTimeOutMs);
+                    urlConnection.setRequestProperty("Accept", "application/json");
+
+                    // Set request type
+                    urlConnection.setRequestMethod("GET");
+                    urlConnection.setDoOutput(false);
+                    urlConnection.setDoInput(true);
+
+                    // Check for errors
+                    int code = urlConnection.getResponseCode();
+                    Log.d(TAG, "Response code: " + String.valueOf(code));
+                    if (code != HttpsURLConnection.HTTP_OK)
+                        throw new IOException("HTTP error " + urlConnection.getResponseCode());
+
+                    // Get response
+                    BufferedReader br = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                    StringBuilder json = new StringBuilder();
+                    String line;
+                    while ((line = br.readLine()) != null)
+                        json.append(line);
+                    Log.d(TAG, json.toString());
+
+                    // Decode result
+                    JSONObject jroot = new JSONObject(json.toString());
+                    String status = jroot.getString("status");
+                    if ("OK".equals(status)) {
+                        JSONArray results = jroot.getJSONArray("results");
+                        if (results.length() > 0) {
+                            elevation = results.getJSONObject(0).getString("elevation");
+                            Log.i(TAG, "Server returned elevation of: " + elevation + "m.");
+                        } else
+                            throw new IOException("JSON no results");
+                    } else
+                        throw new JSONException("JSON status " + status);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        query_altitude.start();
+
+        // Wait until we get the altitude...
+        try {
+            query_altitude.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     public String getAcc() {
@@ -207,11 +304,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         this.acc = acc;
     }
 
-    public LatLng getKomplet() {
-        return komplet;
+    public LatLng getlatlong() {
+        return latlong;
     }
 
-    public void setKomplet(double lat, double lon) {
-        this.komplet = new LatLng(lat, lon);
+    public void setlatlong(double lat, double lon) {
+        this.latlong = new LatLng(lat, lon);
     }
 }

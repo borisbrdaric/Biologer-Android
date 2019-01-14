@@ -80,16 +80,4 @@
         app:headerLayout="@layout/nav_header"
         app:menu="@menu/menu_nav" />
 
-    <!--<View-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="match_parent"-->
-    <!--android:background="#108cb38b">-->
-
-    <!--<ProgressBar-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--/>-->
-    <!--</View>-->
-
-
 </android.support.v4.widget.DrawerLayout>

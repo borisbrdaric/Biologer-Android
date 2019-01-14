@@ -93,4 +93,13 @@
     <string name="hybrid">Hybrid</string>
     <string name="terrain">Terrain</string>
     <string name="sattelite">Sattelite</string>
+    <string name="title_setup_activity">Biologer Setup</string>
+    <string name="license10">Free (CC BY-SA 4.0)</string>
+    <string name="license_default">Get from Biologer server</string>
+    <string name="license20">Free, noncomertial (CC BY-NC-SA 4.0)</string>
+    <string name="license30">Partially open</string>
+    <string name="license40">Closed</string>
+    <string name="setup_title">Setup Biologer</string>
+    <string name="choose_dlicense">Choose different license for your data</string>
+    <string name="choose_ilicense">Choose different license for your images</string>
 </resources>

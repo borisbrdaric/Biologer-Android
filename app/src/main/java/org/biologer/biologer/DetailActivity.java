@@ -60,6 +60,8 @@ import java.util.Locale;
 
 public class DetailActivity extends AppCompatActivity implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
 
+    private static final String TAG = "Biologer.EntryDetails";
+
     private static final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL = 1005;
     private static final int MY_PERMISSIONS_REQUEST_CAMERA = 1006;
     private static final int REQUEST_LOCATION = 1;
@@ -71,8 +73,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
     private double elev = 0.0;
     private int IMAGE_VIEW = 0;
     private static final String IMAGE_DIRECTORY = "/biologer";
-    private int GALLERY = 1, CAMERA = 2;
-    private int MAP = 3;
+    private int GALLERY = 1, CAMERA = 2, MAP = 3;
 
     private TextView tv_gps, tvStage, tv_more, tv_latitude, tv_longitude;
     private CustomEditText et_razlogSmrti, et_komentar, et_brojJedinki;
@@ -470,10 +471,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 
     private void showMap() {
         Intent intent = new Intent(this, MapActivity.class);
-        intent.putExtra("LAT", lattitude);
-        intent.putExtra("LON", longitude);
-        LatLng loc = nLokacija;
-        intent.putExtra("komplet", loc);
+        intent.putExtra("latlong", nLokacija);
         startActivityForResult(intent, MAP);
     }
 
@@ -611,11 +609,15 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 
             Toast.makeText(DetailActivity.this, "Image Saved!", Toast.LENGTH_SHORT).show();
         }
+
+        // Get data from Google MapActivity.java and save it as local variables
         if (requestCode == MAP) {
-            nLokacija = data.getParcelableExtra("nLoc");
+            locationManager.removeUpdates(locationListener);
+            nLokacija = data.getParcelableExtra("google_map_latlong");
             setLocationValues(nLokacija.latitude, nLokacija.longitude);
-            acc = Double.valueOf(data.getExtras().getString("acc"));
-            if (data.getExtras().getString("acc").equals("")) {
+            acc = Double.valueOf(data.getExtras().getString("google_map_accuracy"));
+            elev = Double.valueOf(data.getExtras().getString("google_map_elevation"));
+            if (data.getExtras().getString("google_map_accuracy").equals("0.0")) {
                 tv_gps.setText(R.string.not_available);
             } else {
                 tv_gps.setText(String.format(Locale.ENGLISH, "%.0f", acc));
