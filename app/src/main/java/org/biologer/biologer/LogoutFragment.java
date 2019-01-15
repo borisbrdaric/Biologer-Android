@@ -1,14 +1,12 @@
 package org.biologer.biologer;
 
-import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.AppCompatButton;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.TextView;
 
 import com.auth0.android.jwt.JWT;
@@ -20,7 +18,7 @@ import java.util.List;
 
 public class LogoutFragment extends Fragment {
 
-    private CustomButton btn_logout;
+    private AppCompatButton btn_logout;
     private TextView tv_username;
     private TextView tv_email;
     private TextView tv_database;

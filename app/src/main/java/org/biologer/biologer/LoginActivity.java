@@ -14,7 +14,6 @@ import android.widget.TextView;
 import org.biologer.biologer.model.LoginResponse;
 import org.biologer.biologer.model.UserData;
 import org.biologer.biologer.model.network.UserDataResponse;
-import org.biologer.biologer.model.network.UserSettings;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
