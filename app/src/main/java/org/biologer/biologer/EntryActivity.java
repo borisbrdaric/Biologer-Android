@@ -120,13 +120,14 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_entry);
+
+        // Add a toolbar to the Activity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        // Ovo dodaje dugme za nazad u traku sa alatima
+        getSupportActionBar().setTitle(R.string.entry_title);
+        // Add the back button to the toolbar
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-        getSupportActionBar().setTitle(R.string.entry_title);
 
         //liste taksona i stage-ova iz baze
         taksoni = (ArrayList<Taxon>) App.get().getDaoSession().getTaxonDao().loadAll();
