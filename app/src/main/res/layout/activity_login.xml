@@ -153,7 +153,7 @@
                 android:textColor="@color/colorPrimaryDark"/>
         </LinearLayout>
 
-            <org.biologer.biologer.CustomButton
+            <android.support.v7.widget.AppCompatButton
                 android:id="@+id/btn_login"
                 android:layout_width="wrap_content"
                 android:layout_height="36dp"
@@ -165,7 +165,6 @@
                 android:textAllCaps="true"
                 android:textSize="14sp"
                 android:textColor="@color/white"
-                android:textAppearance="@style/Base.TextAppearance.AppCompat.Large"
                 android:onClick="onLogin"
                 android:background="@drawable/roundshapebtn"/>
 

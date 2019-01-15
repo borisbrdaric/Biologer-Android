@@ -6,13 +6,17 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import org.biologer.biologer.model.Taxon;
+import org.biologer.biologer.model.TaxonDao;
 import org.biologer.biologer.model.UserData;
 import org.biologer.biologer.model.network.UserDataResponse;
 
@@ -25,8 +29,11 @@ import retrofit2.Response;
 
 public class SetupActivity extends AppCompatActivity {
 
+    private static final String TAG = "Biologer.Setup";
+
     ProgressBar progressBarTaxa;
     private int oldProgress = 0;
+    EditText projectName;
 
     // Get the user data from Dao database
     List<UserData> list = App.get().getDaoSession().getUserDataDao().loadAll();
@@ -49,6 +56,11 @@ public class SetupActivity extends AppCompatActivity {
 
         progressBarTaxa = findViewById(R.id.progress_bar_taxa);
         Button btn = findViewById(R.id.btn);
+        projectName = findViewById(R.id.project_name);
+
+        // Get project name for the Entry
+        projectName.setText(SettingsManager.getProjectName());
+
 
         // Fill in the data for Data and Image Licenses
         List<String> dataLicenses =  new ArrayList<String>();
@@ -200,4 +212,27 @@ public class SetupActivity extends AppCompatActivity {
         });
     }
 
+    // Proces running after clicking the toolbar buttons
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
+        int id = item.getItemId();
+        if (id == android.R.id.home) {
+            this.onBackPressed();
+        }
+        return true;
+    }
+
+    // Save preferences on leaving the Setup screen
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        String project_name = projectName.getText().toString();
+        if (project_name.equals("")) {
+            SettingsManager.setProjectName(null);
+        } else {
+            SettingsManager.setProjectName(project_name);
+        }
+        Log.d(TAG, "Project name is set to: " + project_name);
+        finish();
+    }
 }

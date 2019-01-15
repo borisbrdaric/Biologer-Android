@@ -103,4 +103,6 @@
     <string name="setup_title">Подешавања биологера</string>
     <string name="choose_dlicense">Изаберите другачију лиценцу за податке</string>
     <string name="choose_ilicense">Изаберите другачију лиценцу за слике</string>
+    <string name="choose_project">Да ли подаци припадају пројекту?</string>
+    <string name="project_name">Назив пројекта</string>
 </resources>

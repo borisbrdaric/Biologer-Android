@@ -59,7 +59,7 @@
             android:layout_marginBottom="24dp"
             android:gravity="center"/>
 
-        <org.biologer.biologer.CustomButton
+        <android.support.v7.widget.AppCompatButton
             android:id="@+id/btn_logout"
             android:layout_width="wrap_content"
             android:layout_height="36dp"

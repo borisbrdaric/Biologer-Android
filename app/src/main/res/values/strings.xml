@@ -125,4 +125,6 @@
     <string name="setup_title">Setup Biologer</string>
     <string name="choose_dlicense">Choose different license for your data</string>
     <string name="choose_ilicense">Choose different license for your images</string>
+    <string name="choose_project">Does the data belong to a project?</string>
+    <string name="project_name">Project name</string>
 </resources>

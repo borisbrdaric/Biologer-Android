@@ -114,6 +114,8 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
     private int user_data_license = userdata.getData_license();
     private int user_image_license = userdata.getImage_license();
 
+    String project_name = SettingsManager.getProjectName();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -391,7 +393,7 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
         Entry entry1 = new Entry(null, taxon_id, taxon_name, year, month, day,
                 komentar, brojJedinki, maleFemale(), selectedStage, String.valueOf(!check_dead.isChecked()), razlogSmrti,
                 nLokacija.latitude, nLokacija.longitude, acc, elev, "", slika1, slika2, slika3,
-                "", "", String.valueOf(user_data_license), String.valueOf(user_image_license), time, "1,2,3");
+                project_name, "", String.valueOf(user_data_license), String.valueOf(user_image_license), time, "1,2,3");
         App.get().getDaoSession().getEntryDao().insertOrReplace(entry1);
         Toast.makeText(this, getString(R.string.saved), Toast.LENGTH_SHORT).show();
         setResult(RESULT_OK);

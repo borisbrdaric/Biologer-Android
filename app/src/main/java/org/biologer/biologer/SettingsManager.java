@@ -12,7 +12,7 @@ public class SettingsManager {
     private static final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(App.get());
 
     public enum KEY {
-        token, FIRST_LAUNCH, DATABASE_NAME, DATABASE_VERSION, GOOGLE_MAP_TYPE, CUSTOM_DATA_LICENSE, CUSTOM_IMAGE_LICENSE
+        token, FIRST_LAUNCH, DATABASE_NAME, DATABASE_VERSION, GOOGLE_MAP_TYPE, CUSTOM_DATA_LICENSE, CUSTOM_IMAGE_LICENSE, PROJECT_NAME
     }
 
     public static boolean isFirstLaunch()
@@ -91,5 +91,15 @@ public class SettingsManager {
 
     public static String getCustomImageLicense() {
         return prefs.getString(KEY.CUSTOM_IMAGE_LICENSE.toString(),"0");
+    }
+
+    public static void setProjectName(String project_name) {
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString(KEY.PROJECT_NAME.toString(), project_name);
+        editor.apply();
+    }
+
+    public static String getProjectName() {
+        return prefs.getString(KEY.PROJECT_NAME.toString(),null);
     }
 }

@@ -21,6 +21,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="4dp">
         <ProgressBar
             android:id="@+id/progress_bar_taxa"
             style="?android:attr/progressBarStyleHorizontal"
@@ -29,36 +32,53 @@
             android:layout_gravity="center_horizontal"
             android:background="@color/colorPrimaryLight"
             android:visibility="gone" />
+        </FrameLayout>
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="280dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp"
-            android:layout_gravity="start"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
+            android:layout_gravity="center"
             android:text="@string/choose_dlicense" />
 
         <android.support.v7.widget.AppCompatSpinner
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
+            android:layout_width="280dp"
+            android:layout_height="56dp"
             android:id="@+id/spinner_data_license">
         </android.support.v7.widget.AppCompatSpinner>
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="280dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp"
-            android:layout_gravity="start"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
+            android:layout_gravity="center"
             android:text="@string/choose_ilicense" />
 
         <android.support.v7.widget.AppCompatSpinner
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
+            android:layout_width="280dp"
+            android:layout_height="56dp"
             android:id="@+id/spinner_image_license">
         </android.support.v7.widget.AppCompatSpinner>
+
+
+        <TextView
+            android:layout_width="280dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
+            android:layout_gravity="center"
+            android:text="@string/choose_project" />
+
+        <android.support.v7.widget.AppCompatEditText
+            android:id="@+id/project_name"
+            android:layout_width="280dp"
+            android:layout_height="56dp"
+            android:hint="@string/project_name" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -69,7 +89,7 @@
             android:gravity="center"
             android:text="@string/note" />
 
-        <Button
+        <android.support.v7.widget.AppCompatButton
             android:id="@+id/btn"
             android:layout_width="wrap_content"
             android:layout_height="36dp"
