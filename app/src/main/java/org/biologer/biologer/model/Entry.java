@@ -35,17 +35,17 @@ public class Entry {
     private String projectId;
     private String foundOn;
     private String data_licence;
-    private String image_licence;
+    private int image_licence;
     private String time;
     private String types;
 
-    @Generated(hash = 1983397767)
+    @Generated(hash = 1008274762)
     public Entry(Long id, long taxon, String taxon_suggestion, String year,
             String month, String day, String comment, Integer number, String sex,
             Long stage, String deadOrAlive, String causeOfDeath, double lattitude,
             double longitude, Double accuracy, double elevation, String location,
             String slika1, String slika2, String slika3, String projectId,
-            String foundOn, String data_licence, String image_licence, String time,
+            String foundOn, String data_licence, int image_licence, String time,
             String types) {
         this.id = id;
         this.taxon = taxon;
@@ -77,7 +77,6 @@ public class Entry {
     @Generated(hash = 1759844922)
     public Entry() {
     }
-    
     public Long getId() {
         return this.id;
     }
@@ -216,10 +215,10 @@ public class Entry {
     public void setData_licence(String data_licence) {
         this.data_licence = data_licence;
     }
-    public String getImage_licence() {
+    public int getImage_licence() {
         return this.image_licence;
     }
-    public void setImage_licence(String image_licence) {
+    public void setImage_licence(int image_licence) {
         this.image_licence = image_licence;
     }
     public String getTime() {

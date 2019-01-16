@@ -374,11 +374,11 @@ public class LandingActivity extends AppCompatActivity
         apiEntry.setFoundDead(entry.getDeadOrAlive().equals("true") ? 0 : 1);
         apiEntry.setFoundDeadNote(entry.getCauseOfDeath());
         apiEntry.setDataLicense(entry.getData_licence());
-        apiEntry.setImageLicense(entry.getImage_licence());
         apiEntry.setTime(entry.getTime());
         for (int i = 0; i < n; i++) {
             APIEntry.Photo p = new APIEntry.Photo();
             p.setPath(slike.get(i));
+            p.setLicense(entry.getImage_licence());
             photos.add(p);
         }
         apiEntry.setPhotos(photos);

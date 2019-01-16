@@ -412,16 +412,6 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         Long selectedStage = (stage != null) ? stage.getStageId() : null;
         String razlogSmrti = (et_razlogSmrti.getText() != null) ? et_razlogSmrti.getText().toString() : "";
 
-        calendar = Calendar.getInstance();
-        simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-        String fullDate = simpleDateFormat.format(calendar.getTime());
-        String day = fullDate.substring(0, 2);
-        String month = fullDate.substring(3, 5);
-        String year = fullDate.substring(6, 10);
-        String time = fullDate.substring(11, 16);
-        long taxon_id = taxon.getId();
-        String taxon_name = taxon.getName();
-
         currentItem.setTaxon(taxon.getId());
         currentItem.setTaxon_suggestion(taxon.getName().toString());
         currentItem.setComment(komentar);

@@ -16,8 +16,8 @@ android {
         // API level 21 = Android 5.0
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 9
-        versionName "0.4.3"
+        versionCode 10
+        versionName "0.4.4"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
@@ -66,7 +66,7 @@ android {
 
 //ako menjam strukturu baze povecam verziju za 1
 greendao {
-    schemaVersion 110
+    schemaVersion 111
 }
 
 dependencies {

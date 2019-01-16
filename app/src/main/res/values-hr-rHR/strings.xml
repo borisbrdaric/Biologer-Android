@@ -50,7 +50,7 @@
     <string name="gps_update"><b>Upozorenje:</b> Ovaj potez će upisati nove podatke o lokaciji umjesto originalnih podataka. Jeste li sigurni da to želite?</string>
     <string name="nav_open_drawer">Otvori navigacijsku površinu</string>
     <string name="nav_close_drawer">Zatvori navigacijsku površinu</string>
-    <string name="button_update">Ažuriraj podatke</string>
+    <string name="button_update">Ažuriraj taksone</string>
     <string name="textAbout">Biologer je aplikacija koju pokreće slobodan softver, izdan je pod MIT licencom i napravljen kako bi prikupljao podatke o bioraznolikosti na području Istočne Europe.</string>
     <string name="Slide3_title">Početni zaslon</string>
     <string name="textAbout1">Biologer je razvijen zahvaljujući sredstvima Rufford fondacije za male grantove (projekti br. 20507-B i 24652-B) i MAVA fondacije (projekat br. 15097).</string>

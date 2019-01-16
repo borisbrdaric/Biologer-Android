@@ -88,7 +88,7 @@
 
     <!--Setup-->
     <string name="note">Here you can update the list of taxa.</string>
-    <string name="button_update">Update data</string>
+    <string name="button_update">Update taxa</string>
     <string name="database_updated">Taxon database is updated.</string>
     <string name="database_connect_error">Application was unable to connect with database!</string>
 

@@ -51,7 +51,7 @@ public class APIEntry {
     @JsonProperty("data_license")
     private String dataLicense;
     @JsonProperty("image_license")
-    private String imageLicense;
+    private int imageLicense;
     @JsonProperty("time")
     private String time;
     @JsonProperty("types")
@@ -257,16 +257,6 @@ public class APIEntry {
         this.dataLicense = dataLicense;
     }
 
-    @JsonProperty("image_license")
-    public String getImageLicense() {
-        return imageLicense;
-    }
-
-    @JsonProperty("image_license")
-    public void setImageLicense(String imageLicense) {
-        this.imageLicense = imageLicense;
-    }
-
     @JsonProperty("time")
     public String getTime() {
         return time;
@@ -300,6 +290,19 @@ public class APIEntry {
         @JsonProperty("path")
         public void setPath(String path) {
             this.path = path;
+        }
+
+        @JsonProperty("license")
+        private int license;
+
+        @JsonProperty("license")
+        public int getLicense() {
+            return license;
+        }
+
+        @JsonProperty("license")
+        public void setLicense(int license) {
+            this.license = license;
         }
 
     }
