@@ -37,16 +37,14 @@ public class Entry {
     private String data_licence;
     private int image_licence;
     private String time;
-    private String types;
 
-    @Generated(hash = 1008274762)
+    @Generated(hash = 1480829414)
     public Entry(Long id, long taxon, String taxon_suggestion, String year,
             String month, String day, String comment, Integer number, String sex,
             Long stage, String deadOrAlive, String causeOfDeath, double lattitude,
             double longitude, Double accuracy, double elevation, String location,
             String slika1, String slika2, String slika3, String projectId,
-            String foundOn, String data_licence, int image_licence, String time,
-            String types) {
+            String foundOn, String data_licence, int image_licence, String time) {
         this.id = id;
         this.taxon = taxon;
         this.taxon_suggestion = taxon_suggestion;
@@ -72,7 +70,6 @@ public class Entry {
         this.data_licence = data_licence;
         this.image_licence = image_licence;
         this.time = time;
-        this.types = types;
     }
     @Generated(hash = 1759844922)
     public Entry() {
@@ -226,11 +223,5 @@ public class Entry {
     }
     public void setTime(String time) {
         this.time = time;
-    }
-    public String getTypes() {
-        return this.types;
-    }
-    public void setTypes(String types) {
-        this.types = types;
     }
 }

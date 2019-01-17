@@ -2,6 +2,7 @@ package org.biologer.biologer.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.lang.reflect.Array;
 import java.util.List;
 
 /**
@@ -50,12 +51,10 @@ public class APIEntry {
     private String foundDeadNote;
     @JsonProperty("data_license")
     private String dataLicense;
-    @JsonProperty("image_license")
-    private int imageLicense;
     @JsonProperty("time")
     private String time;
-    @JsonProperty("types")
-    private String types;
+    @JsonProperty("observation_types_ids")
+    private int[] observation_types_ids;
 
     @JsonProperty("taxon_id")
     public Integer getTaxonId() {
@@ -267,14 +266,14 @@ public class APIEntry {
         this.time = time;
     }
 
-    @JsonProperty("types")
-    public String getTypes() {
-        return types;
+    @JsonProperty("observation_types_ids")
+    public int[] getTypes() {
+        return observation_types_ids;
     }
 
-    @JsonProperty("types")
-    public void setTypes(String types) {
-        this.types = types;
+    @JsonProperty("observation_types_ids")
+    public void setTypes(int[] observation_types_ids) {
+        this.observation_types_ids = observation_types_ids;
     }
 
     public static class Photo {

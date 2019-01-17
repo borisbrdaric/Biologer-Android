@@ -59,7 +59,6 @@ public class LogoutFragment extends Fragment {
                     App.get().getDaoSession().getStageDao().deleteAll();
                     App.get().getDaoSession().getUserDataDao().deleteAll();
                     SettingsManager.setDatabaseVersion("0");
-                    RetrofitClient.cancelOkHttpRequests();
                     // Kill the app on logout, since new login request does not work on normal logout... :/
                     System.exit(0);
 /*

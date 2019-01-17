@@ -43,8 +43,4 @@ public class RetrofitClient {
         service = retrofit.create(RetrofitService .class);
         return service;
     }
-
-    public static void cancelOkHttpRequests() {
-        client.dispatcher().cancelAll();
-    }
 }
