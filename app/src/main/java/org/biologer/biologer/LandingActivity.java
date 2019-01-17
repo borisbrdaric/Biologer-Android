@@ -366,7 +366,7 @@ public class LandingActivity extends AppCompatActivity
         apiEntry.setElevation((int) entry.getElevation());
         apiEntry.setNote(entry.getComment());
         apiEntry.setSex(entry.getSex());
-        apiEntry.setNumber(entry.getNumber() == 0 ? 1 : entry.getNumber());
+        apiEntry.setNumber(entry.getNumber());
         apiEntry.setProject(entry.getProjectId());
         apiEntry.setFoundOn(entry.getFoundOn());
         apiEntry.setStageId(entry.getStage());
