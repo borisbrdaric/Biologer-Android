@@ -3,6 +3,7 @@ package org.biologer.biologer;
 import android.app.Activity;
 import android.util.Log;
 
+import org.biologer.biologer.model.RetrofitClient;
 import org.biologer.biologer.model.Stage;
 import org.biologer.biologer.model.network.Stage6;
 import org.biologer.biologer.model.network.TaksoniResponse;
@@ -15,6 +16,8 @@ import retrofit2.Response;
 
 public abstract class FetchTaxa extends Activity {
 
+    private static final String TAG = "Biologer.FetchTaxa";
+
     private static int totalPages = 1;
     private static int progressStatus = 0;
 
@@ -23,7 +26,7 @@ public abstract class FetchTaxa extends Activity {
             return;
         }
 
-        Call<TaksoniResponse> call = App.get().getService().getTaxons(page, 50);
+        Call<TaksoniResponse> call = RetrofitClient.getService(SettingsManager.getDatabaseName()).getTaxons(page, 35);
 
         call.enqueue(new CallbackWithRetry<TaksoniResponse>(call) {
             @Override
@@ -56,7 +59,7 @@ public abstract class FetchTaxa extends Activity {
                 if (isLastPage(page)) {
                     // Inform the user of success
                     //Toast.makeText(getActivity(), getString(R.string.database_updated), Toast.LENGTH_LONG).show();
-                    Log.i("Taxa database: ", "All taxa were successfully updated from the server!");
+                    Log.i(TAG, "All taxa were successfully updated from the server!");
                 } else {
                     fetchAll(page + 1);
                 }
@@ -70,7 +73,7 @@ public abstract class FetchTaxa extends Activity {
                 SettingsManager.setDatabaseVersion("0");
                 // Inform the user on failure and write log message
                 //Toast.makeText(getActivity(), getString(R.string.database_connect_error), Toast.LENGTH_LONG).show();
-                Log.e("Taxa database: ", "Application could not get data from a server!");
+                Log.e(TAG, "Application could not get data from a server!");
             }
         });
     }

@@ -40,7 +40,7 @@ public class SettingsManager {
     public static void setDatabaseVersion(String databaseVersion) {
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString(SettingsManager.KEY.DATABASE_VERSION.toString(), databaseVersion);
-        editor.commit();
+        editor.apply();
     }
 
     public static String getDatabaseVersion() {

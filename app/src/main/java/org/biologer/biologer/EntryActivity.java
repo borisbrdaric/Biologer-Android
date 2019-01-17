@@ -285,7 +285,7 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
         return true;
     }
 
-    // Proces running after clicking the toolbar buttons
+    // Process running after clicking the toolbar buttons
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
         int id = item.getItemId();

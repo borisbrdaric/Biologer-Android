@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -12,17 +13,21 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import org.biologer.biologer.model.LoginResponse;
+import org.biologer.biologer.model.RetrofitClient;
 import org.biologer.biologer.model.UserData;
 import org.biologer.biologer.model.network.UserDataResponse;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import okhttp3.Dispatcher;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class LoginActivity extends AppCompatActivity {
+
+    private static final String TAG = "Biologer.Login";
 
     EditText et_username;
     EditText et_password;
@@ -30,7 +35,8 @@ public class LoginActivity extends AppCompatActivity {
     TextView tv_wrongEmail;
     TextView tv_devDatabase;
     // Get the value for KEY.DATABASE_NAME
-    String key_databasename = SettingsManager.getDatabaseName();
+    String key_database_name = SettingsManager.getDatabaseName();
+    String database_name = key_database_name;
     Call login;
 
     /*
@@ -63,7 +69,7 @@ public class LoginActivity extends AppCompatActivity {
         ArrayAdapter<CharSequence> ourDatabases = ArrayAdapter.createFromResource(this, R.array.databases, android.R.layout.simple_spinner_item);
         ourDatabases.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(ourDatabases);
-        int spinnerPosition = ourDatabases.getPosition(key_databasename);
+        int spinnerPosition = ourDatabases.getPosition(key_database_name);
         spinner.setSelection(spinnerPosition);
 
         // If item is chosen from the database list.
@@ -76,18 +82,12 @@ public class LoginActivity extends AppCompatActivity {
 
         public void onItemSelected(AdapterView<?> getdatabase, View view, int pos,long id) {
             // Change the preference according to the user selection
-            SettingsManager.setDatabaseName(getdatabase.getItemAtPosition(pos).toString());
+            database_name = getdatabase.getItemAtPosition(pos).toString();
+            SettingsManager.setDatabaseName(database_name);
 
             tv_devDatabase.setText("");
             if (SettingsManager.getDatabaseName().equals("https://dev.biologer.org")) {
                 tv_devDatabase.setText(R.string.devDatabase);
-            }
-
-            // DIRTY JOOOOBBBB!!!! Must restart the app if database has bean changed
-            // In future network services should be initialised after app has bean started
-            if (!SettingsManager.getDatabaseName().equals(key_databasename)){
-                finish();
-                System.exit(0);
             }
         }
 
@@ -117,11 +117,13 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }
 
-        if (SettingsManager.getDatabaseName().equals("https://biologer.hr")) {
-            login = App.get().getService().login("password", "2", hrKey, "*", et_username.getText().toString(), et_password.getText().toString());
+        if (database_name.equals("https://biologer.hr")) {
+            login = RetrofitClient.getService(database_name).login("password", "2", hrKey, "*", et_username.getText().toString(), et_password.getText().toString());
         } else {
-            login = App.get().getService().login("password", "2", rsKey, "*", et_username.getText().toString(), et_password.getText().toString());
+            login = RetrofitClient.getService(database_name).login("password", "2", rsKey, "*", et_username.getText().toString(), et_password.getText().toString());
         }
+
+        Log.d(TAG, "Logging into " + database_name + " as user " + et_username.getText().toString());
 
         login.enqueue(new Callback<LoginResponse>() {
             @Override
@@ -147,7 +149,7 @@ public class LoginActivity extends AppCompatActivity {
 
     // Get email and name and store it
     private void fillUserData(){
-        Call<UserDataResponse> serv = App.get().getService().getUserData();
+        Call<UserDataResponse> serv = RetrofitClient.getService(database_name).getUserData();
         serv.enqueue(new Callback<UserDataResponse>() {
             @Override
             public void onResponse(Call<UserDataResponse> serv, Response<UserDataResponse> response) {

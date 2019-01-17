@@ -27,6 +27,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.biologer.biologer.bus.DeleteEntryFromList;
 import org.biologer.biologer.model.Entry;
 import org.biologer.biologer.model.APIEntry;
+import org.biologer.biologer.model.RetrofitClient;
 import org.biologer.biologer.model.UploadFileResponse;
 import org.biologer.biologer.model.UserData;
 import org.biologer.biologer.model.network.APIEntryResponse;
@@ -40,6 +41,7 @@ import java.util.List;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -71,9 +73,6 @@ public class LandingActivity extends AppCompatActivity
         setContentView(R.layout.activity_landing);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        //App.get().getDaoSession().getUserDataDao().deleteAll();
-        //navDrawerFill();
 
         progressBar = findViewById(R.id.progress);
         progressBar4Taxa = findViewById(R.id.progress_taxa);
@@ -111,7 +110,7 @@ public class LandingActivity extends AppCompatActivity
 
     // Send a short request to the server that will return if the taxonomic tree is up to date.
     private void updateTaxa() {
-        Call<TaksoniResponse> call = App.get().getService().getTaxons(1, 1);
+        Call<TaksoniResponse> call = RetrofitClient.getService(SettingsManager.getDatabaseName()).getTaxons(1, 1);
         call.enqueue(new Callback<TaksoniResponse>() {
             @Override
             public void onResponse(Call<TaksoniResponse> call, Response<TaksoniResponse> response) {
@@ -150,7 +149,7 @@ public class LandingActivity extends AppCompatActivity
             final int data_license_local = userdata.getData_license();
             final int image_license_local = userdata.getImage_license();
             // Get User data from a server
-            Call<UserDataResponse> call = App.get().getService().getUserData();
+            Call<UserDataResponse> call = RetrofitClient.getService(SettingsManager.getDatabaseName()).getUserData();
             call.enqueue(new Callback<UserDataResponse>() {
                 @Override
                 public void onResponse(Call<UserDataResponse> call, Response<UserDataResponse> response) {
@@ -391,7 +390,7 @@ public class LandingActivity extends AppCompatActivity
             e.printStackTrace();
         }
 
-        Call<APIEntryResponse> call = App.get().getService().uploadEntry(apiEntry);
+        Call<APIEntryResponse> call = RetrofitClient.getService(SettingsManager.getDatabaseName()).uploadEntry(apiEntry);
         call.enqueue(new Callback<APIEntryResponse>() {
             @Override
             public void onResponse(Call<APIEntryResponse> call, Response<APIEntryResponse> response) {
@@ -415,7 +414,7 @@ public class LandingActivity extends AppCompatActivity
         RequestBody reqFile = RequestBody.create(MediaType.parse("image/*"), file);
         MultipartBody.Part body = MultipartBody.Part.createFormData("file", file.getName(), reqFile);
 
-        Call<UploadFileResponse> call = App.get().getService().uploadFile(body);
+        Call<UploadFileResponse> call = RetrofitClient.getService(SettingsManager.getDatabaseName()).uploadFile(body);
 
         call.enqueue(new Callback<UploadFileResponse>() {
             @Override
@@ -436,9 +435,8 @@ public class LandingActivity extends AppCompatActivity
         });
     }
 
-
     private void navDrawerFill() {
-        Call<UserDataResponse> serv = App.get().getService().getUserData();
+        Call<UserDataResponse> serv = RetrofitClient.getService(SettingsManager.getDatabaseName()).getUserData();
         serv.enqueue(new Callback<UserDataResponse>() {
             @Override
             public void onResponse(Call<UserDataResponse> serv, Response<UserDataResponse> response) {
@@ -540,4 +538,5 @@ public class LandingActivity extends AppCompatActivity
         final AlertDialog alert = builder.create();
         alert.show();
     }
+
 }

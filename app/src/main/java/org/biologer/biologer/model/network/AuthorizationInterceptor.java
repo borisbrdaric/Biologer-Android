@@ -1,7 +1,6 @@
 package org.biologer.biologer.model.network;
 import android.support.annotation.NonNull;
 
-import org.biologer.biologer.App;
 import org.biologer.biologer.SettingsManager;
 
 import java.io.IOException;
@@ -10,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import okhttp3.CacheControl;
 import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -23,7 +23,11 @@ public class AuthorizationInterceptor implements Interceptor {
 
     @Override
     public Response intercept(@NonNull Chain chain) throws IOException {
-        Request request = chain.request().newBuilder().addHeader("Authorization", "Bearer " + SettingsManager.getToken()).build();
+        Request request = chain.request();
+        Request.Builder builder = request.newBuilder()
+                .header("Authorization", "Bearer " + SettingsManager.getToken())
+                .cacheControl(CacheControl.FORCE_NETWORK);
+        request = builder.build();
 
         Response response = chain.proceed(request);
 
@@ -31,7 +35,7 @@ public class AuthorizationInterceptor implements Interceptor {
         {
 //            if (!(App.get().getCurrentActivity() instanceof LoginActivity)) {
 //                User.logout(App.get().getCurrentActivity());
-//                SplashActivity.clearStart(App.get().getCurrentActivity());
+//                SplashAcAuthorizationInterceptortivity.clearStart(App.get().getCurrentActivity());
 //            }
         }
 

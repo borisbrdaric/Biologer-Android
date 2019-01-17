@@ -1,5 +1,6 @@
 package org.biologer.biologer;
 
+import android.app.ActivityManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -9,12 +10,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.auth0.android.jwt.JWT;
+import com.google.firebase.internal.InternalTokenResult;
 
+import org.biologer.biologer.model.RetrofitClient;
 import org.biologer.biologer.model.UserData;
-import org.w3c.dom.Text;
 
+import java.io.File;
 import java.util.List;
+
+import okhttp3.Cache;
+import okhttp3.CacheControl;
 
 public class LogoutFragment extends Fragment {
 
@@ -22,7 +27,6 @@ public class LogoutFragment extends Fragment {
     private TextView tv_username;
     private TextView tv_email;
     private TextView tv_database;
-    //private TextView tv_user;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
@@ -33,12 +37,6 @@ public class LogoutFragment extends Fragment {
     public void onStart() {
         super.onStart();
         View view = getView();
-        //tv_user = getActivity().findViewById(R.id.tv_user);
-        //String token = SettingsManager.getToken();
-        //JWT jwt = new JWT(token);
-        //long userId = Long.valueOf(jwt.getSubject());
-        //SettingsManager.setActiveAccountId(userId);
-        //tv_user.setText(String.valueOf(userId));
 
         if (view != null) {
             btn_logout = getActivity().findViewById(R.id.btn_logout);
@@ -61,10 +59,14 @@ public class LogoutFragment extends Fragment {
                     App.get().getDaoSession().getStageDao().deleteAll();
                     App.get().getDaoSession().getUserDataDao().deleteAll();
                     SettingsManager.setDatabaseVersion("0");
+                    RetrofitClient.cancelOkHttpRequests();
+                    // Kill the app on logout, since new login request does not work on normal logout... :/
+                    System.exit(0);
+/*
                     Intent intent = new Intent(getActivity(), LoginActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent);
-                    //getContext().finish();
+*/
                 }
             });
         }

@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 
+import org.biologer.biologer.model.RetrofitClient;
 import org.biologer.biologer.model.UserData;
 import org.biologer.biologer.model.network.UserDataResponse;
 
@@ -97,6 +98,7 @@ public class SetupActivity extends AppCompatActivity {
                     UserData uData = new UserData(uid, email, name, 40, image_license);
                     App.get().getDaoSession().getUserDataDao().insertOrReplace(uData);
                 }
+                Log.e(TAG, "Data license set to: " + SettingsManager.getCustomDataLicense());
             }
             @Override
             public void onNothingSelected(AdapterView<?> parentView) {
@@ -130,6 +132,7 @@ public class SetupActivity extends AppCompatActivity {
                     UserData uData = new UserData(uid, email, name, data_license, 40);
                     App.get().getDaoSession().getUserDataDao().insertOrReplace(uData);
                 }
+                Log.e(TAG, "Image license set to: " + SettingsManager.getCustomImageLicense());
             }
             @Override
             public void onNothingSelected(AdapterView<?> parentView) {
@@ -176,7 +179,7 @@ public class SetupActivity extends AppCompatActivity {
     }
 
     private void updateDataLicenseFromServer() {
-        Call<UserDataResponse> call = App.get().getService().getUserData();
+        Call<UserDataResponse> call = RetrofitClient.getService(SettingsManager.getDatabaseName()).getUserData();
         call.enqueue(new Callback<UserDataResponse>() {
             @Override
             public void onResponse(Call<UserDataResponse> call, Response<UserDataResponse> response) {
@@ -188,13 +191,13 @@ public class SetupActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<UserDataResponse> call, Throwable t) {
-                Log.e("Taxa database: ", "Application could not get user data from a server!");
+                Log.e(TAG, "Application could not get user data (data license) from a server!");
             }
         });
     }
 
     private void updateImageLicenseFromServer() {
-        Call<UserDataResponse> call = App.get().getService().getUserData();
+        Call<UserDataResponse> call = RetrofitClient.getService(SettingsManager.getDatabaseName()).getUserData();
         call.enqueue(new Callback<UserDataResponse>() {
             @Override
             public void onResponse(Call<UserDataResponse> call, Response<UserDataResponse> response) {
@@ -204,7 +207,7 @@ public class SetupActivity extends AppCompatActivity {
             }
             @Override
             public void onFailure(Call<UserDataResponse> call, Throwable t) {
-                Log.e("Taxa database: ", "Application could not get user data from a server!");
+                Log.e(TAG, "Application could not get user data (image license) from a server!");
             }
         });
     }
@@ -226,10 +229,11 @@ public class SetupActivity extends AppCompatActivity {
         String project_name = projectName.getText().toString();
         if (project_name.equals("")) {
             SettingsManager.setProjectName(null);
+            Log.d(TAG, "No project name is selected.");
         } else {
             SettingsManager.setProjectName(project_name);
+            Log.d(TAG, "Project name is set to: " + project_name);
         }
-        Log.d(TAG, "Project name is set to: " + project_name);
         finish();
     }
 }
