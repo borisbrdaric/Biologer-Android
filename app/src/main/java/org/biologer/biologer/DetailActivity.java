@@ -214,7 +214,9 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
             et_komentar.setText(currentItem.getComment());
         }
         et_brojJedinki = (CustomEditText) findViewById(R.id.et_brojJedinki);
-        et_brojJedinki.setText(currentItem.getNumber().toString());
+        if (currentItem.getNumber() != null) {
+            et_brojJedinki.setText(currentItem.getNumber().toString());
+        }
         rb_male = findViewById(R.id.rb_musko);
         if (currentItem.getSex().equalsIgnoreCase("male")){
             rb_male.setChecked(true);
