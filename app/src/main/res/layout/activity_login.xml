@@ -166,7 +166,6 @@
                 android:textAllCaps="true"
                 android:textSize="14sp"
                 android:textColor="@color/white"
-                android:onClick="onLogin"
                 android:background="@drawable/roundshapebtn"/>
 
         <LinearLayout

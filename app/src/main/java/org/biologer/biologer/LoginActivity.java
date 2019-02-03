@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -75,6 +76,15 @@ public class LoginActivity extends AppCompatActivity {
         // If item is chosen from the database list.
         spinner = (Spinner) findViewById(R.id.spinner_databases);
         spinner.setOnItemSelectedListener(new getDatabaseURL());
+
+        // Android 4.4 (KitKat) compatibility: Set login button listener programmatically.
+        Button loginButton = (Button) findViewById(R.id.btn_login);
+        loginButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onLogin(v);
+            }
+        });
     }
 
     // Activity starting after user selects a Database from the list
