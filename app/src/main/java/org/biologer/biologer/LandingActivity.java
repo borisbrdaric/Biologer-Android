@@ -55,7 +55,13 @@ public class LandingActivity extends AppCompatActivity
     int m = 0;
     ArrayList<Entry> entryList;
     List<APIEntry.Photo> photos = null;
-    UserData loggedUser = new UserData();
+
+    // Get the user data
+    List<UserData> list = App.get().getDaoSession().getUserDataDao().loadAll();
+    UserData loggedUser = list.get(0);
+    Long uid = loggedUser.getId();
+    int data_license_local = loggedUser.getData_license();
+    int image_license_local = loggedUser.getImage_license();
 
     private DrawerLayout drawer;
 
@@ -89,14 +95,10 @@ public class LandingActivity extends AppCompatActivity
         View header = navigationView.getHeaderView(0);
         TextView tv_username = header.findViewById(R.id.tv_username);
         TextView tv_email = header.findViewById(R.id.tv_email);
-        List<UserData> list = App.get().getDaoSession().getUserDataDao().loadAll();
 
-        if (list != null && list.size() > 0) {
-            UserData loggedUser = list.get(0);
-
-            tv_username.setText(loggedUser.getUsername());
-            tv_email.setText(loggedUser.getEmail());
-        }
+        // Set the text for sidepanel
+        tv_username.setText(loggedUser.getUsername());
+        tv_email.setText(loggedUser.getEmail());
 
         android.support.v4.app.Fragment fragment = new LandingFragment();
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -142,12 +144,6 @@ public class LandingActivity extends AppCompatActivity
     // Check if user selected custom Data and Image Licenses. If not, update them from the server.
     private void updateLicense() {
         if (SettingsManager.getCustomDataLicense().equals("0") || SettingsManager.getCustomImageLicense().equals("0")) {
-            // Get User data from a local database
-            List<UserData> list = App.get().getDaoSession().getUserDataDao().loadAll();
-            UserData userdata = list.get(0);
-            final Long uid = userdata.getId();
-            final int data_license_local = userdata.getData_license();
-            final int image_license_local = userdata.getImage_license();
             // Get User data from a server
             Call<UserDataResponse> call = RetrofitClient.getService(SettingsManager.getDatabaseName()).getUserData();
             call.enqueue(new Callback<UserDataResponse>() {

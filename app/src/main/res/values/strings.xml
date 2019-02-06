@@ -127,4 +127,6 @@
     <string name="choose_ilicense">Choose different license for your images</string>
     <string name="choose_project">Does the data belong to a project?</string>
     <string name="project_name">Project name</string>
+    <string name="license_public">Free, publish instantly</string>
+    <string name="license_timed">Free, publish in 3 years</string>
 </resources>

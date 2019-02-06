@@ -105,4 +105,6 @@
     <string name="choose_project">Pripadaju li podatci nekom projektu?</string>
     <string name="new_database_available">Nova verzija taksonomske baze podataka dostupna je online. Možete ju ažurirati sada ili kasnije iz postavki aplikacije. Želite li ažurirati svoju bazu podataka?</string>
     <string name="project_name">Ime projekta</string>
+    <string name="license_public">Slobodna, odmah publikuj</string>
+    <string name="license_timed">Slobodna, publikuj za 3 godine</string>
 </resources>

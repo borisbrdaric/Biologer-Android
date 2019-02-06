@@ -105,4 +105,6 @@
     <string name="choose_ilicense">Изаберите другачију лиценцу за слике</string>
     <string name="choose_project">Да ли подаци припадају пројекту?</string>
     <string name="project_name">Назив пројекта</string>
+    <string name="license_public">Слободна, одмах објави</string>
+    <string name="license_timed">Слободна, објави за 3 године</string>
 </resources>
