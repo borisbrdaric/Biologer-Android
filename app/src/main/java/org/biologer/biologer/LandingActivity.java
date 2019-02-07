@@ -34,6 +34,7 @@ import org.biologer.biologer.model.network.APIEntryResponse;
 import org.biologer.biologer.model.network.TaksoniResponse;
 import org.biologer.biologer.model.network.UserDataResponse;
 import org.greenrobot.eventbus.EventBus;
+import org.json.JSONStringer;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -49,6 +50,8 @@ import retrofit2.Response;
 
 public class LandingActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+    private static final String TAG = "Biologer.Landing";
 
     ArrayList<String> slike = new ArrayList<>();
     int n = 0;
@@ -388,7 +391,7 @@ public class LandingActivity extends AppCompatActivity
         ObjectMapper mapper = new ObjectMapper();
         try {
             String s = mapper.writeValueAsString(apiEntry);
-            Log.i("API_ENTRY", s);
+            Log.i(TAG, "Upload Entry " + s);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }

@@ -83,12 +83,12 @@ public class SetupActivity extends AppCompatActivity {
                     }
                     if (position == 1) {
                         SettingsManager.setCustomDataLicense("1");
-                        UserData uData = new UserData(uid, email, name, 10, image_license);
+                        UserData uData = new UserData(uid, email, name, 11, image_license);
                         App.get().getDaoSession().getUserDataDao().insertOrReplace(uData);
                     }
                     if (position == 2) {
                         SettingsManager.setCustomDataLicense("2");
-                        UserData uData = new UserData(uid, email, name, 20, image_license);
+                        UserData uData = new UserData(uid, email, name, 35, image_license);
                         App.get().getDaoSession().getUserDataDao().insertOrReplace(uData);
                     }
                     Log.e(TAG, "Data license set to: " + SettingsManager.getCustomDataLicense());
@@ -112,12 +112,12 @@ public class SetupActivity extends AppCompatActivity {
                     }
                     if (position == 1) {
                         SettingsManager.setCustomImageLicense("1");
-                        UserData uData = new UserData(uid, email, name, data_license, 10);
+                        UserData uData = new UserData(uid, email, name, data_license, 11);
                         App.get().getDaoSession().getUserDataDao().insertOrReplace(uData);
                     }
                     if (position == 2) {
                         SettingsManager.setCustomImageLicense("2");
-                        UserData uData = new UserData(uid, email, name, data_license, 20);
+                        UserData uData = new UserData(uid, email, name, data_license, 35);
                         App.get().getDaoSession().getUserDataDao().insertOrReplace(uData);
                     }
                     Log.e(TAG, "Image license set to: " + SettingsManager.getCustomImageLicense());
