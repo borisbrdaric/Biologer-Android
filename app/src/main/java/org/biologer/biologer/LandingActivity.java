@@ -34,7 +34,6 @@ import org.biologer.biologer.model.network.APIEntryResponse;
 import org.biologer.biologer.model.network.TaksoniResponse;
 import org.biologer.biologer.model.network.UserDataResponse;
 import org.greenrobot.eventbus.EventBus;
-import org.json.JSONStringer;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -42,7 +41,6 @@ import java.util.List;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
-import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;

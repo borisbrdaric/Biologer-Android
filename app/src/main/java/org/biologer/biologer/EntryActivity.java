@@ -50,7 +50,6 @@ import org.biologer.biologer.model.StageDao;
 import org.biologer.biologer.model.Taxon;
 import org.biologer.biologer.model.TaxonDao;
 import org.biologer.biologer.model.UserData;
-import org.json.JSONException;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -111,8 +110,8 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
     // Get the user data
     List<UserData> list = App.get().getDaoSession().getUserDataDao().loadAll();
     UserData userdata = list.get(0);
-    private int user_data_license = userdata.getData_license();
-    private int user_image_license = userdata.getImage_license();
+    int user_data_license = userdata.getData_license();
+    int user_image_license = userdata.getImage_license();
 
     String project_name = SettingsManager.getProjectName();
 

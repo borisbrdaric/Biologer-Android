@@ -35,7 +35,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.view.View;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -215,7 +214,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         }
         et_brojJedinki = (CustomEditText) findViewById(R.id.et_brojJedinki);
         if (currentItem.getNumber() != null) {
-            et_brojJedinki.setText(currentItem.getNumber().toString());
+            et_brojJedinki.setText(String.valueOf(currentItem.getNumber()));
         }
         rb_male = findViewById(R.id.rb_musko);
         if (currentItem.getSex().equalsIgnoreCase("male")){
@@ -410,7 +409,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
     private void entrySaver(final Taxon taxon) {
         Stage stage = (tvStage.getTag() != null) ? (Stage) tvStage.getTag() : null;
         String komentar = (et_komentar.getText().toString() != null) ? et_komentar.getText().toString() : "";
-        Integer brojJedinki = (et_brojJedinki.getText().toString().trim().length() > 0) ? Integer.valueOf(et_brojJedinki.getText().toString()) : 0;
+        Integer brojJedinki = (et_brojJedinki.getText().toString().trim().length() > 0) ? Integer.valueOf(et_brojJedinki.getText().toString()) : null;
         Long selectedStage = (stage != null) ? stage.getStageId() : null;
         String razlogSmrti = (et_razlogSmrti.getText() != null) ? et_razlogSmrti.getText().toString() : "";
 
