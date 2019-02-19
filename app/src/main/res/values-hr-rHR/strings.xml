@@ -107,4 +107,12 @@
     <string name="project_name">Ime projekta</string>
     <string name="license_public">Slobodna, odmah publikuj</string>
     <string name="license_timed">Slobodna, publikuj za 3 godine</string>
+    <string name="channel_description">This is used to receive notifications about taxonomic updates.</string>
+    <string name="channel_name">Update taxa</string>
+    <string name="notify_title_taxa">Updating taxa</string>
+    <string name="notify_desc_taxa">Downloading new taxonomic database.</string>
+    <string name="notify_title_taxa_updated">Up to date</string>
+    <string name="notify_desc_taxa_updated">Taxonomic database is now updated.</string>
+    <string name="notify_title_taxa_failed">Update failed</string>
+    <string name="notify_desc_taxa_failed">Taxonomic database was not updated from the server. Ensure that you have a stabile internet connection and retry.</string>
 </resources>

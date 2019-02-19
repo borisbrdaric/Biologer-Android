@@ -107,4 +107,12 @@
     <string name="project_name">Назив пројекта</string>
     <string name="license_public">Слободна, одмах објави</string>
     <string name="license_timed">Слободна, објави за 3 године</string>
+    <string name="channel_description">Користи се за обавештења везана за таксономске измене.</string>
+    <string name="channel_name">Ажурирање таксона</string>
+    <string name="notify_title_taxa">Ажурирање таксона</string>
+    <string name="notify_desc_taxa">Преузимам нову верзију базе таксона.</string>
+    <string name="notify_title_taxa_updated">Up to date</string>
+    <string name="notify_desc_taxa_updated">Taxonomic database is now updated.</string>
+    <string name="notify_title_taxa_failed">Update failed</string>
+    <string name="notify_desc_taxa_failed">Taxonomic database was not updated from the server. Ensure that you have a stabile internet connection and retry.</string>
 </resources>

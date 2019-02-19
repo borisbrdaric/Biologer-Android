@@ -1,6 +1,10 @@
 package org.biologer.biologer;
 
+import android.app.PendingIntent;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.Toolbar;
@@ -228,7 +232,6 @@ public class SetupActivity extends AppCompatActivity {
                 progressBarTaxa.setVisibility(View.VISIBLE);
 
                 Thread updateStatusBar = new Thread() {
-
                     @Override
                     public void run() {
                         try {
@@ -237,16 +240,19 @@ public class SetupActivity extends AppCompatActivity {
                                 int progress_value = FetchTaxa.getProgressStatus();
                                 if (progress_value != oldProgress) {
                                     oldProgress = progress_value;
+                                    // Update progress bar and notfication bar
                                     progressBarTaxa.setProgress(progress_value);
                                 }
                             }
                         } catch (InterruptedException e) {
                             e.printStackTrace();
+                            taxaNotificationFailed();
                         } finally {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
                                     progressBarTaxa.setVisibility(View.GONE);
+                                    taxaNotificationFinish();
                                 }
                             });
                         }
@@ -255,9 +261,75 @@ public class SetupActivity extends AppCompatActivity {
 
                 updateStatusBar.start();
                 FetchTaxa.fetchAll(1);
-
             }
         });
+    }
+
+    public void taxaNotification(int progress) {
+        // To do something if notification is taped, we must set up an intent
+        Intent intent = new Intent(this, SplashActivity.class);
+        intent.setAction(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_LAUNCHER);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
+
+        // Build the notification
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, "biologer_taxa")
+                .setSmallIcon(R.drawable.ic_kornjaca)
+                .setContentTitle(getString(R.string.notify_title_taxa))
+                .setContentText(getString(R.string.notify_desc_taxa))
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setContentIntent(pendingIntent)
+                .setProgress(100, progress, false)
+                .setOnlyAlertOnce(true)
+                .setAutoCancel(true);
+
+        // Display the notification
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+        notificationManager.notify(1, mBuilder.build());
+    }
+
+    public void taxaNotificationFinish() {
+        // To do something if notification is taped, we must set up an intent
+        Intent intent = new Intent(this, SplashActivity.class);
+        intent.setAction(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_LAUNCHER);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
+
+        // Build the notification
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, "biologer_taxa")
+                .setSmallIcon(R.drawable.ic_kornjaca)
+                .setContentTitle(getString(R.string.notify_title_taxa_updated))
+                .setContentText(getString(R.string.notify_desc_taxa_updated))
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setContentIntent(pendingIntent)
+                .setOnlyAlertOnce(true)
+                .setAutoCancel(true);
+
+        // Display the notification
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+        notificationManager.notify(1, mBuilder.build());
+    }
+
+    public void taxaNotificationFailed() {
+        // To do something if notification is taped, we must set up an intent
+        Intent intent = new Intent(this, SplashActivity.class);
+        intent.setAction(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_LAUNCHER);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
+
+        // Build the notification
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, "biologer_taxa")
+                .setSmallIcon(R.drawable.ic_kornjaca)
+                .setContentTitle(getString(R.string.notify_title_taxa_failed))
+                .setContentText(getString(R.string.notify_desc_taxa_failed))
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setContentIntent(pendingIntent)
+                .setOnlyAlertOnce(true)
+                .setAutoCancel(true);
+
+        // Display the notification
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+        notificationManager.notify(1, mBuilder.build());
     }
 
     private void updateDataLicenseFromServer() {
