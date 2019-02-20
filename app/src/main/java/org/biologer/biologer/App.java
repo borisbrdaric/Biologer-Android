@@ -32,7 +32,6 @@ public class App extends Application {
         DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this, "notes-db");
         Database db = helper.getWritableDb();
         daoSession = new DaoMaster(db).newSession();
-
     }
 
     public void createNotificationChannel() {
@@ -42,7 +41,7 @@ public class App extends Application {
             String channel_id = "biologer_taxa";
             CharSequence name = getString(R.string.channel_name);
             String description = getString(R.string.channel_description);
-            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            int importance = NotificationManager.IMPORTANCE_LOW;
             NotificationChannel channel = new NotificationChannel(channel_id, name, importance);
             channel.setDescription(description);
             // Register the channel with the system; you can't change the importance

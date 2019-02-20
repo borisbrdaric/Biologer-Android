@@ -7,6 +7,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
@@ -51,6 +52,7 @@ public class FetchTaxa extends Service {
         fetchAll(1);
     }
 
+    // We will initialise notification with foreground priodity
     private Notification initialiseNotification(String title, String description){
         // To do something if notification is taped, we must set up an intent
         Intent intent = new Intent(this, SplashActivity.class);
@@ -62,8 +64,9 @@ public class FetchTaxa extends Service {
                 .setSmallIcon(R.drawable.ic_kornjaca)
                 .setContentTitle(title)
                 .setContentText(description)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setOngoing(true)
+                .setOnlyAlertOnce(true)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(false);
 
@@ -81,9 +84,10 @@ public class FetchTaxa extends Service {
                 .setSmallIcon(R.drawable.ic_kornjaca)
                 .setContentTitle(getString(R.string.notify_title_taxa))
                 .setContentText(getString(R.string.notify_desc_taxa))
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setProgress(100, progressStatus, false)
                 .setOngoing(true)
+                .setOnlyAlertOnce(true)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(false);
 
@@ -100,19 +104,37 @@ public class FetchTaxa extends Service {
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
 
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, "biologer_taxa")
-                .setSmallIcon(R.drawable.ic_kornjaca)
-                .setContentTitle(title)
-                .setContentText(description)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setOngoing(false)
-                .setContentIntent(pendingIntent)
-                .setAutoCancel(true);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, "biologer_taxa")
+                    .setSmallIcon(R.drawable.ic_kornjaca)
+                    .setContentTitle(title)
+                    .setContentText(description)
+                    .setPriority(NotificationManager.IMPORTANCE_DEFAULT)
+                    .setOngoing(false)
+                    .setContentIntent(pendingIntent)
+                    .setOnlyAlertOnce(false)
+                    .setAutoCancel(true);
 
-        Notification notification = mBuilder.build();
+            Notification notification = mBuilder.build();
 
-        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        mNotificationManager.notify(1, notification);
+            NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            mNotificationManager.notify(1, notification);
+        } else {
+            NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, "biologer_taxa")
+                    .setSmallIcon(R.drawable.ic_kornjaca)
+                    .setContentTitle(title)
+                    .setContentText(description)
+                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                    .setOngoing(false)
+                    .setContentIntent(pendingIntent)
+                    .setOnlyAlertOnce(false)
+                    .setAutoCancel(true);
+
+            Notification notification = mBuilder.build();
+
+            NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            mNotificationManager.notify(1, notification);
+        }
     }
 
     public void fetchAll(final int page) {
