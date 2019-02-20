@@ -129,7 +129,7 @@
     <string name="project_name">Project name</string>
     <string name="license_public">Free, publish instantly</string>
     <string name="license_timed">Free, publish in 3 years</string>
-    <string name="channel_description">This is used to receive notifications about taxonomic updates.</string>
+    <string name="channel_description">Displays notifications related with taxonomic updates.</string>
     <string name="channel_name">Update taxa</string>
     <string name="notify_title_taxa">Updating taxa</string>
     <string name="notify_desc_taxa">Downloading new taxonomic database.</string>

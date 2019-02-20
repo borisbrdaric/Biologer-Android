@@ -73,7 +73,6 @@ public class LandingActivity extends AppCompatActivity
     private ProgressBar progressBarTaxa;
     private int oldProgress = 0;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -474,7 +473,6 @@ public class LandingActivity extends AppCompatActivity
     }
 
     Thread updateStatusBar = new Thread() {
-
         @Override
         public void run() {
             try {
@@ -493,21 +491,30 @@ public class LandingActivity extends AppCompatActivity
                     @Override
                     public void run() {
                         progressBar4Taxa.setVisibility(View.GONE);
+                        stopTaxonFetchingService();
                     }
                 });
             }
         }
     };
 
+    protected void stopTaxonFetchingService() {
+        // intent used to start service for fetching taxa
+        final Intent fetchTaxa = new Intent(this, FetchTaxa.class);
+        stopService(fetchTaxa);
+    }
+
     protected void buildAlertMessageNewerTaxaDb() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        // intent used to start service for fetching taxa
+        final Intent fetchTaxa = new Intent(this, FetchTaxa.class);
         builder.setMessage(getString(R.string.new_database_available))
                 .setCancelable(false)
                 .setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
                     public void onClick(final DialogInterface dialog, final int id) {
                         progressBar4Taxa.setVisibility(View.VISIBLE);
                         updateStatusBar.start();
-                        FetchTaxa.fetchAll(1);
+                        startService(fetchTaxa);
                         SettingsManager.setDatabaseVersion(lastUpdatedAt);
                     }
                 })
@@ -524,13 +531,15 @@ public class LandingActivity extends AppCompatActivity
 
     protected void buildAlertMessageEmptyTaxaDb() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        // intent used to start service for fetching taxa
+        final Intent fetchTaxa = new Intent(this, FetchTaxa.class);
         builder.setMessage(getString(R.string.database_empty))
                 .setCancelable(false)
                 .setPositiveButton(getString(R.string.contin), new DialogInterface.OnClickListener() {
                     public void onClick(final DialogInterface dialog, final int id) {
                         progressBar4Taxa.setVisibility(View.VISIBLE);
                         updateStatusBar.start();
-                        FetchTaxa.fetchAll(1);
+                        startService(fetchTaxa);
                         SettingsManager.setDatabaseVersion(lastUpdatedAt);
                     }
                 })

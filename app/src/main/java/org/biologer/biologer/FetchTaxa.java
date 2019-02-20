@@ -1,6 +1,15 @@
 package org.biologer.biologer;
 
 import android.app.Activity;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.Service;
+import android.content.Context;
+import android.content.Intent;
+import android.os.IBinder;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
 
 import org.biologer.biologer.model.RetrofitClient;
@@ -14,14 +23,99 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Response;
 
-public abstract class FetchTaxa extends Activity {
+public class FetchTaxa extends Service {
 
     private static final String TAG = "Biologer.FetchTaxa";
 
     private static int totalPages = 1;
     private static int progressStatus = 0;
 
-    public static void fetchAll(final int page) {
+    @Override
+    public void onCreate() {
+        this.startForeground();
+    }
+
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
+
+    public void onDestroy() {
+        updateNotificationText(getString(R.string.notify_title_taxa_updated), getString(R.string.notify_desc_taxa_updated));
+        super.onDestroy();
+    }
+
+    private void startForeground() {
+        Log.i(TAG, "Service for fetching taxa is started");
+        startForeground(1, initialiseNotification(getString(R.string.notify_title_taxa), getString(R.string.notify_desc_taxa)));
+        fetchAll(1);
+    }
+
+    private Notification initialiseNotification(String title, String description){
+        // To do something if notification is taped, we must set up an intent
+        Intent intent = new Intent(this, SplashActivity.class);
+        intent.setAction(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_LAUNCHER);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
+
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, "biologer_taxa")
+                .setSmallIcon(R.drawable.ic_kornjaca)
+                .setContentTitle(title)
+                .setContentText(description)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setOngoing(true)
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(false);
+
+        return mBuilder.build();
+    }
+
+    private void updateNotificationBar(int progressStatus) {
+        // To do something if notification is taped, we must set up an intent
+        Intent intent = new Intent(this, SplashActivity.class);
+        intent.setAction(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_LAUNCHER);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
+
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, "biologer_taxa")
+                .setSmallIcon(R.drawable.ic_kornjaca)
+                .setContentTitle(getString(R.string.notify_title_taxa))
+                .setContentText(getString(R.string.notify_desc_taxa))
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setProgress(100, progressStatus, false)
+                .setOngoing(true)
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(false);
+
+        Notification notification = mBuilder.build();
+
+        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager.notify(1, notification);
+    }
+
+    private void updateNotificationText(String title, String description) {
+        // To do something if notification is taped, we must set up an intent
+        Intent intent = new Intent(this, SplashActivity.class);
+        intent.setAction(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_LAUNCHER);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
+
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, "biologer_taxa")
+                .setSmallIcon(R.drawable.ic_kornjaca)
+                .setContentTitle(title)
+                .setContentText(description)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setOngoing(false)
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true);
+
+        Notification notification = mBuilder.build();
+
+        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager.notify(1, notification);
+    }
+
+    public void fetchAll(final int page) {
         if (page > totalPages) {
             return;
         }
@@ -43,6 +137,7 @@ public abstract class FetchTaxa extends Activity {
 
                 // Variables used to update the Progress Bar status
                 progressStatus = (page * 100 / totalPages);
+                updateNotificationBar(progressStatus);
 
                 for (Taxa taxon : taxa) {
                     App.get().getDaoSession().getTaxonDao().insertOrReplace(taxon.toTaxon());
@@ -74,6 +169,7 @@ public abstract class FetchTaxa extends Activity {
                 // Inform the user on failure and write log message
                 //Toast.makeText(getActivity(), getString(R.string.database_connect_error), Toast.LENGTH_LONG).show();
                 Log.e(TAG, "Application could not get data from a server!");
+                updateNotificationText(getString(R.string.notify_title_taxa_failed), getString(R.string.notify_desc_taxa_failed));
             }
         });
     }
