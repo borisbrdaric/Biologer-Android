@@ -1,10 +1,7 @@
 package org.biologer.biologer;
 
-import android.app.PendingIntent;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationManagerCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.Toolbar;
@@ -253,7 +250,6 @@ public class SetupActivity extends AppCompatActivity {
                                 @Override
                                 public void run() {
                                     progressBarTaxa.setVisibility(View.GONE);
-                                    stopService(fetchTaxa);
                                 }
                             });
                         }

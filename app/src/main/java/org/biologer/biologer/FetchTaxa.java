@@ -47,12 +47,13 @@ public class FetchTaxa extends Service {
     }
 
     private void startForeground() {
+        // Start the fetching and display notification
         Log.i(TAG, "Service for fetching taxa is started");
         startForeground(1, initialiseNotification(getString(R.string.notify_title_taxa), getString(R.string.notify_desc_taxa)));
         fetchAll(1);
     }
 
-    // We will initialise notification with foreground priodity
+    // We will initialise notification with foreground priority
     private Notification initialiseNotification(String title, String description){
         // To do something if notification is taped, we must set up an intent
         Intent intent = new Intent(this, SplashActivity.class);
@@ -79,6 +80,9 @@ public class FetchTaxa extends Service {
         intent.setAction(Intent.ACTION_MAIN);
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
+
+        Intent retry = new Intent(this, FetchTaxa.class);
+        PendingIntent retryPendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
 
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, "biologer_taxa")
                 .setSmallIcon(R.drawable.ic_kornjaca)
@@ -142,7 +146,7 @@ public class FetchTaxa extends Service {
             return;
         }
 
-        Call<TaksoniResponse> call = RetrofitClient.getService(SettingsManager.getDatabaseName()).getTaxons(page, 35);
+        Call<TaksoniResponse> call = RetrofitClient.getService(SettingsManager.getDatabaseName()).getTaxons(page, 30);
 
         call.enqueue(new CallbackWithRetry<TaksoniResponse>(call) {
             @Override
@@ -177,6 +181,8 @@ public class FetchTaxa extends Service {
                     // Inform the user of success
                     //Toast.makeText(getActivity(), getString(R.string.database_updated), Toast.LENGTH_LONG).show();
                     Log.i(TAG, "All taxa were successfully updated from the server!");
+                    stopForeground(true);
+                    stopSelf();
                 } else {
                     fetchAll(page + 1);
                 }

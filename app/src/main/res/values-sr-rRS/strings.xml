@@ -115,4 +115,5 @@
     <string name="notify_desc_taxa_updated">Таксономска база податаке је надограђена.</string>
     <string name="notify_title_taxa_failed">Неуспело ажурирање</string>
     <string name="notify_desc_taxa_failed">Такосномска база није ажурирана са сервера. Уверите се да имате стабилан интернет и покушајте поново.</string>
+    <string name="retry">Retry</string>
 </resources>

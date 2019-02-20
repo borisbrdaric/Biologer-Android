@@ -491,18 +491,11 @@ public class LandingActivity extends AppCompatActivity
                     @Override
                     public void run() {
                         progressBar4Taxa.setVisibility(View.GONE);
-                        stopTaxonFetchingService();
                     }
                 });
             }
         }
     };
-
-    protected void stopTaxonFetchingService() {
-        // intent used to start service for fetching taxa
-        final Intent fetchTaxa = new Intent(this, FetchTaxa.class);
-        stopService(fetchTaxa);
-    }
 
     protected void buildAlertMessageNewerTaxaDb() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
