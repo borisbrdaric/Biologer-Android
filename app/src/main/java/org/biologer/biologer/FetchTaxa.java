@@ -53,7 +53,7 @@ public class FetchTaxa extends Service {
         fetchAll(1);
     }
 
-    // We will initialise notification with foreground priority
+    // We will initialise notification with Foreground priority
     private Notification initialiseNotification(String title, String description){
         // To do something if notification is taped, we must set up an intent
         Intent intent = new Intent(this, SplashActivity.class);

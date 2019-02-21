@@ -15,9 +15,9 @@ import retrofit2.converter.jackson.JacksonConverterFactory;
 public class RetrofitClient {
 
     private static Retrofit retrofit = null;
-    private static OkHttpClient client = null;
 
     private static Retrofit getClient(String base_url) {
+        OkHttpClient client = null;
         if (retrofit == null) {
             ObjectMapper mapper = new ObjectMapper();
             mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);

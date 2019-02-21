@@ -113,7 +113,7 @@ public class LandingActivity extends AppCompatActivity
     // Send a short request to the server that will return if the taxonomic tree is up to date.
     private void updateTaxa() {
         Call<TaksoniResponse> call = RetrofitClient.getService(SettingsManager.getDatabaseName()).getTaxons(1, 1);
-        call.enqueue(new Callback<TaksoniResponse>() {
+        call.enqueue(new CallbackWithRetry<TaksoniResponse>(call) {
             @Override
             public void onResponse(Call<TaksoniResponse> call, Response<TaksoniResponse> response) {
                 // Get the version of the taxa database from server
@@ -146,7 +146,7 @@ public class LandingActivity extends AppCompatActivity
         if (SettingsManager.getCustomDataLicense().equals("0") || SettingsManager.getCustomImageLicense().equals("0")) {
             // Get User data from a server
             Call<UserDataResponse> call = RetrofitClient.getService(SettingsManager.getDatabaseName()).getUserData();
-            call.enqueue(new Callback<UserDataResponse>() {
+            call.enqueue(new CallbackWithRetry<UserDataResponse>(call) {
                 @Override
                 public void onResponse(Call<UserDataResponse> call, Response<UserDataResponse> response) {
                     String email = response.body().getData().getEmail();
@@ -216,8 +216,6 @@ public class LandingActivity extends AppCompatActivity
             ft.commit();
         } else {
             startActivity(intent);
-            //super.onNavigationItemSelected();
-
         }
 
         drawer.closeDrawer(GravityCompat.START);

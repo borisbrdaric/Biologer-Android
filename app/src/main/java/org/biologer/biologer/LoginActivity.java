@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.biologer.biologer.model.LoginResponse;
 import org.biologer.biologer.model.RetrofitClient;
@@ -38,7 +39,6 @@ public class LoginActivity extends AppCompatActivity {
     // Get the value for KEY.DATABASE_NAME
     String key_database_name = SettingsManager.getDatabaseName();
     String database_name = key_database_name;
-    Call login;
 
     /*
      Get the keys for client applications. Separate client key should be given for each Biologer server
@@ -48,6 +48,7 @@ public class LoginActivity extends AppCompatActivity {
     String rsKey = BuildConfig.BiologerRS_Key;
     String hrKey = BuildConfig.BiologerHR_Key;
 
+    Call <LoginResponse> login;
 
     //regex za email
     String regex = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^-]+(?:\\.[a-zA-Z0-9_!#$%&'*+/=?`{|}~^-]+)*@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$";
@@ -127,20 +128,20 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }
 
+        // Change the call according to the database selected
         if (database_name.equals("https://biologer.hr")) {
             login = RetrofitClient.getService(database_name).login("password", "2", hrKey, "*", et_username.getText().toString(), et_password.getText().toString());
         } else {
             login = RetrofitClient.getService(database_name).login("password", "2", rsKey, "*", et_username.getText().toString(), et_password.getText().toString());
         }
-
         Log.d(TAG, "Logging into " + database_name + " as user " + et_username.getText().toString());
 
+        // Get the response from the call
         login.enqueue(new Callback<LoginResponse>() {
             @Override
             public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
                 if(response.isSuccessful()) {
-                    LoginResponse response1 = response.body();
-                    SettingsManager.setToken(response1.getAccessToken());
+                    SettingsManager.setToken(response.body().getAccessToken());
                     fillUserData();
                 }
 
@@ -151,7 +152,7 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<LoginResponse> call, Throwable t) {
-
+                Toast.makeText(LoginActivity.this, "Cannot get response from the server", Toast.LENGTH_LONG).show();
             }
         });
 
@@ -160,7 +161,7 @@ public class LoginActivity extends AppCompatActivity {
     // Get email and name and store it
     private void fillUserData(){
         Call<UserDataResponse> serv = RetrofitClient.getService(database_name).getUserData();
-        serv.enqueue(new Callback<UserDataResponse>() {
+        serv.enqueue(new CallbackWithRetry<UserDataResponse>(serv) {
             @Override
             public void onResponse(Call<UserDataResponse> serv, Response<UserDataResponse> response) {
                 String email = response.body().getData().getEmail();
@@ -175,7 +176,7 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<UserDataResponse> call, Throwable t) {
-                String s = "ff";
+                Toast.makeText(LoginActivity.this, "Cannot get response from the server", Toast.LENGTH_LONG).show();
             }
         });
     }
