@@ -77,12 +77,29 @@ public class LoginActivity extends AppCompatActivity {
         spinner = (Spinner) findViewById(R.id.spinner_databases);
         spinner.setOnItemSelectedListener(new getDatabaseURL());
 
-        // Android 4.4 (KitKat) compatibility: Set login button listener programmatically.
+        // Android 4.4 (KitKat) compatibility: Set button listener programmatically.
+        // Login button.
         Button loginButton = (Button) findViewById(R.id.btn_login);
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 onLogin(v);
+            }
+        });
+        // Register link.
+        CustomTextView registerTextView = (CustomTextView) findViewById(R.id.ctv_register);
+        registerTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onRegister(v);
+            }
+        });
+        // Forgot password link.
+        CustomTextView forgotPassTextView = (CustomTextView) findViewById(R.id.ctv_forgotPass);
+        forgotPassTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onForgotPass(v);
             }
         });
     }
