@@ -119,4 +119,8 @@
     <string name="OK">OK</string>
     <string name="exit_application">After logging out from Biologer you can start the aplication again and log back into some of our online databases.</string>
     <string name="user_is_logged_out">It looks like no user is currently logged in. Biologer will now exit allowing you to restart the application and log back in.</string>
+    <string name="should_cancel_taxa_update">Biologer is currently updating taxonomic database. Would you like to cancel this operation?</string>
+    <string name="continue_update">Continua updating</string>
+    <string name="notify_title_taxa_partially_updated">Taxa partially updated</string>
+    <string name="notify_desc_taxa_partially_updated">Taxonomic tree is partially updated. To get full options from this application ou can complete updating from Biologer Preferences.</string>
 </resources>

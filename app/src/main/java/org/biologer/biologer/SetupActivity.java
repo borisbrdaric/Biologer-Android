@@ -1,13 +1,16 @@
 package org.biologer.biologer;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -230,6 +233,7 @@ public class SetupActivity extends AppCompatActivity {
             public void onClick(View view) {
 
                 progressBarTaxa.setVisibility(View.VISIBLE);
+                getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 
                 Thread updateStatusBar = new Thread() {
                     @Override
@@ -250,6 +254,7 @@ public class SetupActivity extends AppCompatActivity {
                                 @Override
                                 public void run() {
                                     progressBarTaxa.setVisibility(View.GONE);
+                                    getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
                                 }
                             });
                         }
@@ -309,15 +314,42 @@ public class SetupActivity extends AppCompatActivity {
     // Save preferences on leaving the Setup screen
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
-        String project_name = projectName.getText().toString();
-        if (project_name.equals("")) {
-            SettingsManager.setProjectName(null);
-            Log.d(TAG, "No project name is selected.");
+        if (progressBarTaxa.getVisibility() == View.VISIBLE){
+            cancelTaxaUpdate();
         } else {
-            SettingsManager.setProjectName(project_name);
-            Log.d(TAG, "Project name is set to: " + project_name);
+            super.onBackPressed();
+
+            String project_name = projectName.getText().toString();
+            if (project_name.equals("")) {
+                SettingsManager.setProjectName(null);
+                Log.d(TAG, "No project name is selected.");
+            } else {
+                SettingsManager.setProjectName(project_name);
+                Log.d(TAG, "Project name is set to: " + project_name);
+            }
+
+            finish();
         }
-        finish();
+    }
+
+    private void cancelTaxaUpdate() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(getString(R.string.should_cancel_taxa_update))
+                .setCancelable(false)
+                .setPositiveButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, final int id) {
+                        progressBarTaxa.setVisibility(View.GONE);
+                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+                        stopService(new Intent(SetupActivity.this, FetchTaxa.class));
+                    }
+                })
+                .setNegativeButton(getString(R.string.continue_update), new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, final int id) {
+                        dialog.cancel();
+                    }
+                });
+        final AlertDialog alert = builder.create();
+        alert.show();
+
     }
 }

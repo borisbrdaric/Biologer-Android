@@ -29,6 +29,7 @@ public class FetchTaxa extends Service {
     private static final String TAG = "Biologer.FetchTaxa";
 
     private static int totalPages = 1;
+    private static int currentPage = Integer.valueOf(SettingsManager.getTaxaLastPageUpdated());
     private static int progressStatus = 0;
 
     @Override
@@ -42,7 +43,14 @@ public class FetchTaxa extends Service {
     }
 
     public void onDestroy() {
-        updateNotificationText(getString(R.string.notify_title_taxa_updated), getString(R.string.notify_desc_taxa_updated));
+        if (progressStatus == 100) {
+            updateNotificationText(getString(R.string.notify_title_taxa_updated), getString(R.string.notify_desc_taxa_updated));
+        } else {
+            SettingsManager.setTaxaLastPageUpdated(String.valueOf(currentPage));
+            updateNotificationText(getString(R.string.notify_title_taxa_partially_updated), getString(R.string.notify_desc_taxa_partially_updated));
+            stopForeground(true);
+            stopSelf();
+        }
         super.onDestroy();
     }
 
@@ -50,7 +58,8 @@ public class FetchTaxa extends Service {
         // Start the fetching and display notification
         Log.i(TAG, "Service for fetching taxa is started");
         startForeground(1, initialiseNotification(getString(R.string.notify_title_taxa), getString(R.string.notify_desc_taxa)));
-        fetchAll(1);
+        // Get the last downloaded page from saved the preferences and continue downloading from this page.
+        fetchAll(currentPage);
     }
 
     // We will initialise notification with Foreground priority
@@ -158,11 +167,9 @@ public class FetchTaxa extends Service {
 
                 List<Taxa> taxa = response.body().getData();
 
-                int lastPage = response.body().getMeta().getLastPage();
-                int currentPage = response.body().getMeta().getCurrentPage();
-
                 // Variables used to update the Progress Bar status
                 progressStatus = (page * 100 / totalPages);
+                currentPage = page;
                 updateNotificationBar(progressStatus);
 
                 for (Taxa taxon : taxa) {
@@ -179,7 +186,6 @@ public class FetchTaxa extends Service {
                 // loader. Otherwise we continue fetching taxa from the API on the next page.
                 if (isLastPage(page)) {
                     // Inform the user of success
-                    //Toast.makeText(getActivity(), getString(R.string.database_updated), Toast.LENGTH_LONG).show();
                     Log.i(TAG, "All taxa were successfully updated from the server!");
                     stopForeground(true);
                     stopSelf();
