@@ -1,32 +1,36 @@
 package org.biologer.biologer;
 
-import android.app.ActivityManager;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatButton;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.google.firebase.internal.InternalTokenResult;
-
+import org.biologer.biologer.model.LoginResponse;
 import org.biologer.biologer.model.RetrofitClient;
 import org.biologer.biologer.model.UserData;
 
-import java.io.File;
 import java.util.List;
 
-import okhttp3.Cache;
-import okhttp3.CacheControl;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class LogoutFragment extends Fragment {
 
-    private AppCompatButton btn_logout;
-    private TextView tv_username;
-    private TextView tv_email;
-    private TextView tv_database;
+    private static final String TAG = "Biologer.Logout";
+
+    AppCompatButton btn_logout;
+    TextView tv_username;
+    TextView tv_email;
+    TextView tv_database;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
@@ -53,14 +57,9 @@ public class LogoutFragment extends Fragment {
             btn_logout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    SettingsManager.deleteToken();
-                    // Maybe also to delete database!
-                    App.get().getDaoSession().getTaxonDao().deleteAll();
-                    App.get().getDaoSession().getStageDao().deleteAll();
-                    App.get().getDaoSession().getUserDataDao().deleteAll();
-                    SettingsManager.setDatabaseVersion("0");
+                    clearUserData();
                     // Kill the app on logout, since new login request does not work on normal logout... :/
-                    System.exit(0);
+                    killApp();
 /*
                     Intent intent = new Intent(getActivity(), LoginActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -69,5 +68,32 @@ public class LogoutFragment extends Fragment {
                 }
             });
         }
+    }
+
+    private void killApp() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setMessage(getString(R.string.exit_application))
+                .setCancelable(false)
+                .setPositiveButton(getString(R.string.OK), new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, final int id) {
+                        System.exit(0);
+                    }
+                });
+        final AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+    public static void clearUserData() {
+        // Delete user token
+        SettingsManager.deleteToken();
+        // Set the default preferences
+        SettingsManager.setDatabaseVersion("0");
+        SettingsManager.setCustomDataLicense("0");
+        SettingsManager.setCustomImageLicense("0");
+        SettingsManager.setProjectName(null);
+        // Maybe also to delete database...
+        App.get().getDaoSession().getTaxonDao().deleteAll();
+        App.get().getDaoSession().getStageDao().deleteAll();
+        App.get().getDaoSession().getUserDataDao().deleteAll();
     }
 }

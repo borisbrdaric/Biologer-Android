@@ -127,4 +127,22 @@
     <string name="choose_ilicense">Choose different license for your images</string>
     <string name="choose_project">Does the data belong to a project?</string>
     <string name="project_name">Project name</string>
+    <string name="license_public">Free, publish instantly</string>
+    <string name="license_timed">Free, publish in 3 years</string>
+    <string name="channel_description">Displays notifications related with taxonomic updates.</string>
+    <string name="channel_name">Update taxa</string>
+    <string name="notify_title_taxa">Updating taxa</string>
+    <string name="notify_desc_taxa">Downloading new taxonomic database.</string>
+    <string name="notify_title_taxa_updated">Up to date</string>
+    <string name="notify_desc_taxa_updated">Taxonomic database is now updated.</string>
+    <string name="notify_title_taxa_failed">Update failed</string>
+    <string name="notify_desc_taxa_failed">Taxonomic database was not updated from the server. Ensure that you have a stabile internet connection and retry.</string>
+    <string name="retry">Retry</string>
+    <string name="OK">OK</string>
+    <string name="exit_application">After logging out from Biologer you can start the application again and log back into some of our online databases.</string>
+    <string name="user_is_logged_out">It looks like no user is currently logged in. Biologer will now exit allowing you to restart the application and log back in.</string>
+    <string name="should_cancel_taxa_update">Biologer is currently updating taxonomic database. Would you like to cancel this operation?</string>
+    <string name="continue_update">Continua updating</string>
+    <string name="notify_title_taxa_partially_updated">Taxa partially updated</string>
+    <string name="notify_desc_taxa_partially_updated">Taxonomic tree is partially updated. To get full options from this application ou can complete updating from Biologer Preferences.</string>
 </resources>

@@ -13,6 +13,7 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <uses-feature android:name="android.hardware.location.gps" />
     <uses-feature
@@ -93,6 +94,9 @@
                 android:value="org.biologer.biologer.LandingActivity" />
         </activity>
         <activity android:name=".IntroActivity" />
+
+        <service android:name="org.biologer.biologer.FetchTaxa"
+            android:enabled="true" />
 
         <provider
             android:name="android.support.v4.content.FileProvider"

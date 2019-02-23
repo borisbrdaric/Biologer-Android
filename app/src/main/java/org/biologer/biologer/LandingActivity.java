@@ -41,7 +41,6 @@ import java.util.List;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
-import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -50,12 +49,16 @@ import retrofit2.Response;
 public class LandingActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    private static final String TAG = "Biologer.Landing";
+
     ArrayList<String> slike = new ArrayList<>();
     int n = 0;
     int m = 0;
     ArrayList<Entry> entryList;
     List<APIEntry.Photo> photos = null;
-    UserData loggedUser = new UserData();
+
+    // Get the user data from a GreenDao database
+    List<UserData> userdata_list = App.get().getDaoSession().getUserDataDao().loadAll();
 
     private DrawerLayout drawer;
 
@@ -65,7 +68,6 @@ public class LandingActivity extends AppCompatActivity
     private String lastUpdatedAt;
     private ProgressBar progressBarTaxa;
     private int oldProgress = 0;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,14 +91,10 @@ public class LandingActivity extends AppCompatActivity
         View header = navigationView.getHeaderView(0);
         TextView tv_username = header.findViewById(R.id.tv_username);
         TextView tv_email = header.findViewById(R.id.tv_email);
-        List<UserData> list = App.get().getDaoSession().getUserDataDao().loadAll();
 
-        if (list != null && list.size() > 0) {
-            UserData loggedUser = list.get(0);
-
-            tv_username.setText(loggedUser.getUsername());
-            tv_email.setText(loggedUser.getEmail());
-        }
+        // Set the text for sidepanel
+        tv_username.setText(getUserName());
+        tv_email.setText(getUserEmail());
 
         android.support.v4.app.Fragment fragment = new LandingFragment();
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -111,7 +109,7 @@ public class LandingActivity extends AppCompatActivity
     // Send a short request to the server that will return if the taxonomic tree is up to date.
     private void updateTaxa() {
         Call<TaksoniResponse> call = RetrofitClient.getService(SettingsManager.getDatabaseName()).getTaxons(1, 1);
-        call.enqueue(new Callback<TaksoniResponse>() {
+        call.enqueue(new CallbackWithRetry<TaksoniResponse>(call) {
             @Override
             public void onResponse(Call<TaksoniResponse> call, Response<TaksoniResponse> response) {
                 // Get the version of the taxa database from server
@@ -142,15 +140,9 @@ public class LandingActivity extends AppCompatActivity
     // Check if user selected custom Data and Image Licenses. If not, update them from the server.
     private void updateLicense() {
         if (SettingsManager.getCustomDataLicense().equals("0") || SettingsManager.getCustomImageLicense().equals("0")) {
-            // Get User data from a local database
-            List<UserData> list = App.get().getDaoSession().getUserDataDao().loadAll();
-            UserData userdata = list.get(0);
-            final Long uid = userdata.getId();
-            final int data_license_local = userdata.getData_license();
-            final int image_license_local = userdata.getImage_license();
             // Get User data from a server
             Call<UserDataResponse> call = RetrofitClient.getService(SettingsManager.getDatabaseName()).getUserData();
-            call.enqueue(new Callback<UserDataResponse>() {
+            call.enqueue(new CallbackWithRetry<UserDataResponse>(call) {
                 @Override
                 public void onResponse(Call<UserDataResponse> call, Response<UserDataResponse> response) {
                     String email = response.body().getData().getEmail();
@@ -159,17 +151,17 @@ public class LandingActivity extends AppCompatActivity
                     int image_license = response.body().getData().getSettings().getImageLicense();
                     // If both data and image licence should be retrieved from server
                     if (SettingsManager.getCustomDataLicense().equals("0") && SettingsManager.getCustomImageLicense().equals("0")) {
-                        UserData uData = new UserData(uid, email, name, data_license, image_license);
+                        UserData uData = new UserData(getUserID(), email, name, data_license, image_license);
                         App.get().getDaoSession().getUserDataDao().insertOrReplace(uData);
                     }
                     // If only Data License should be retreived from server
                     if (SettingsManager.getCustomDataLicense().equals("0") && !SettingsManager.getCustomImageLicense().equals("0")) {
-                        UserData uData = new UserData(uid, email, name, data_license, image_license_local);
+                        UserData uData = new UserData(getUserID(), email, name, data_license, getUserImageLicense());
                         App.get().getDaoSession().getUserDataDao().insertOrReplace(uData);
                     }
                     // If only Image License should be retreived from server
                     if (!SettingsManager.getCustomDataLicense().equals("0") && SettingsManager.getCustomImageLicense().equals("0")) {
-                        UserData uData = new UserData(uid, email, name, data_license_local, image_license);
+                        UserData uData = new UserData(getUserID(), email, name, getUserDataLicense(), image_license);
                         App.get().getDaoSession().getUserDataDao().insertOrReplace(uData);
                     }
                 }
@@ -220,8 +212,6 @@ public class LandingActivity extends AppCompatActivity
             ft.commit();
         } else {
             startActivity(intent);
-            //super.onNavigationItemSelected();
-
         }
 
         drawer.closeDrawer(GravityCompat.START);
@@ -272,15 +262,8 @@ public class LandingActivity extends AppCompatActivity
         View header = navigationView.getHeaderView(0);
         TextView tv_username = header.findViewById(R.id.tv_username);
         TextView tv_email = header.findViewById(R.id.tv_email);
-        List<UserData> list = App.get().getDaoSession().getUserDataDao().loadAll();
-        if (list != null && list.size() != 0) {
-            loggedUser = list.get(0);
-            tv_username.setText(loggedUser.getUsername());
-            tv_email.setText(loggedUser.getEmail());
-        } else {
-            Intent intent = new Intent(LandingActivity.this, LoginActivity.class);
-            startActivity(intent);
-        }
+        tv_username.setText(getUserName());
+        tv_email.setText(getUserEmail());
         super.onResume();
     }
 
@@ -392,7 +375,7 @@ public class LandingActivity extends AppCompatActivity
         ObjectMapper mapper = new ObjectMapper();
         try {
             String s = mapper.writeValueAsString(apiEntry);
-            Log.i("API_ENTRY", s);
+            Log.i(TAG, "Upload Entry " + s);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
@@ -477,7 +460,6 @@ public class LandingActivity extends AppCompatActivity
     }
 
     Thread updateStatusBar = new Thread() {
-
         @Override
         public void run() {
             try {
@@ -504,13 +486,15 @@ public class LandingActivity extends AppCompatActivity
 
     protected void buildAlertMessageNewerTaxaDb() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        // intent used to start service for fetching taxa
+        final Intent fetchTaxa = new Intent(this, FetchTaxa.class);
         builder.setMessage(getString(R.string.new_database_available))
                 .setCancelable(false)
                 .setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
                     public void onClick(final DialogInterface dialog, final int id) {
                         progressBar4Taxa.setVisibility(View.VISIBLE);
                         updateStatusBar.start();
-                        FetchTaxa.fetchAll(1);
+                        startService(fetchTaxa);
                         SettingsManager.setDatabaseVersion(lastUpdatedAt);
                     }
                 })
@@ -527,13 +511,15 @@ public class LandingActivity extends AppCompatActivity
 
     protected void buildAlertMessageEmptyTaxaDb() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        // intent used to start service for fetching taxa
+        final Intent fetchTaxa = new Intent(this, FetchTaxa.class);
         builder.setMessage(getString(R.string.database_empty))
                 .setCancelable(false)
                 .setPositiveButton(getString(R.string.contin), new DialogInterface.OnClickListener() {
                     public void onClick(final DialogInterface dialog, final int id) {
                         progressBar4Taxa.setVisibility(View.VISIBLE);
                         updateStatusBar.start();
-                        FetchTaxa.fetchAll(1);
+                        startService(fetchTaxa);
                         SettingsManager.setDatabaseVersion(lastUpdatedAt);
                     }
                 })
@@ -544,6 +530,51 @@ public class LandingActivity extends AppCompatActivity
                 });
         final AlertDialog alert = builder.create();
         alert.show();
+    }
+
+    private UserData getLoggedUser() {
+        if (userdata_list.isEmpty()) {
+            LogoutFragment.clearUserData();
+            userLoggedOut();
+        }
+        return userdata_list.get(0);
+    }
+
+    private Long getUserID() {
+        return getLoggedUser().getId();
+    }
+
+    private int getUserDataLicense() {
+        return getLoggedUser().getData_license();
+    }
+
+    private int getUserImageLicense() {
+        return getLoggedUser().getImage_license();
+    }
+
+    private String getUserName() {
+        return getLoggedUser().getUsername();
+    }
+
+    private String getUserEmail() {
+        return getLoggedUser().getEmail();
+    }
+
+    private void userLoggedOut() {
+        Intent intent = new Intent(LandingActivity.this, LoginActivity.class);
+        startActivity(intent);
+        /*
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(getString(R.string.user_is_logged_out))
+                .setCancelable(false)
+                .setPositiveButton(getString(R.string.OK), new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, final int id) {
+                        System.exit(0);
+                    }
+                });
+        final AlertDialog alert = builder.create();
+        alert.show();
+        */
     }
 
 }

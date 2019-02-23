@@ -105,4 +105,22 @@
     <string name="choose_ilicense">Изаберите другачију лиценцу за слике</string>
     <string name="choose_project">Да ли подаци припадају пројекту?</string>
     <string name="project_name">Назив пројекта</string>
+    <string name="license_public">Слободна, одмах објави</string>
+    <string name="license_timed">Слободна, објави за 3 године</string>
+    <string name="channel_description">Приказује обавештења везана за таксономске измене.</string>
+    <string name="channel_name">Ажурирање таксона</string>
+    <string name="notify_title_taxa">Ажурирање таксона</string>
+    <string name="notify_desc_taxa">Преузимам нову верзију базе таксона.</string>
+    <string name="notify_title_taxa_updated">Ажурно</string>
+    <string name="notify_desc_taxa_updated">Таксономска база податаке је надограђена.</string>
+    <string name="notify_title_taxa_failed">Неуспело ажурирање</string>
+    <string name="notify_desc_taxa_failed">Такосномска база није ажурирана са сервера. Уверите се да имате стабилан интернет и покушајте поново.</string>
+    <string name="retry">Покушај поново</string>
+    <string name="OK">У реду</string>
+    <string name="exit_application">Након што се одјавите са Биологера можете поново покренути апликацију и пријавити се на неку другу базу података.</string>
+    <string name="user_is_logged_out">Изгледа да ниједан корисник није пријављен. Биологећ ће изаћи омогућивши вам да поново покренете апликацију и да се пријавите.</string>
+    <string name="should_cancel_taxa_update">Биологер тренутно ажурира базу података за таксоне. Да ли желите да откажете ажурирање?</string>
+    <string name="continue_update">Настави</string>
+    <string name="notify_title_taxa_partially_updated">Taxa partially updated</string>
+    <string name="notify_desc_taxa_partially_updated">Taxonomic tree is partially updated. To get full options from this application ou can complete updating from Biologer Preferences.</string>
 </resources>

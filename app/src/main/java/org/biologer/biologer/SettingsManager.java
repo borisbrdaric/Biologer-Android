@@ -12,7 +12,7 @@ public class SettingsManager {
     private static final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(App.get());
 
     public enum KEY {
-        token, FIRST_LAUNCH, DATABASE_NAME, DATABASE_VERSION, GOOGLE_MAP_TYPE, CUSTOM_DATA_LICENSE, CUSTOM_IMAGE_LICENSE, PROJECT_NAME
+        token, FIRST_LAUNCH, DATABASE_NAME, DATABASE_VERSION, GOOGLE_MAP_TYPE, CUSTOM_DATA_LICENSE, CUSTOM_IMAGE_LICENSE, PROJECT_NAME, TAXA_LAST_PAGE_UPDATED
     }
 
     public static boolean isFirstLaunch()
@@ -102,4 +102,15 @@ public class SettingsManager {
     public static String getProjectName() {
         return prefs.getString(KEY.PROJECT_NAME.toString(),null);
     }
+
+    public static void setTaxaLastPageUpdated(String last_page) {
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString(KEY.TAXA_LAST_PAGE_UPDATED.toString(), last_page);
+        editor.apply();
+    }
+
+    public static String getTaxaLastPageUpdated() {
+        return prefs.getString(KEY.TAXA_LAST_PAGE_UPDATED.toString(),"1");
+    }
+
 }

@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.biologer.biologer.model.LoginResponse;
 import org.biologer.biologer.model.RetrofitClient;
@@ -21,7 +22,6 @@ import org.biologer.biologer.model.network.UserDataResponse;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import okhttp3.Dispatcher;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -38,7 +38,6 @@ public class LoginActivity extends AppCompatActivity {
     // Get the value for KEY.DATABASE_NAME
     String key_database_name = SettingsManager.getDatabaseName();
     String database_name = key_database_name;
-    Call login;
 
     /*
      Get the keys for client applications. Separate client key should be given for each Biologer server
@@ -48,6 +47,7 @@ public class LoginActivity extends AppCompatActivity {
     String rsKey = BuildConfig.BiologerRS_Key;
     String hrKey = BuildConfig.BiologerHR_Key;
 
+    Call <LoginResponse> login;
 
     //regex za email
     String regex = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^-]+(?:\\.[a-zA-Z0-9_!#$%&'*+/=?`{|}~^-]+)*@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$";
@@ -77,12 +77,29 @@ public class LoginActivity extends AppCompatActivity {
         spinner = (Spinner) findViewById(R.id.spinner_databases);
         spinner.setOnItemSelectedListener(new getDatabaseURL());
 
-        // Android 4.4 (KitKat) compatibility: Set login button listener programmatically.
+        // Android 4.4 (KitKat) compatibility: Set button listener programmatically.
+        // Login button.
         Button loginButton = (Button) findViewById(R.id.btn_login);
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 onLogin(v);
+            }
+        });
+        // Register link.
+        CustomTextView registerTextView = (CustomTextView) findViewById(R.id.ctv_register);
+        registerTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onRegister(v);
+            }
+        });
+        // Forgot password link.
+        CustomTextView forgotPassTextView = (CustomTextView) findViewById(R.id.ctv_forgotPass);
+        forgotPassTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onForgotPass(v);
             }
         });
     }
@@ -127,31 +144,33 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }
 
+        // Change the call according to the database selected
         if (database_name.equals("https://biologer.hr")) {
             login = RetrofitClient.getService(database_name).login("password", "2", hrKey, "*", et_username.getText().toString(), et_password.getText().toString());
         } else {
             login = RetrofitClient.getService(database_name).login("password", "2", rsKey, "*", et_username.getText().toString(), et_password.getText().toString());
         }
-
         Log.d(TAG, "Logging into " + database_name + " as user " + et_username.getText().toString());
 
+        // Get the response from the call
         login.enqueue(new Callback<LoginResponse>() {
             @Override
-            public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
+            public void onResponse(Call<LoginResponse> login, Response<LoginResponse> response) {
                 if(response.isSuccessful()) {
-                    LoginResponse response1 = response.body();
-                    SettingsManager.setToken(response1.getAccessToken());
+                    String token = response.body().getAccessToken();
+                    Log.d(TAG, "Token value is: " + token);
+                    SettingsManager.setToken(token);
                     fillUserData();
                 }
-
                 else {
                     tv_wrongPass.setText(R.string.wrong_creds);
+                    Log.d(TAG, String.valueOf(response.body()));
                 }
             }
-
             @Override
-            public void onFailure(Call<LoginResponse> call, Throwable t) {
-
+            public void onFailure(Call<LoginResponse> login, Throwable t) {
+                Toast.makeText(LoginActivity.this, "Cannot get response from the server (token)", Toast.LENGTH_LONG).show();
+                Log.e(TAG, "Cannot get response from the server (token)");
             }
         });
 
@@ -172,10 +191,10 @@ public class LoginActivity extends AppCompatActivity {
                 Intent intent = new Intent(LoginActivity.this, LandingActivity.class);
                 startActivity(intent);
             }
-
             @Override
-            public void onFailure(Call<UserDataResponse> call, Throwable t) {
-                String s = "ff";
+            public void onFailure(Call<UserDataResponse> serv, Throwable t) {
+                Toast.makeText(LoginActivity.this, "Cannot get response from the server (userdata)", Toast.LENGTH_LONG).show();
+                Log.e(TAG, "Cannot get response from the server (userdata)");
             }
         });
     }
