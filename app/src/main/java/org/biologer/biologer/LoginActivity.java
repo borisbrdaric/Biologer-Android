@@ -22,7 +22,6 @@ import org.biologer.biologer.model.network.UserDataResponse;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import okhttp3.Dispatcher;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -139,20 +138,22 @@ public class LoginActivity extends AppCompatActivity {
         // Get the response from the call
         login.enqueue(new Callback<LoginResponse>() {
             @Override
-            public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
+            public void onResponse(Call<LoginResponse> login, Response<LoginResponse> response) {
                 if(response.isSuccessful()) {
-                    SettingsManager.setToken(response.body().getAccessToken());
+                    String token = response.body().getAccessToken();
+                    Log.d(TAG, "Token value is: " + token);
+                    SettingsManager.setToken(token);
                     fillUserData();
                 }
-
                 else {
                     tv_wrongPass.setText(R.string.wrong_creds);
+                    Log.d(TAG, String.valueOf(response.body()));
                 }
             }
-
             @Override
-            public void onFailure(Call<LoginResponse> call, Throwable t) {
-                Toast.makeText(LoginActivity.this, "Cannot get response from the server", Toast.LENGTH_LONG).show();
+            public void onFailure(Call<LoginResponse> login, Throwable t) {
+                Toast.makeText(LoginActivity.this, "Cannot get response from the server (token)", Toast.LENGTH_LONG).show();
+                Log.e(TAG, "Cannot get response from the server (token)");
             }
         });
 
@@ -161,7 +162,7 @@ public class LoginActivity extends AppCompatActivity {
     // Get email and name and store it
     private void fillUserData(){
         Call<UserDataResponse> serv = RetrofitClient.getService(database_name).getUserData();
-        serv.enqueue(new CallbackWithRetry<UserDataResponse>(serv) {
+        serv.enqueue(new Callback<UserDataResponse>() {
             @Override
             public void onResponse(Call<UserDataResponse> serv, Response<UserDataResponse> response) {
                 String email = response.body().getData().getEmail();
@@ -173,10 +174,10 @@ public class LoginActivity extends AppCompatActivity {
                 Intent intent = new Intent(LoginActivity.this, LandingActivity.class);
                 startActivity(intent);
             }
-
             @Override
-            public void onFailure(Call<UserDataResponse> call, Throwable t) {
-                Toast.makeText(LoginActivity.this, "Cannot get response from the server", Toast.LENGTH_LONG).show();
+            public void onFailure(Call<UserDataResponse> serv, Throwable t) {
+                Toast.makeText(LoginActivity.this, "Cannot get response from the server (userdata)", Toast.LENGTH_LONG).show();
+                Log.e(TAG, "Cannot get response from the server (userdata)");
             }
         });
     }

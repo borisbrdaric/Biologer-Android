@@ -57,12 +57,8 @@ public class LandingActivity extends AppCompatActivity
     ArrayList<Entry> entryList;
     List<APIEntry.Photo> photos = null;
 
-    // Get the user data
-    List<UserData> list = App.get().getDaoSession().getUserDataDao().loadAll();
-    UserData loggedUser = list.get(0);
-    Long uid = loggedUser.getId();
-    int data_license_local = loggedUser.getData_license();
-    int image_license_local = loggedUser.getImage_license();
+    // Get the user data from a GreenDao database
+    List<UserData> userdata_list = App.get().getDaoSession().getUserDataDao().loadAll();
 
     private DrawerLayout drawer;
 
@@ -97,8 +93,8 @@ public class LandingActivity extends AppCompatActivity
         TextView tv_email = header.findViewById(R.id.tv_email);
 
         // Set the text for sidepanel
-        tv_username.setText(loggedUser.getUsername());
-        tv_email.setText(loggedUser.getEmail());
+        tv_username.setText(getUserName());
+        tv_email.setText(getUserEmail());
 
         android.support.v4.app.Fragment fragment = new LandingFragment();
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -155,17 +151,17 @@ public class LandingActivity extends AppCompatActivity
                     int image_license = response.body().getData().getSettings().getImageLicense();
                     // If both data and image licence should be retrieved from server
                     if (SettingsManager.getCustomDataLicense().equals("0") && SettingsManager.getCustomImageLicense().equals("0")) {
-                        UserData uData = new UserData(uid, email, name, data_license, image_license);
+                        UserData uData = new UserData(getUserID(), email, name, data_license, image_license);
                         App.get().getDaoSession().getUserDataDao().insertOrReplace(uData);
                     }
                     // If only Data License should be retreived from server
                     if (SettingsManager.getCustomDataLicense().equals("0") && !SettingsManager.getCustomImageLicense().equals("0")) {
-                        UserData uData = new UserData(uid, email, name, data_license, image_license_local);
+                        UserData uData = new UserData(getUserID(), email, name, data_license, getUserImageLicense());
                         App.get().getDaoSession().getUserDataDao().insertOrReplace(uData);
                     }
                     // If only Image License should be retreived from server
                     if (!SettingsManager.getCustomDataLicense().equals("0") && SettingsManager.getCustomImageLicense().equals("0")) {
-                        UserData uData = new UserData(uid, email, name, data_license_local, image_license);
+                        UserData uData = new UserData(getUserID(), email, name, getUserDataLicense(), image_license);
                         App.get().getDaoSession().getUserDataDao().insertOrReplace(uData);
                     }
                 }
@@ -266,15 +262,8 @@ public class LandingActivity extends AppCompatActivity
         View header = navigationView.getHeaderView(0);
         TextView tv_username = header.findViewById(R.id.tv_username);
         TextView tv_email = header.findViewById(R.id.tv_email);
-        List<UserData> list = App.get().getDaoSession().getUserDataDao().loadAll();
-        if (list != null && list.size() != 0) {
-            loggedUser = list.get(0);
-            tv_username.setText(loggedUser.getUsername());
-            tv_email.setText(loggedUser.getEmail());
-        } else {
-            Intent intent = new Intent(LandingActivity.this, LoginActivity.class);
-            startActivity(intent);
-        }
+        tv_username.setText(getUserName());
+        tv_email.setText(getUserEmail());
         super.onResume();
     }
 
@@ -541,6 +530,51 @@ public class LandingActivity extends AppCompatActivity
                 });
         final AlertDialog alert = builder.create();
         alert.show();
+    }
+
+    private UserData getLoggedUser() {
+        if (userdata_list.isEmpty()) {
+            LogoutFragment.clearUserData();
+            userLoggedOut();
+        }
+        return userdata_list.get(0);
+    }
+
+    private Long getUserID() {
+        return getLoggedUser().getId();
+    }
+
+    private int getUserDataLicense() {
+        return getLoggedUser().getData_license();
+    }
+
+    private int getUserImageLicense() {
+        return getLoggedUser().getImage_license();
+    }
+
+    private String getUserName() {
+        return getLoggedUser().getUsername();
+    }
+
+    private String getUserEmail() {
+        return getLoggedUser().getEmail();
+    }
+
+    private void userLoggedOut() {
+        Intent intent = new Intent(LandingActivity.this, LoginActivity.class);
+        startActivity(intent);
+        /*
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(getString(R.string.user_is_logged_out))
+                .setCancelable(false)
+                .setPositiveButton(getString(R.string.OK), new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, final int id) {
+                        System.exit(0);
+                    }
+                });
+        final AlertDialog alert = builder.create();
+        alert.show();
+        */
     }
 
 }

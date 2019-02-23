@@ -116,4 +116,7 @@
     <string name="notify_title_taxa_failed">Неуспело ажурирање</string>
     <string name="notify_desc_taxa_failed">Такосномска база није ажурирана са сервера. Уверите се да имате стабилан интернет и покушајте поново.</string>
     <string name="retry">Retry</string>
+    <string name="OK">OK</string>
+    <string name="exit_application">After logging out from Biologer you can start the aplication again and log back into some of our online databases.</string>
+    <string name="user_is_logged_out">It looks like no user is currently logged in. Biologer will now exit allowing you to restart the application and log back in.</string>
 </resources>
