@@ -145,4 +145,7 @@
     <string name="continue_update">Continua updating</string>
     <string name="notify_title_taxa_partially_updated">Taxa partially updated</string>
     <string name="notify_desc_taxa_partially_updated">Taxonomic tree is partially updated. To get full options from this application ou can complete updating from Biologer Preferences.</string>
+    <string name="stop_action">Stop</string>
+    <string name="resume_action">Resume</string>
+    <string name="cancel_update">Cancel update</string>
 </resources>

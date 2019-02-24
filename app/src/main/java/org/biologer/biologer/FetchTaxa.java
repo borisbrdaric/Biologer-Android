@@ -1,17 +1,13 @@
 package org.biologer.biologer;
 
-import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.IBinder;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationManagerCompat;
-import android.util.Log;
+import android.support.v4.app.NotificationCompat;import android.util.Log;
 
 import org.biologer.biologer.model.RetrofitClient;
 import org.biologer.biologer.model.Stage;
@@ -28,13 +24,23 @@ public class FetchTaxa extends Service {
 
     private static final String TAG = "Biologer.FetchTaxa";
 
+    public static final String ACTION_START_FOREGROUND_SERVICE = "ACTION_START_FOREGROUND_SERVICE";
+    public static final String ACTION_STOP_FOREGROUND_SERVICE = "ACTION_STOP_FOREGROUND_SERVICE";
+    public static final String ACTION_CANCEL = "ACTION_CANCEL";
+    public static final String ACTION_RESUME = "ACTION_RESUME";
+    private String stop_fetching = "no";
+    private static FetchTaxa instance = null;
+
     private static int totalPages = 1;
     private static int currentPage = Integer.valueOf(SettingsManager.getTaxaLastPageUpdated());
     private static int progressStatus = 0;
 
     @Override
     public void onCreate() {
-        this.startForeground();
+        super.onCreate();
+        stopForeground(true);
+        instance = this;
+        Log.d(TAG, "Running onCreate()");
     }
 
     @Override
@@ -42,29 +48,61 @@ public class FetchTaxa extends Service {
         return null;
     }
 
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        if(intent != null)
+        {
+            String action = intent.getAction();
+
+            switch (action)
+            {
+                case ACTION_START_FOREGROUND_SERVICE:
+                    stop_fetching = "no";
+                    startTaxaFetchingService();
+                    Log.i(TAG, "Starting foreground service.");
+//                    Toast.makeText(getApplicationContext(), "Foreground service is started.", Toast.LENGTH_LONG).show();
+                    break;
+                case ACTION_STOP_FOREGROUND_SERVICE:
+                    stop_fetching = "yes";
+                    stopTaxaFetchingService();
+                    Log.i(TAG, "Stopping foreground service.");
+                    break;
+                case ACTION_CANCEL:
+                    stop_fetching = "yes";
+                    stopTaxaFetchingService();
+                    Log.i(TAG, "Action cancel selected, stopping the foreground service.");
+                    break;
+                case ACTION_RESUME:
+                    stop_fetching = "no";
+                    startTaxaFetchingService();
+                    Log.i(TAG, "Action resume selected, continuing the foreground service.");
+                    break;
+            }
+        }
+        return super.onStartCommand(intent, flags, startId);
+    }
+
     public void onDestroy() {
-        if (progressStatus == 100) {
-            updateNotificationText(getString(R.string.notify_title_taxa_updated), getString(R.string.notify_desc_taxa_updated));
+        super.onDestroy();
+        instance = null;
+        Log.d(TAG, "Running onDestroy(). Last page fetched was " + String.valueOf(currentPage));
+        // If fetching is finished successfully we will start next fetching from the first
+        // page. If not, we can resume fetching.
+        if (SettingsManager.getTaxaLastPageUpdated().equals("1")) {
+            // Don’t do anything
+        } if (currentPage == totalPages) {
+            SettingsManager.setTaxaLastPageUpdated("1");
         } else {
             SettingsManager.setTaxaLastPageUpdated(String.valueOf(currentPage));
-            updateNotificationText(getString(R.string.notify_title_taxa_partially_updated), getString(R.string.notify_desc_taxa_partially_updated));
-            stopForeground(true);
-            stopSelf();
         }
-        super.onDestroy();
     }
 
-    private void startForeground() {
+    private void startTaxaFetchingService() {
         // Start the fetching and display notification
-        Log.i(TAG, "Service for fetching taxa is started");
-        startForeground(1, initialiseNotification(getString(R.string.notify_title_taxa), getString(R.string.notify_desc_taxa)));
-        // Get the last downloaded page from saved the preferences and continue downloading from this page.
-        fetchAll(currentPage);
-    }
+        Log.i(TAG, "Service for fetching taxa started");
+        Log.i(TAG, "Continuing from the page " + String.valueOf(currentPage));
 
-    // We will initialise notification with Foreground priority
-    private Notification initialiseNotification(String title, String description){
-        // To do something if notification is taped, we must set up an intent
+        // Create initial notification to be set to Foreground
         Intent intent = new Intent(this, SplashActivity.class);
         intent.setAction(Intent.ACTION_MAIN);
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
@@ -72,15 +110,23 @@ public class FetchTaxa extends Service {
 
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, "biologer_taxa")
                 .setSmallIcon(R.drawable.ic_kornjaca)
-                .setContentTitle(title)
-                .setContentText(description)
+                .setContentTitle(getString(R.string.notify_title_taxa))
+                .setContentText(getString(R.string.notify_desc_taxa))
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setOngoing(true)
                 .setOnlyAlertOnce(true)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(false);
 
-        return mBuilder.build();
+        Notification notification = mBuilder.build();
+        startForeground(1, notification);
+
+        // Get the last downloaded page from saved the preferences and continue downloading from this page.
+        fetchAll(currentPage);
+    }
+
+    private void stopTaxaFetchingService() {
+        stopForeground(true);
     }
 
     private void updateNotificationBar(int progressStatus) {
@@ -90,8 +136,17 @@ public class FetchTaxa extends Service {
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
 
-        Intent retry = new Intent(this, FetchTaxa.class);
-        PendingIntent retryPendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
+        // Add Cancel button intent in notification.
+        Intent cancelIntent = new Intent(this, FetchTaxa.class);
+        cancelIntent.setAction(ACTION_CANCEL);
+        PendingIntent pendingCancelIntent = PendingIntent.getService(this, 0, cancelIntent, 0);
+        NotificationCompat.Action cancelAction = new NotificationCompat.Action(android.R.drawable.ic_media_pause, getString(R.string.stop_action), pendingCancelIntent);
+
+        // Add Resume button intent in notification.
+        Intent resumeIntent = new Intent(this, FetchTaxa.class);
+        resumeIntent.setAction(ACTION_RESUME);
+        PendingIntent pendingResumeIntent = PendingIntent.getService(this, 0, resumeIntent, 0);
+        NotificationCompat.Action resumeAction = new NotificationCompat.Action(android.R.drawable.ic_media_play, getString(R.string.resume_action), pendingResumeIntent);
 
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, "biologer_taxa")
                 .setSmallIcon(R.drawable.ic_kornjaca)
@@ -102,7 +157,9 @@ public class FetchTaxa extends Service {
                 .setOngoing(true)
                 .setOnlyAlertOnce(true)
                 .setContentIntent(pendingIntent)
-                .setAutoCancel(false);
+                .setAutoCancel(false)
+                .addAction(cancelAction)
+                .addAction(resumeAction);
 
         Notification notification = mBuilder.build();
 
@@ -117,23 +174,7 @@ public class FetchTaxa extends Service {
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, "biologer_taxa")
-                    .setSmallIcon(R.drawable.ic_kornjaca)
-                    .setContentTitle(title)
-                    .setContentText(description)
-                    .setPriority(NotificationManager.IMPORTANCE_DEFAULT)
-                    .setOngoing(false)
-                    .setContentIntent(pendingIntent)
-                    .setOnlyAlertOnce(false)
-                    .setAutoCancel(true);
-
-            Notification notification = mBuilder.build();
-
-            NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-            mNotificationManager.notify(1, notification);
-        } else {
-            NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, "biologer_taxa")
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, "biologer_taxa")
                     .setSmallIcon(R.drawable.ic_kornjaca)
                     .setContentTitle(title)
                     .setContentText(description)
@@ -147,7 +188,11 @@ public class FetchTaxa extends Service {
 
             NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             mNotificationManager.notify(1, notification);
-        }
+    }
+
+    private void cancelNotification() {
+        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager.cancel(1);
     }
 
     public void fetchAll(final int page) {
@@ -155,7 +200,7 @@ public class FetchTaxa extends Service {
             return;
         }
 
-        Call<TaksoniResponse> call = RetrofitClient.getService(SettingsManager.getDatabaseName()).getTaxons(page, 30);
+        Call<TaksoniResponse> call = RetrofitClient.getService(SettingsManager.getDatabaseName()).getTaxons(page, 40);
 
         call.enqueue(new CallbackWithRetry<TaksoniResponse>(call) {
             @Override
@@ -182,14 +227,19 @@ public class FetchTaxa extends Service {
                     }
                 }
 
+                Log.i(TAG, "Fetching page No. " + String.valueOf(page) + " of total " + String.valueOf(totalPages) + " pages");
+
                 // If we just finished fetching taxa data for the last page, we can stop showing
                 // loader. Otherwise we continue fetching taxa from the API on the next page.
                 if (isLastPage(page)) {
                     // Inform the user of success
                     Log.i(TAG, "All taxa were successfully updated from the server!");
-                    stopForeground(true);
                     stopSelf();
-                } else {
+                } if (stop_fetching.equals("yes")) {
+                    stopSelf();
+                    Log.i(TAG, "Fetching of taxa data is canceled by the user!");
+                }
+                else {
                     fetchAll(page + 1);
                 }
             }
@@ -214,5 +264,10 @@ public class FetchTaxa extends Service {
 
     public static int getProgressStatus() {
         return progressStatus;
+    }
+
+    // to check if the service is still running
+    public static boolean isInstanceCreated() {
+        return instance != null;
     }
 }

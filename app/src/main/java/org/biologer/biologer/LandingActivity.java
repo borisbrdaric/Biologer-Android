@@ -17,6 +17,8 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.Menu;
 import android.view.View;
+import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -80,6 +82,9 @@ public class LandingActivity extends AppCompatActivity
         progressBar4Taxa = findViewById(R.id.progress_taxa);
         progressBarTaxa = findViewById(R.id.progress_bar_taxa1);
 
+        Button button = findViewById(R.id.btn_cancel_update);
+
+
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.nav_open_drawer, R.string.nav_close_drawer);
         drawer.addDrawerListener(toggle);
@@ -104,6 +109,13 @@ public class LandingActivity extends AppCompatActivity
 
         updateTaxa();
         updateLicense();
+
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                cancelTaxaUpdate();
+            }
+        });
     }
 
     // Send a short request to the server that will return if the taxonomic tree is up to date.
@@ -487,7 +499,8 @@ public class LandingActivity extends AppCompatActivity
     protected void buildAlertMessageNewerTaxaDb() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         // intent used to start service for fetching taxa
-        final Intent fetchTaxa = new Intent(this, FetchTaxa.class);
+        final Intent fetchTaxa = new Intent(LandingActivity.this, FetchTaxa.class);
+        fetchTaxa.setAction(FetchTaxa.ACTION_START_FOREGROUND_SERVICE);
         builder.setMessage(getString(R.string.new_database_available))
                 .setCancelable(false)
                 .setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
@@ -513,6 +526,7 @@ public class LandingActivity extends AppCompatActivity
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         // intent used to start service for fetching taxa
         final Intent fetchTaxa = new Intent(this, FetchTaxa.class);
+        fetchTaxa.setAction(FetchTaxa.ACTION_START_FOREGROUND_SERVICE);
         builder.setMessage(getString(R.string.database_empty))
                 .setCancelable(false)
                 .setPositiveButton(getString(R.string.contin), new DialogInterface.OnClickListener() {
@@ -524,6 +538,32 @@ public class LandingActivity extends AppCompatActivity
                     }
                 })
                 .setNegativeButton(getString(R.string.skip), new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, final int id) {
+                        dialog.cancel();
+                    }
+                });
+        final AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+    private void cancelTaxaUpdate() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(getString(R.string.should_cancel_taxa_update))
+                .setCancelable(false)
+                .setPositiveButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, final int id) {
+                        SettingsManager.setDatabaseVersion("0");
+                        SettingsManager.setTaxaLastPageUpdated("1");
+                        App.get().getDaoSession().getTaxonDao().deleteAll();
+                        App.get().getDaoSession().getStageDao().deleteAll();
+                        progressBar4Taxa.setVisibility(View.GONE);
+                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+                        Intent fetchTaxa = new Intent(LandingActivity.this, FetchTaxa.class);
+                        fetchTaxa.setAction(FetchTaxa.ACTION_STOP_FOREGROUND_SERVICE);
+                        startService(fetchTaxa);
+                    }
+                })
+                .setNegativeButton(getString(R.string.continue_update), new DialogInterface.OnClickListener() {
                     public void onClick(final DialogInterface dialog, final int id) {
                         dialog.cancel();
                     }

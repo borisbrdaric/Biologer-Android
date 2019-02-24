@@ -91,6 +91,7 @@ public class LogoutFragment extends Fragment {
         SettingsManager.setCustomDataLicense("0");
         SettingsManager.setCustomImageLicense("0");
         SettingsManager.setProjectName(null);
+        SettingsManager.setTaxaLastPageUpdated("1");
         // Maybe also to delete database...
         App.get().getDaoSession().getTaxonDao().deleteAll();
         App.get().getDaoSession().getStageDao().deleteAll();

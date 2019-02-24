@@ -57,7 +57,8 @@ public class SetupActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         // intent used to start service for fetching taxa
-        final Intent fetchTaxa = new Intent(this, FetchTaxa.class);
+        final Intent fetchTaxa = new Intent(SetupActivity.this, FetchTaxa.class);
+        fetchTaxa.setAction(FetchTaxa.ACTION_START_FOREGROUND_SERVICE);
 
         progressBarTaxa = findViewById(R.id.progress_bar_taxa);
         Button btn = findViewById(R.id.btn);
@@ -314,7 +315,7 @@ public class SetupActivity extends AppCompatActivity {
     // Save preferences on leaving the Setup screen
     @Override
     public void onBackPressed() {
-        if (progressBarTaxa.getVisibility() == View.VISIBLE){
+        if (FetchTaxa.isInstanceCreated()){
             cancelTaxaUpdate();
         } else {
             super.onBackPressed();
@@ -338,9 +339,15 @@ public class SetupActivity extends AppCompatActivity {
                 .setCancelable(false)
                 .setPositiveButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
                     public void onClick(final DialogInterface dialog, final int id) {
+                        SettingsManager.setDatabaseVersion("0");
+                        SettingsManager.setTaxaLastPageUpdated("1");
+                        App.get().getDaoSession().getTaxonDao().deleteAll();
+                        App.get().getDaoSession().getStageDao().deleteAll();
                         progressBarTaxa.setVisibility(View.GONE);
                         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-                        stopService(new Intent(SetupActivity.this, FetchTaxa.class));
+                        Intent fetchTaxa = new Intent(SetupActivity.this, FetchTaxa.class);
+                        fetchTaxa.setAction(FetchTaxa.ACTION_STOP_FOREGROUND_SERVICE);
+                        startService(fetchTaxa);
                     }
                 })
                 .setNegativeButton(getString(R.string.continue_update), new DialogInterface.OnClickListener() {
@@ -350,6 +357,5 @@ public class SetupActivity extends AppCompatActivity {
                 });
         final AlertDialog alert = builder.create();
         alert.show();
-
     }
 }

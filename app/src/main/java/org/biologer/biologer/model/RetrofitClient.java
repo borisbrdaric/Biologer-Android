@@ -8,6 +8,7 @@ import org.biologer.biologer.RetrofitService;
 import org.biologer.biologer.SettingsManager;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
@@ -27,6 +28,8 @@ public class RetrofitClient {
             mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
             OkHttpClient client = new OkHttpClient.Builder()
+                    .readTimeout(5, TimeUnit.SECONDS)
+                    .connectTimeout(200, TimeUnit.SECONDS)
                     .addInterceptor(
                             new Interceptor() {
                                 @Override
