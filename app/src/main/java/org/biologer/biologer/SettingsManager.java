@@ -12,7 +12,7 @@ public class SettingsManager {
     private static final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(App.get());
 
     public enum KEY {
-        token, FIRST_LAUNCH, DATABASE_NAME, DATABASE_VERSION, GOOGLE_MAP_TYPE, CUSTOM_DATA_LICENSE, CUSTOM_IMAGE_LICENSE, PROJECT_NAME, TAXA_LAST_PAGE_UPDATED
+        token, FIRST_LAUNCH, DATABASE_NAME, DATABASE_VERSION, GOOGLE_MAP_TYPE, PROJECT_NAME, TAXA_LAST_PAGE_UPDATED
     }
 
     public static boolean isFirstLaunch()
@@ -71,26 +71,6 @@ public class SettingsManager {
 
     public static String getGoogleMapType() {
         return prefs.getString(KEY.GOOGLE_MAP_TYPE.toString(),"NORMAL");
-    }
-
-    public static void setCustomDataLicense(String custom_data_license) {
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putString(KEY.CUSTOM_DATA_LICENSE.toString(), custom_data_license);
-        editor.apply();
-    }
-
-    public static String getCustomDataLicense() {
-        return prefs.getString(KEY.CUSTOM_DATA_LICENSE.toString(),"0");
-    }
-
-    public static void setCustomImageLicense(String custom_image_license) {
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putString(KEY.CUSTOM_IMAGE_LICENSE.toString(), custom_image_license);
-        editor.apply();
-    }
-
-    public static String getCustomImageLicense() {
-        return prefs.getString(KEY.CUSTOM_IMAGE_LICENSE.toString(),"0");
     }
 
     public static void setProjectName(String project_name) {

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.preference.PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory android:title="@string/data_synchronisation">
+        <ListPreference android:key="data_license"
+            android:title="@string/data_license"
+            android:summary="@string/choose_dlicense"
+            android:defaultValue="0" />
+        <ListPreference android:key="image_license"
+            android:title="@string/image_license"
+            android:summary="@string/choose_ilicense"
+            android:defaultValue="0" />
+        <Preference
+            android:title="@string/update_taxa"
+            android:key="taxa_button"
+            android:summary="@string/update_taxa_desc"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/additional_options">
+        <EditTextPreference
+            android:key="project_name"
+            android:title="@string/project_name"
+            android:dialogTitle="@string/project_name"
+            android:summary="@string/choose_project"
+            android:defaultValue="" />
+    </PreferenceCategory>
+
+</android.support.v7.preference.PreferenceScreen>

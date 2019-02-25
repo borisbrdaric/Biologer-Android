@@ -54,9 +54,6 @@
                 android:value="org.biologer.biologer.EntryActivity" />
         </activity>
         <activity
-            android:name=".SetupActivity"
-            android:label="@string/title_setup_activity" />
-        <activity
             android:name=".EntryActivity"
             android:windowSoftInputMode="stateAlwaysHidden|adjustResize">
             <meta-data
@@ -97,6 +94,8 @@
 
         <service android:name="org.biologer.biologer.FetchTaxa"
             android:enabled="true" />
+
+        <service android:name="org.biologer.biologer.UpdateLicenses"/>
 
         <provider
             android:name="android.support.v4.content.FileProvider"

@@ -1,8 +1,10 @@
 package org.biologer.biologer;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -23,6 +25,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -112,8 +115,6 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
     UserData userdata = list.get(0);
     int user_data_license = userdata.getData_license();
     int user_image_license = userdata.getImage_license();
-
-    String project_name = SettingsManager.getProjectName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -378,6 +379,7 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
         Integer brojJedinki = (et_brojJedinki.getText().toString().trim().length() > 0) ? Integer.valueOf(et_brojJedinki.getText().toString()) : null;
         Long selectedStage = (stage != null) ? stage.getStageId() : null;
         String razlogSmrti = (et_razlogSmrti.getText() != null) ? et_razlogSmrti.getText().toString() : "";
+        String project_name = PreferenceManager.getDefaultSharedPreferences(this).getString("project_name", "0");
 
         calendar = Calendar.getInstance();
         simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");

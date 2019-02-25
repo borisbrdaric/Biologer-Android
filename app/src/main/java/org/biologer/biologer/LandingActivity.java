@@ -1,7 +1,10 @@
 package org.biologer.biologer;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.design.widget.NavigationView;
 
 import android.support.v4.app.Fragment;
@@ -12,6 +15,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
@@ -35,6 +39,7 @@ import org.biologer.biologer.model.UserData;
 import org.biologer.biologer.model.network.APIEntryResponse;
 import org.biologer.biologer.model.network.TaksoniResponse;
 import org.biologer.biologer.model.network.UserDataResponse;
+import org.biologer.biologer.model.network.UserDataSer;
 import org.greenrobot.eventbus.EventBus;
 
 import java.io.File;
@@ -71,6 +76,8 @@ public class LandingActivity extends AppCompatActivity
     private ProgressBar progressBarTaxa;
     private int oldProgress = 0;
 
+    android.support.v4.app.Fragment fragment = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -101,14 +108,10 @@ public class LandingActivity extends AppCompatActivity
         tv_username.setText(getUserName());
         tv_email.setText(getUserEmail());
 
-        android.support.v4.app.Fragment fragment = new LandingFragment();
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.add(R.id.content_frame, fragment);
-        ft.addToBackStack("fragment");
-        ft.commit();
+        showLandingFragment();
 
         updateTaxa();
-        updateLicense();
+        updateLicenses();
 
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -128,9 +131,9 @@ public class LandingActivity extends AppCompatActivity
                 lastUpdatedAt = Long.toString(response.body().getMeta().getLastUpdatedAt());
                 String previousVersion = SettingsManager.getDatabaseVersion();
                 if (lastUpdatedAt.equals(previousVersion)) {
-                    Log.i("Taxa database: ","It looks like this taxonomic database is already up to date. Nothing to do here!");
+                    Log.i(TAG,"It looks like this taxonomic database is already up to date. Nothing to do here!");
                 } else  {
-                    Log.i("Taxa database: ","Taxa database on the server and android app didn’t match!");
+                    Log.i(TAG,"Taxa database on the server and android app didn’t match!");
                     if (previousVersion.equals("0")) {
                         // If the database was never updated...
                         buildAlertMessageEmptyTaxaDb();
@@ -149,46 +152,15 @@ public class LandingActivity extends AppCompatActivity
         });
     }
 
-    // Check if user selected custom Data and Image Licenses. If not, update them from the server.
-    private void updateLicense() {
-        if (SettingsManager.getCustomDataLicense().equals("0") || SettingsManager.getCustomImageLicense().equals("0")) {
-            // Get User data from a server
-            Call<UserDataResponse> call = RetrofitClient.getService(SettingsManager.getDatabaseName()).getUserData();
-            call.enqueue(new CallbackWithRetry<UserDataResponse>(call) {
-                @Override
-                public void onResponse(Call<UserDataResponse> call, Response<UserDataResponse> response) {
-                    String email = response.body().getData().getEmail();
-                    String name = response.body().getData().getFullName();
-                    int data_license = response.body().getData().getSettings().getDataLicense();
-                    int image_license = response.body().getData().getSettings().getImageLicense();
-                    // If both data and image licence should be retrieved from server
-                    if (SettingsManager.getCustomDataLicense().equals("0") && SettingsManager.getCustomImageLicense().equals("0")) {
-                        UserData uData = new UserData(getUserID(), email, name, data_license, image_license);
-                        App.get().getDaoSession().getUserDataDao().insertOrReplace(uData);
-                    }
-                    // If only Data License should be retreived from server
-                    if (SettingsManager.getCustomDataLicense().equals("0") && !SettingsManager.getCustomImageLicense().equals("0")) {
-                        UserData uData = new UserData(getUserID(), email, name, data_license, getUserImageLicense());
-                        App.get().getDaoSession().getUserDataDao().insertOrReplace(uData);
-                    }
-                    // If only Image License should be retreived from server
-                    if (!SettingsManager.getCustomDataLicense().equals("0") && SettingsManager.getCustomImageLicense().equals("0")) {
-                        UserData uData = new UserData(getUserID(), email, name, getUserDataLicense(), image_license);
-                        App.get().getDaoSession().getUserDataDao().insertOrReplace(uData);
-                    }
-                }
-                @Override
-                public void onFailure(Call<UserDataResponse> call, Throwable t) {
-                    Log.e("Taxa database: ", "Application could not get user data from a server!");
-                }
-            });
-        }
+    private void updateLicenses() {
+        // Check if the licence has shanged on the server and update if needed
+        final Intent update_licenses = new Intent(LandingActivity.this, UpdateLicenses.class);
+        startService(update_licenses);
     }
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         int id = item.getItemId();
-        android.support.v4.app.Fragment fragment = null;
         Intent intent = null;
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -203,24 +175,27 @@ public class LandingActivity extends AppCompatActivity
             case R.id.nav_logout:
                 fragment = new LogoutFragment();
                 break;
+            case R.id.nav_setup:
+                fragment = new PreferencesFragment();
+                break;
             case R.id.nav_help:
                 startActivity(new Intent(LandingActivity.this, IntroActivity.class));
                 finish();
                 drawer.closeDrawer(GravityCompat.START);
                 return true;
-            case R.id.nav_setup:
+                /*
                 startActivity(new Intent(LandingActivity.this, SetupActivity.class));
                 drawer.closeDrawer(GravityCompat.START);
                 return true;
+                */
             default:
                 fragment = new LandingFragment();
         }
 
         if (fragment != null) {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-
             ft.add(R.id.content_frame, fragment);
-            ft.addToBackStack("fragment");
+            ft.addToBackStack("new fragment");
             ft.commit();
         } else {
             startActivity(intent);
@@ -337,7 +312,6 @@ public class LandingActivity extends AppCompatActivity
                 uploadFile(file, i);
             }
         }
-
     }
 
     private void uploadEntry_step2() {
@@ -572,15 +546,16 @@ public class LandingActivity extends AppCompatActivity
         alert.show();
     }
 
+    // Get the data from GreenDao database
     private UserData getLoggedUser() {
         if (userdata_list.isEmpty()) {
-            LogoutFragment.clearUserData();
+            clearUserData(this);
             userLoggedOut();
         }
         return userdata_list.get(0);
     }
 
-    private Long getUserID() {
+    public Long getUserID() {
         return getLoggedUser().getId();
     }
 
@@ -617,4 +592,26 @@ public class LandingActivity extends AppCompatActivity
         */
     }
 
+    public static void clearUserData(Context context) {
+        // Delete user token
+        SettingsManager.deleteToken();
+        // Set the default preferences
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        preferences.edit().clear().apply();
+        SettingsManager.setDatabaseVersion("0");
+        SettingsManager.setProjectName(null);
+        SettingsManager.setTaxaLastPageUpdated("1");
+        // Maybe also to delete database...
+        App.get().getDaoSession().getTaxonDao().deleteAll();
+        App.get().getDaoSession().getStageDao().deleteAll();
+        App.get().getDaoSession().getUserDataDao().deleteAll();
+    }
+
+    private void showLandingFragment() {
+        fragment = new LandingFragment();
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.add(R.id.content_frame, fragment);
+        ft.addToBackStack("landing fragment");
+        ft.commit();
+    }
 }
