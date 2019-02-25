@@ -55,7 +55,7 @@ public class FetchTaxa extends Service {
             if (action != null) {
                 switch (action) {
                     case ACTION_START:
-                        Log.d(TAG, "Action start selected, starting foreground service.");
+                        Log.i(TAG, "Action start selected, starting foreground service.");
                         // Clean previous data just in case
                         SettingsManager.setDatabaseVersion("0");
                         App.get().getDaoSession().getTaxonDao().deleteAll();
@@ -67,20 +67,27 @@ public class FetchTaxa extends Service {
                         notificationInitiate();
                         break;
                     case ACTION_STOP:
-                        Log.d(TAG, "Action stop selected, pausing foreground service.");
+                        Log.i(TAG, "Action stop selected, pausing foreground service.");
                         SettingsManager.setTaxaLastPageUpdated(String.valueOf(currentPage));
                         stop_fetching = "stop";
                         stopForeground(true);
                         break;
                     case ACTION_CANCEL:
-                        Log.i(TAG, "Action cancel selected, killing the foreground service.");
-                        stop_fetching = "cancel";
-                        SettingsManager.setDatabaseVersion("0");
-                        currentPage = 1;
-                        SettingsManager.setTaxaLastPageUpdated(String.valueOf(currentPage));
-                        App.get().getDaoSession().getTaxonDao().deleteAll();
-                        App.get().getDaoSession().getStageDao().deleteAll();
-                        stopForeground(true);
+                        // If paused we have to kill the Service, else we continue with the loop and the
+                        // service will be killed after fetching the current page...
+                        if(stop_fetching.equals("no")) {
+                            Log.i(TAG, "Action cancel selected, killing the paused foreground service.");
+                            stop_fetching = "cancel";
+                            cleanDatabase();
+                            stopForeground(true);
+                            notificationUpdateText(getString(R.string.notify_title_taxa_canceled), getString(R.string.notify_desc_taxa_canceled));
+                            stopSelf();
+                        } else {
+                            Log.i(TAG, "Action cancel selected, killing the running foreground service.");
+                            stop_fetching = "cancel";
+                            cleanDatabase();
+                            stopForeground(true);
+                        }
                         break;
                     case ACTION_RESUME:
                         Log.i(TAG, "Action resume selected, continuing the foreground service.");
@@ -98,6 +105,14 @@ public class FetchTaxa extends Service {
         super.onDestroy();
         instance = null;
         Log.d(TAG, "Running onDestroy(). Last page fetched was " + String.valueOf(currentPage) + " out of " + String.valueOf(totalPages) + " total pages.");
+    }
+
+    private void cleanDatabase() {
+        SettingsManager.setDatabaseVersion("0");
+        currentPage = 1;
+        SettingsManager.setTaxaLastPageUpdated(String.valueOf(currentPage));
+        App.get().getDaoSession().getTaxonDao().deleteAll();
+        App.get().getDaoSession().getStageDao().deleteAll();
     }
 
     private void notificationInitiate() {

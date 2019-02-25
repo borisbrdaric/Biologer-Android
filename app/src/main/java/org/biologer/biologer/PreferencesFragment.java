@@ -17,6 +17,7 @@ public class PreferencesFragment extends PreferenceFragmentCompat {
     private static final String TAG = "Biologer.Preferences";
 
     Boolean licence_has_changed = false;
+    Boolean should_resume = false;
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
@@ -56,9 +57,16 @@ public class PreferencesFragment extends PreferenceFragmentCompat {
                 // Start the service for fetching taxa
                 final Intent fetchTaxa = new Intent(getActivity(), FetchTaxa.class);
                 fetchTaxa.setAction(FetchTaxa.ACTION_START);
+                final Intent resumeFetchTaxa = new Intent(getActivity(), FetchTaxa.class);
+                resumeFetchTaxa.setAction(FetchTaxa.ACTION_RESUME);
                 Activity activity = getActivity();
                 if(activity != null) {
-                    activity.startService(fetchTaxa);
+                    // If the fetching is paused we would prefer to resume the activity rather than fetching data from the first page.
+                    if (should_resume) {
+                        activity.startService(resumeFetchTaxa);
+                    } else {
+                        activity.startService(fetchTaxa);
+                    }
                 }
 
                 // Start a thread to monitor taxa update and set user interface after the update is finished
@@ -78,6 +86,7 @@ public class PreferencesFragment extends PreferenceFragmentCompat {
                                 activity.runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
+                                        should_resume = true;
                                         button.setEnabled(true);
                                         button.setSummary(getString(R.string.update_taxa_desc));
                                     }

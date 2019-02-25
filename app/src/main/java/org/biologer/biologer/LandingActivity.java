@@ -1,5 +1,6 @@
 package org.biologer.biologer;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -436,12 +437,13 @@ public class LandingActivity extends AppCompatActivity
         }
     }
 
+    // Start a thread to monitor taxa update and remove the progress bar when updated
     Thread updateStatusBar = new Thread() {
         @Override
         public void run() {
             try {
-                sleep(1000);
-                while (progressBarTaxa.getProgress() < 100) {
+                sleep(2000);
+                while (FetchTaxa.isInstanceCreated()) {
                     int progress_value = FetchTaxa.getProgressStatus();
                     if (progress_value != oldProgress) {
                         oldProgress = progress_value;
