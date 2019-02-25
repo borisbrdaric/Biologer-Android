@@ -135,4 +135,10 @@
     <string name="update_taxa_desc">Updates taxonomic tree in your application from Biologer server.</string>
     <string name="data_synchronisation">Data synchronisation</string>
     <string name="additional_options">Additional options</string>
+    <string name="updating_taxa_be_patient">Updating taxonomic database from the server. Please be patient.</string>
+    <string name="pause_action">Pause</string>
+    <string name="notify_title_taxa_paused">Update paused</string>
+    <string name="notify_desc_taxa_paused">Downloading new taxonomic database from the server is paused.</string>
+    <string name="notify_title_taxa_canceled">Update canceled</string>
+    <string name="notify_desc_taxa_canceled">Downloading new taxonomic database is canceled by the user.</string>
 </resources>

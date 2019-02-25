@@ -135,4 +135,10 @@
     <string name="update_taxa_desc">Освежава таксономско стабло преузимањем података са Биологеровог сервера.</string>
     <string name="data_synchronisation">Усаглашавање података</string>
     <string name="additional_options">Додатне опције</string>
+    <string name="updating_taxa_be_patient">Сачекајте док се не заврши преузимање таксономске базе са сервера.</string>
+    <string name="pause_action">Заустави</string>
+    <string name="notify_title_taxa_paused">Ажурирање је заустављено</string>
+    <string name="notify_desc_taxa_paused">Преузимање новог таксономског стабла са сервера је паузирано.</string>
+    <string name="notify_title_taxa_canceled">Ажурирање је отказано</string>
+    <string name="notify_desc_taxa_canceled">Преузимање новог таксономског стабла са сервера је отказано.</string>
 </resources>

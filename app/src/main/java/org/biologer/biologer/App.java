@@ -41,7 +41,7 @@ public class App extends Application {
             String channel_id = "biologer_taxa";
             CharSequence name = getString(R.string.channel_name);
             String description = getString(R.string.channel_description);
-            int importance = NotificationManager.IMPORTANCE_LOW;
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
             NotificationChannel channel = new NotificationChannel(channel_id, name, importance);
             channel.setDescription(description);
             // Register the channel with the system; you can't change the importance

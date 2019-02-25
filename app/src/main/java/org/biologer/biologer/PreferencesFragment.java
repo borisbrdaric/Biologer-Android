@@ -40,13 +40,54 @@ public class PreferencesFragment extends PreferenceFragmentCompat {
         }
 
         // Add button fot taxa sync process
-        Preference button = findPreference("taxa_button");
+        final Preference button = findPreference("taxa_button");
+        // If already fetching taxa disable the fetch taxa button
+        if (FetchTaxa.isInstanceCreated()) {
+            button.setEnabled(false);
+            button.setSummary(getString(R.string.updating_taxa_be_patient));
+        }
+
         button.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
+                // Disable the button first
+                button.setEnabled(false);
+                button.setSummary(getString(R.string.updating_taxa_be_patient));
+                // Start the service for fetching taxa
                 final Intent fetchTaxa = new Intent(getActivity(), FetchTaxa.class);
-                fetchTaxa.setAction(FetchTaxa.ACTION_START_FOREGROUND_SERVICE);
-                getActivity().startService(fetchTaxa);
+                fetchTaxa.setAction(FetchTaxa.ACTION_START);
+                Activity activity = getActivity();
+                if(activity != null) {
+                    activity.startService(fetchTaxa);
+                }
+
+                // Start a thread to monitor taxa update and set user interface after the update is finished
+                Thread waitForTaxaUpdate = new Thread() {
+                    @Override
+                    public void run() {
+                        try {
+                            sleep(2000);
+                            while (FetchTaxa.isInstanceCreated()) {
+                                // Run this loop on every 2 seconds while updating taxa
+                            }
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        } finally {
+                            Activity activity = getActivity();
+                            if(activity != null) {
+                                activity.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        button.setEnabled(true);
+                                        button.setSummary(getString(R.string.update_taxa_desc));
+                                    }
+                                });
+                            }
+                        }
+                    }
+                };
+                waitForTaxaUpdate.start();
+
                 return true;
             }
         });

@@ -1,6 +1,5 @@
 package org.biologer.biologer;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -39,7 +38,6 @@ import org.biologer.biologer.model.UserData;
 import org.biologer.biologer.model.network.APIEntryResponse;
 import org.biologer.biologer.model.network.TaksoniResponse;
 import org.biologer.biologer.model.network.UserDataResponse;
-import org.biologer.biologer.model.network.UserDataSer;
 import org.greenrobot.eventbus.EventBus;
 
 import java.io.File;
@@ -64,15 +62,11 @@ public class LandingActivity extends AppCompatActivity
     ArrayList<Entry> entryList;
     List<APIEntry.Photo> photos = null;
 
-    // Get the user data from a GreenDao database
-    List<UserData> userdata_list = App.get().getDaoSession().getUserDataDao().loadAll();
-
     private DrawerLayout drawer;
 
     private FrameLayout progressBar;
 
     private FrameLayout progressBar4Taxa;
-    private String lastUpdatedAt;
     private ProgressBar progressBarTaxa;
     private int oldProgress = 0;
 
@@ -90,7 +84,6 @@ public class LandingActivity extends AppCompatActivity
         progressBarTaxa = findViewById(R.id.progress_bar_taxa1);
 
         Button button = findViewById(R.id.btn_cancel_update);
-
 
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.nav_open_drawer, R.string.nav_close_drawer);
@@ -124,17 +117,15 @@ public class LandingActivity extends AppCompatActivity
     // Send a short request to the server that will return if the taxonomic tree is up to date.
     private void updateTaxa() {
         Call<TaksoniResponse> call = RetrofitClient.getService(SettingsManager.getDatabaseName()).getTaxons(1, 1);
-        call.enqueue(new CallbackWithRetry<TaksoniResponse>(call) {
+        call.enqueue(new Callback<TaksoniResponse>() {
             @Override
             public void onResponse(Call<TaksoniResponse> call, Response<TaksoniResponse> response) {
-                // Get the version of the taxa database from server
-                lastUpdatedAt = Long.toString(response.body().getMeta().getLastUpdatedAt());
-                String previousVersion = SettingsManager.getDatabaseVersion();
-                if (lastUpdatedAt.equals(previousVersion)) {
+                // Check if version of taxa from Server and Preferences match. If server version is newer ask for update
+                if (Long.toString(response.body().getMeta().getLastUpdatedAt()).equals(SettingsManager.getDatabaseVersion())) {
                     Log.i(TAG,"It looks like this taxonomic database is already up to date. Nothing to do here!");
                 } else  {
-                    Log.i(TAG,"Taxa database on the server and android app didn’t match!");
-                    if (previousVersion.equals("0")) {
+                    Log.i(TAG,"Taxa database on the server seems to be newer that your version.");
+                    if (SettingsManager.getDatabaseVersion().equals("0")) {
                         // If the database was never updated...
                         buildAlertMessageEmptyTaxaDb();
                     } else {
@@ -474,7 +465,7 @@ public class LandingActivity extends AppCompatActivity
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         // intent used to start service for fetching taxa
         final Intent fetchTaxa = new Intent(LandingActivity.this, FetchTaxa.class);
-        fetchTaxa.setAction(FetchTaxa.ACTION_START_FOREGROUND_SERVICE);
+        fetchTaxa.setAction(FetchTaxa.ACTION_START);
         builder.setMessage(getString(R.string.new_database_available))
                 .setCancelable(false)
                 .setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
@@ -482,13 +473,11 @@ public class LandingActivity extends AppCompatActivity
                         progressBar4Taxa.setVisibility(View.VISIBLE);
                         updateStatusBar.start();
                         startService(fetchTaxa);
-                        SettingsManager.setDatabaseVersion(lastUpdatedAt);
                     }
                 })
                 .setNegativeButton(getString(R.string.no), new DialogInterface.OnClickListener() {
                     public void onClick(final DialogInterface dialog, final int id) {
-                        // If user don’t update just ignore updates until the next version of the database
-                        SettingsManager.setDatabaseVersion(lastUpdatedAt);
+                        // If user don’t update just ignore updates until next session
                         dialog.cancel();
                     }
                 });
@@ -500,7 +489,7 @@ public class LandingActivity extends AppCompatActivity
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         // intent used to start service for fetching taxa
         final Intent fetchTaxa = new Intent(this, FetchTaxa.class);
-        fetchTaxa.setAction(FetchTaxa.ACTION_START_FOREGROUND_SERVICE);
+        fetchTaxa.setAction(FetchTaxa.ACTION_START);
         builder.setMessage(getString(R.string.database_empty))
                 .setCancelable(false)
                 .setPositiveButton(getString(R.string.contin), new DialogInterface.OnClickListener() {
@@ -508,11 +497,11 @@ public class LandingActivity extends AppCompatActivity
                         progressBar4Taxa.setVisibility(View.VISIBLE);
                         updateStatusBar.start();
                         startService(fetchTaxa);
-                        SettingsManager.setDatabaseVersion(lastUpdatedAt);
                     }
                 })
                 .setNegativeButton(getString(R.string.skip), new DialogInterface.OnClickListener() {
                     public void onClick(final DialogInterface dialog, final int id) {
+                        // If user don’t update just ignore updates until next session
                         dialog.cancel();
                     }
                 });
@@ -526,14 +515,10 @@ public class LandingActivity extends AppCompatActivity
                 .setCancelable(false)
                 .setPositiveButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
                     public void onClick(final DialogInterface dialog, final int id) {
-                        SettingsManager.setDatabaseVersion("0");
-                        SettingsManager.setTaxaLastPageUpdated("1");
-                        App.get().getDaoSession().getTaxonDao().deleteAll();
-                        App.get().getDaoSession().getStageDao().deleteAll();
                         progressBar4Taxa.setVisibility(View.GONE);
                         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
                         Intent fetchTaxa = new Intent(LandingActivity.this, FetchTaxa.class);
-                        fetchTaxa.setAction(FetchTaxa.ACTION_STOP_FOREGROUND_SERVICE);
+                        fetchTaxa.setAction(FetchTaxa.ACTION_CANCEL);
                         startService(fetchTaxa);
                     }
                 })
@@ -548,48 +533,68 @@ public class LandingActivity extends AppCompatActivity
 
     // Get the data from GreenDao database
     private UserData getLoggedUser() {
-        if (userdata_list.isEmpty()) {
+        // Get the user data from a GreenDao database
+        List<UserData> userdata_list = App.get().getDaoSession().getUserDataDao().loadAll();
+        // If there is no user data we should logout the user
+        if (userdata_list == null || userdata_list.isEmpty()) {
+            // Delete user data
             clearUserData(this);
-            userLoggedOut();
+            // Go to login screen
+            userLogOut();
+            return null;
+        } else {
+            return userdata_list.get(0);
         }
-        return userdata_list.get(0);
     }
 
     public Long getUserID() {
-        return getLoggedUser().getId();
+        UserData userdata = getLoggedUser();
+        if (userdata != null) {
+            return userdata.getId();
+        } else {
+            return null;
+        }
     }
 
     private int getUserDataLicense() {
-        return getLoggedUser().getData_license();
+        UserData userdata = getLoggedUser();
+        if (userdata != null) {
+            return userdata.getData_license();
+        } else {
+            return 0;
+        }
     }
 
     private int getUserImageLicense() {
-        return getLoggedUser().getImage_license();
+        UserData userdata = getLoggedUser();
+        if (userdata != null) {
+        return userdata.getImage_license();
+    } else {
+        return 0;
+    }
     }
 
     private String getUserName() {
-        return getLoggedUser().getUsername();
+        UserData userdata = getLoggedUser();
+        if (userdata != null) {
+            return userdata.getUsername();
+        } else {
+            return "User is not logged in";
+        }
     }
 
     private String getUserEmail() {
-        return getLoggedUser().getEmail();
+        UserData userdata = getLoggedUser();
+        if (userdata != null) {
+            return userdata.getEmail();
+    } else {
+        return "Couldn’t get email address.";
+    }
     }
 
-    private void userLoggedOut() {
+    private void userLogOut() {
         Intent intent = new Intent(LandingActivity.this, LoginActivity.class);
         startActivity(intent);
-        /*
-        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(getString(R.string.user_is_logged_out))
-                .setCancelable(false)
-                .setPositiveButton(getString(R.string.OK), new DialogInterface.OnClickListener() {
-                    public void onClick(final DialogInterface dialog, final int id) {
-                        System.exit(0);
-                    }
-                });
-        final AlertDialog alert = builder.create();
-        alert.show();
-        */
     }
 
     public static void clearUserData(Context context) {
