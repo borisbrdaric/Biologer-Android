@@ -4,6 +4,7 @@ import android.app.Application;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.os.Build;
+import android.support.multidex.MultiDexApplication;
 
 import org.biologer.biologer.model.DaoMaster;
 import org.biologer.biologer.model.DaoSession;
@@ -13,7 +14,7 @@ import org.greenrobot.greendao.database.Database;
  * Created by brjovanovic on 12/24/2017.
  */
 
-public class App extends Application {
+public class App extends MultiDexApplication {
 
     private static App app;
     private DaoSession daoSession;

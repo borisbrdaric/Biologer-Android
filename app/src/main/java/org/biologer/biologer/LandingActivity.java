@@ -1,6 +1,5 @@
 package org.biologer.biologer;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -202,8 +201,6 @@ public class LandingActivity extends AppCompatActivity
 
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
-//        } else if (getSupportFragmentManager().getBackStackEntryCount() == 1) {
-//            finish();
         } else {
             if (getSupportFragmentManager().getBackStackEntryCount() == 1) {
                 final AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -227,14 +224,11 @@ public class LandingActivity extends AppCompatActivity
                 super.onBackPressed();
             }
         }
-        //super.onBackPressed();
-
     }
 
     @Override
     public void onResume() {
         //navDrawerFill();
-
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener((NavigationView.OnNavigationItemSelectedListener) this);
 

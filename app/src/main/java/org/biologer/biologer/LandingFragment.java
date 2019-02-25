@@ -65,7 +65,8 @@ public class LandingFragment extends Fragment {
                 menu.addMenuItem(deleteItem);
             }
         };
-// set creator
+
+        // set creator
         listView.setMenuCreator(creator);
 
         listView.setOnMenuItemClickListener(new SwipeMenuListView.OnMenuItemClickListener() {

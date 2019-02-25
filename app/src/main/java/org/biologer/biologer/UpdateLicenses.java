@@ -90,7 +90,7 @@ public class UpdateLicenses extends Service {
             } else {
                 // If both data ind image license should be taken from preferences
                 Log.d(TAG, "User selected custom licences for images (" + image_license + ") and data (" + data_license + ").");
-                UserData uData = new UserData(getUserID(), getUserEmail(), getUserName(), Integer.valueOf(data_license), Integer.valueOf(data_license));
+                UserData uData = new UserData(getUserID(), getUserEmail(), getUserName(), Integer.valueOf(data_license), Integer.valueOf(image_license));
                 App.get().getDaoSession().getUserDataDao().insertOrReplace(uData);
             }
         }
