@@ -30,6 +30,10 @@ public class PreferencesFragment extends PreferenceFragmentCompat {
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         // Load the preferences from an XML resource
         setPreferencesFromResource(R.xml.fragment_preferences, rootKey);
+        Preference preferences = getPreferenceScreen();
+        if (preferences != null) {
+            preferences.setIconSpaceReserved(false);
+        }
         Log.d(TAG, "Loading preferences fragment");
 
         ListPreference dataLicense = (ListPreference) findPreference("data_license");

@@ -1,29 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.preference.PreferenceScreen
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <PreferenceCategory android:title="@string/data_synchronisation">
-        <ListPreference android:key="data_license"
+    <!--
+    <PreferenceCategory
+        android:title="@string/data_synchronisation"
+        app:iconSpaceReserved="false">
+        -->
+        <ListPreference
+            android:key="data_license"
             android:title="@string/data_license"
             android:summary="@string/choose_dlicense"
-            android:defaultValue="0" />
-        <ListPreference android:key="image_license"
+            app:iconSpaceReserved="false"
+            android:defaultValue="0"/>
+        <ListPreference
+            android:key="image_license"
             android:title="@string/image_license"
             android:summary="@string/choose_ilicense"
+            app:iconSpaceReserved="false"
             android:defaultValue="0" />
         <Preference
             android:title="@string/update_taxa"
             android:key="taxa_button"
-            android:summary="@string/update_taxa_desc"/>
-    </PreferenceCategory>
-
-    <PreferenceCategory android:title="@string/additional_options">
+            android:summary="@string/update_taxa_desc"
+            app:iconSpaceReserved="false"/>
+    <!--
+    </PreferenceCategory>-->
+<!--
+    <PreferenceCategory
+        android:title="@string/additional_options"
+        app:iconSpaceReserved="false">
+        -->
         <EditTextPreference
             android:key="project_name"
             android:title="@string/project_name"
             android:dialogTitle="@string/project_name"
             android:summary="@string/choose_project"
+            app:iconSpaceReserved="false"
             android:defaultValue="" />
-    </PreferenceCategory>
+    <!--
+    </PreferenceCategory>-->
 
 </android.support.v7.preference.PreferenceScreen>
