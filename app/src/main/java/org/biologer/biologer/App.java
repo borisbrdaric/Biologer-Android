@@ -4,6 +4,7 @@ import android.app.Application;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.os.Build;
+import android.support.multidex.MultiDexApplication;
 
 import org.biologer.biologer.model.DaoMaster;
 import org.biologer.biologer.model.DaoSession;
@@ -13,7 +14,7 @@ import org.greenrobot.greendao.database.Database;
  * Created by brjovanovic on 12/24/2017.
  */
 
-public class App extends Application {
+public class App extends MultiDexApplication {
 
     private static App app;
     private DaoSession daoSession;
@@ -28,7 +29,7 @@ public class App extends Application {
         // Create Notification channel in order to send notification to android API 26+
         createNotificationChannel();
 
-        //za GreenDAO bazu, obavezno
+        // For initialisation of GreenDAO database
         DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this, "notes-db");
         Database db = helper.getWritableDb();
         daoSession = new DaoMaster(db).newSession();
@@ -41,7 +42,7 @@ public class App extends Application {
             String channel_id = "biologer_taxa";
             CharSequence name = getString(R.string.channel_name);
             String description = getString(R.string.channel_description);
-            int importance = NotificationManager.IMPORTANCE_LOW;
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
             NotificationChannel channel = new NotificationChannel(channel_id, name, importance);
             channel.setDescription(description);
             // Register the channel with the system; you can't change the importance

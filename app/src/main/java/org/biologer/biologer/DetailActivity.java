@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.drm.DrmStore;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
@@ -17,6 +18,7 @@ import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -101,10 +103,12 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         // Add a toolbar to the Activity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle(R.string.entry_title);
-        // Add the back button to the toolbar
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        ActionBar actionbar = getSupportActionBar();
+        if (actionbar != null) {
+            actionbar.setTitle(R.string.entry_title);
+            actionbar.setDisplayHomeAsUpEnabled(true);
+            actionbar.setDisplayShowHomeEnabled(true);
+        }
 
         // Find selected record
         Bundle bundle = getIntent().getExtras();
@@ -154,7 +158,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
             taksonometrija1[i] = taksoni.get(i).getName();
         }
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, taksonometrija1);
-        acTextView = findViewById(R.id.tvTakson_auto);
+        acTextView = findViewById(R.id.textview_list_of_taxa);
         acTextView.setAdapter(adapter);
         acTextView.addTextChangedListener(new TextWatcher() {
 

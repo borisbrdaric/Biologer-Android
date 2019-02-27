@@ -1,7 +1,11 @@
 package org.biologer.biologer;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.design.widget.NavigationView;
 
 import android.support.v4.app.Fragment;
@@ -12,11 +16,14 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.Menu;
 import android.view.View;
+import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -57,17 +64,15 @@ public class LandingActivity extends AppCompatActivity
     ArrayList<Entry> entryList;
     List<APIEntry.Photo> photos = null;
 
-    // Get the user data from a GreenDao database
-    List<UserData> userdata_list = App.get().getDaoSession().getUserDataDao().loadAll();
-
     private DrawerLayout drawer;
 
     private FrameLayout progressBar;
 
     private FrameLayout progressBar4Taxa;
-    private String lastUpdatedAt;
     private ProgressBar progressBarTaxa;
     private int oldProgress = 0;
+
+    android.support.v4.app.Fragment fragment = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,6 +84,8 @@ public class LandingActivity extends AppCompatActivity
         progressBar = findViewById(R.id.progress);
         progressBar4Taxa = findViewById(R.id.progress_taxa);
         progressBarTaxa = findViewById(R.id.progress_bar_taxa1);
+
+        Button button = findViewById(R.id.btn_cancel_update);
 
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.nav_open_drawer, R.string.nav_close_drawer);
@@ -96,30 +103,35 @@ public class LandingActivity extends AppCompatActivity
         tv_username.setText(getUserName());
         tv_email.setText(getUserEmail());
 
-        android.support.v4.app.Fragment fragment = new LandingFragment();
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.add(R.id.content_frame, fragment);
-        ft.addToBackStack("fragment");
-        ft.commit();
+        showLandingFragment();
 
-        updateTaxa();
-        updateLicense();
+        if (isNetworkAvailable()) {
+            updateTaxa();
+            updateLicenses();
+        } else {
+            Log.d(TAG, "There is no network available. Application will not be able to get new data from the server.");
+        }
+
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                cancelTaxaUpdate();
+            }
+        });
     }
 
     // Send a short request to the server that will return if the taxonomic tree is up to date.
     private void updateTaxa() {
         Call<TaksoniResponse> call = RetrofitClient.getService(SettingsManager.getDatabaseName()).getTaxons(1, 1);
-        call.enqueue(new CallbackWithRetry<TaksoniResponse>(call) {
+        call.enqueue(new Callback<TaksoniResponse>() {
             @Override
             public void onResponse(Call<TaksoniResponse> call, Response<TaksoniResponse> response) {
-                // Get the version of the taxa database from server
-                lastUpdatedAt = Long.toString(response.body().getMeta().getLastUpdatedAt());
-                String previousVersion = SettingsManager.getDatabaseVersion();
-                if (lastUpdatedAt.equals(previousVersion)) {
-                    Log.i("Taxa database: ","It looks like this taxonomic database is already up to date. Nothing to do here!");
+                // Check if version of taxa from Server and Preferences match. If server version is newer ask for update
+                if (Long.toString(response.body().getMeta().getLastUpdatedAt()).equals(SettingsManager.getDatabaseVersion())) {
+                    Log.i(TAG,"It looks like this taxonomic database is already up to date. Nothing to do here!");
                 } else  {
-                    Log.i("Taxa database: ","Taxa database on the server and android app didn’t match!");
-                    if (previousVersion.equals("0")) {
+                    Log.i(TAG,"Taxa database on the server seems to be newer that your version.");
+                    if (SettingsManager.getDatabaseVersion().equals("0")) {
                         // If the database was never updated...
                         buildAlertMessageEmptyTaxaDb();
                     } else {
@@ -137,46 +149,15 @@ public class LandingActivity extends AppCompatActivity
         });
     }
 
-    // Check if user selected custom Data and Image Licenses. If not, update them from the server.
-    private void updateLicense() {
-        if (SettingsManager.getCustomDataLicense().equals("0") || SettingsManager.getCustomImageLicense().equals("0")) {
-            // Get User data from a server
-            Call<UserDataResponse> call = RetrofitClient.getService(SettingsManager.getDatabaseName()).getUserData();
-            call.enqueue(new CallbackWithRetry<UserDataResponse>(call) {
-                @Override
-                public void onResponse(Call<UserDataResponse> call, Response<UserDataResponse> response) {
-                    String email = response.body().getData().getEmail();
-                    String name = response.body().getData().getFullName();
-                    int data_license = response.body().getData().getSettings().getDataLicense();
-                    int image_license = response.body().getData().getSettings().getImageLicense();
-                    // If both data and image licence should be retrieved from server
-                    if (SettingsManager.getCustomDataLicense().equals("0") && SettingsManager.getCustomImageLicense().equals("0")) {
-                        UserData uData = new UserData(getUserID(), email, name, data_license, image_license);
-                        App.get().getDaoSession().getUserDataDao().insertOrReplace(uData);
-                    }
-                    // If only Data License should be retreived from server
-                    if (SettingsManager.getCustomDataLicense().equals("0") && !SettingsManager.getCustomImageLicense().equals("0")) {
-                        UserData uData = new UserData(getUserID(), email, name, data_license, getUserImageLicense());
-                        App.get().getDaoSession().getUserDataDao().insertOrReplace(uData);
-                    }
-                    // If only Image License should be retreived from server
-                    if (!SettingsManager.getCustomDataLicense().equals("0") && SettingsManager.getCustomImageLicense().equals("0")) {
-                        UserData uData = new UserData(getUserID(), email, name, getUserDataLicense(), image_license);
-                        App.get().getDaoSession().getUserDataDao().insertOrReplace(uData);
-                    }
-                }
-                @Override
-                public void onFailure(Call<UserDataResponse> call, Throwable t) {
-                    Log.e("Taxa database: ", "Application could not get user data from a server!");
-                }
-            });
-        }
+    private void updateLicenses() {
+        // Check if the licence has shanged on the server and update if needed
+        final Intent update_licenses = new Intent(LandingActivity.this, UpdateLicenses.class);
+        startService(update_licenses);
     }
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         int id = item.getItemId();
-        android.support.v4.app.Fragment fragment = null;
         Intent intent = null;
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -191,24 +172,27 @@ public class LandingActivity extends AppCompatActivity
             case R.id.nav_logout:
                 fragment = new LogoutFragment();
                 break;
+            case R.id.nav_setup:
+                fragment = new PreferencesFragment();
+                break;
             case R.id.nav_help:
                 startActivity(new Intent(LandingActivity.this, IntroActivity.class));
                 finish();
                 drawer.closeDrawer(GravityCompat.START);
                 return true;
-            case R.id.nav_setup:
+                /*
                 startActivity(new Intent(LandingActivity.this, SetupActivity.class));
                 drawer.closeDrawer(GravityCompat.START);
                 return true;
+                */
             default:
                 fragment = new LandingFragment();
         }
 
         if (fragment != null) {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-
             ft.add(R.id.content_frame, fragment);
-            ft.addToBackStack("fragment");
+            ft.addToBackStack("new fragment");
             ft.commit();
         } else {
             startActivity(intent);
@@ -223,8 +207,6 @@ public class LandingActivity extends AppCompatActivity
 
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
-//        } else if (getSupportFragmentManager().getBackStackEntryCount() == 1) {
-//            finish();
         } else {
             if (getSupportFragmentManager().getBackStackEntryCount() == 1) {
                 final AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -248,14 +230,11 @@ public class LandingActivity extends AppCompatActivity
                 super.onBackPressed();
             }
         }
-        //super.onBackPressed();
-
     }
 
     @Override
     public void onResume() {
         //navDrawerFill();
-
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener((NavigationView.OnNavigationItemSelectedListener) this);
 
@@ -325,7 +304,6 @@ public class LandingActivity extends AppCompatActivity
                 uploadFile(file, i);
             }
         }
-
     }
 
     private void uploadEntry_step2() {
@@ -459,12 +437,13 @@ public class LandingActivity extends AppCompatActivity
         }
     }
 
+    // Start a thread to monitor taxa update and remove the progress bar when updated
     Thread updateStatusBar = new Thread() {
         @Override
         public void run() {
             try {
-                sleep(1000);
-                while (progressBarTaxa.getProgress() < 100) {
+                sleep(2000);
+                while (FetchTaxa.isInstanceCreated()) {
                     int progress_value = FetchTaxa.getProgressStatus();
                     if (progress_value != oldProgress) {
                         oldProgress = progress_value;
@@ -487,7 +466,8 @@ public class LandingActivity extends AppCompatActivity
     protected void buildAlertMessageNewerTaxaDb() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         // intent used to start service for fetching taxa
-        final Intent fetchTaxa = new Intent(this, FetchTaxa.class);
+        final Intent fetchTaxa = new Intent(LandingActivity.this, FetchTaxa.class);
+        fetchTaxa.setAction(FetchTaxa.ACTION_START);
         builder.setMessage(getString(R.string.new_database_available))
                 .setCancelable(false)
                 .setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
@@ -495,13 +475,11 @@ public class LandingActivity extends AppCompatActivity
                         progressBar4Taxa.setVisibility(View.VISIBLE);
                         updateStatusBar.start();
                         startService(fetchTaxa);
-                        SettingsManager.setDatabaseVersion(lastUpdatedAt);
                     }
                 })
                 .setNegativeButton(getString(R.string.no), new DialogInterface.OnClickListener() {
                     public void onClick(final DialogInterface dialog, final int id) {
-                        // If user don’t update just ignore updates until the next version of the database
-                        SettingsManager.setDatabaseVersion(lastUpdatedAt);
+                        // If user don’t update just ignore updates until next session
                         dialog.cancel();
                     }
                 });
@@ -513,6 +491,7 @@ public class LandingActivity extends AppCompatActivity
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         // intent used to start service for fetching taxa
         final Intent fetchTaxa = new Intent(this, FetchTaxa.class);
+        fetchTaxa.setAction(FetchTaxa.ACTION_START);
         builder.setMessage(getString(R.string.database_empty))
                 .setCancelable(false)
                 .setPositiveButton(getString(R.string.contin), new DialogInterface.OnClickListener() {
@@ -520,10 +499,32 @@ public class LandingActivity extends AppCompatActivity
                         progressBar4Taxa.setVisibility(View.VISIBLE);
                         updateStatusBar.start();
                         startService(fetchTaxa);
-                        SettingsManager.setDatabaseVersion(lastUpdatedAt);
                     }
                 })
                 .setNegativeButton(getString(R.string.skip), new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, final int id) {
+                        // If user don’t update just ignore updates until next session
+                        dialog.cancel();
+                    }
+                });
+        final AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+    private void cancelTaxaUpdate() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(getString(R.string.should_cancel_taxa_update))
+                .setCancelable(false)
+                .setPositiveButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, final int id) {
+                        progressBar4Taxa.setVisibility(View.GONE);
+                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+                        Intent fetchTaxa = new Intent(LandingActivity.this, FetchTaxa.class);
+                        fetchTaxa.setAction(FetchTaxa.ACTION_CANCEL);
+                        startService(fetchTaxa);
+                    }
+                })
+                .setNegativeButton(getString(R.string.continue_update), new DialogInterface.OnClickListener() {
                     public void onClick(final DialogInterface dialog, final int id) {
                         dialog.cancel();
                     }
@@ -532,49 +533,96 @@ public class LandingActivity extends AppCompatActivity
         alert.show();
     }
 
+    // Get the data from GreenDao database
     private UserData getLoggedUser() {
-        if (userdata_list.isEmpty()) {
-            LogoutFragment.clearUserData();
-            userLoggedOut();
+        // Get the user data from a GreenDao database
+        List<UserData> userdata_list = App.get().getDaoSession().getUserDataDao().loadAll();
+        // If there is no user data we should logout the user
+        if (userdata_list == null || userdata_list.isEmpty()) {
+            // Delete user data
+            clearUserData(this);
+            // Go to login screen
+            userLogOut();
+            return null;
+        } else {
+            return userdata_list.get(0);
         }
-        return userdata_list.get(0);
     }
 
-    private Long getUserID() {
-        return getLoggedUser().getId();
+    public Long getUserID() {
+        UserData userdata = getLoggedUser();
+        if (userdata != null) {
+            return userdata.getId();
+        } else {
+            return null;
+        }
     }
 
     private int getUserDataLicense() {
-        return getLoggedUser().getData_license();
+        UserData userdata = getLoggedUser();
+        if (userdata != null) {
+            return userdata.getData_license();
+        } else {
+            return 0;
+        }
     }
 
     private int getUserImageLicense() {
-        return getLoggedUser().getImage_license();
+        UserData userdata = getLoggedUser();
+        if (userdata != null) {
+        return userdata.getImage_license();
+    } else {
+        return 0;
+    }
     }
 
     private String getUserName() {
-        return getLoggedUser().getUsername();
+        UserData userdata = getLoggedUser();
+        if (userdata != null) {
+            return userdata.getUsername();
+        } else {
+            return "User is not logged in";
+        }
     }
 
     private String getUserEmail() {
-        return getLoggedUser().getEmail();
+        UserData userdata = getLoggedUser();
+        if (userdata != null) {
+            return userdata.getEmail();
+        } else {
+            return "Couldn’t get email address.";
+        }
     }
-
-    private void userLoggedOut() {
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivitymanager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivitymanager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+    private void userLogOut() {
         Intent intent = new Intent(LandingActivity.this, LoginActivity.class);
         startActivity(intent);
-        /*
-        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(getString(R.string.user_is_logged_out))
-                .setCancelable(false)
-                .setPositiveButton(getString(R.string.OK), new DialogInterface.OnClickListener() {
-                    public void onClick(final DialogInterface dialog, final int id) {
-                        System.exit(0);
-                    }
-                });
-        final AlertDialog alert = builder.create();
-        alert.show();
-        */
     }
 
+    public static void clearUserData(Context context) {
+        // Delete user token
+        SettingsManager.deleteToken();
+        // Set the default preferences
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        preferences.edit().clear().apply();
+        SettingsManager.setDatabaseVersion("0");
+        SettingsManager.setProjectName(null);
+        SettingsManager.setTaxaLastPageUpdated("1");
+        // Maybe also to delete database...
+        App.get().getDaoSession().getTaxonDao().deleteAll();
+        App.get().getDaoSession().getStageDao().deleteAll();
+        App.get().getDaoSession().getUserDataDao().deleteAll();
+    }
+
+    private void showLandingFragment() {
+        fragment = new LandingFragment();
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.add(R.id.content_frame, fragment);
+        ft.addToBackStack("landing fragment");
+        ft.commit();
+    }
 }
