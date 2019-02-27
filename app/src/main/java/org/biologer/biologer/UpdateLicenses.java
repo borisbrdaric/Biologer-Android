@@ -27,6 +27,9 @@ public class UpdateLicenses extends Service {
 
     private static final String TAG = "Biologer.UpdateLicense";
 
+    private static final int TOTAL_RETRIES = 3;
+    private int retryCount = 0;
+
     // Get the user data from a GreenDao database
     List<UserData> userdata_list = App.get().getDaoSession().getUserDataDao().loadAll();
 
@@ -84,7 +87,10 @@ public class UpdateLicenses extends Service {
                     @Override
                     public void onFailure(Call<UserDataResponse> call, Throwable t) {
                         Log.e(TAG, "Application could not get user’s licences from the server.");
-                        retryUpdateLicense();
+                        if (retryCount++ < TOTAL_RETRIES) {
+                            Log.d(TAG, "Retrying request to get licences from server (" + retryCount + " out of " + TOTAL_RETRIES + ")");
+                            updateLicense();
+                        }
                     }
                 });
             } else {
@@ -95,24 +101,6 @@ public class UpdateLicenses extends Service {
             }
         }
         stopSelf();
-    }
-
-    private void retryUpdateLicense() {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(getString(R.string.retry_licence_from_server))
-                .setCancelable(true)
-                .setPositiveButton(getString(R.string.retry), new DialogInterface.OnClickListener() {
-                    public void onClick(final DialogInterface dialog, final int id) {
-                        updateLicense();
-                    }
-                })
-                .setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
-                    public void onClick(final DialogInterface dialog, final int id) {
-                        dialog.cancel();
-                    }
-                });
-        final AlertDialog alert = builder.create();
-        alert.show();
     }
 
     // Get the data from GreenDao database

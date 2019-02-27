@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.design.widget.NavigationView;
 
 import android.support.v4.app.Fragment;
@@ -103,8 +105,12 @@ public class LandingActivity extends AppCompatActivity
 
         showLandingFragment();
 
-        updateTaxa();
-        updateLicenses();
+        if (isNetworkAvailable()) {
+            updateTaxa();
+            updateLicenses();
+        } else {
+            Log.d(TAG, "There is no network available. Application will not be able to get new data from the server.");
+        }
 
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -583,11 +589,15 @@ public class LandingActivity extends AppCompatActivity
         UserData userdata = getLoggedUser();
         if (userdata != null) {
             return userdata.getEmail();
-    } else {
-        return "Couldn’t get email address.";
+        } else {
+            return "Couldn’t get email address.";
+        }
     }
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivitymanager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivitymanager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
-
     private void userLogOut() {
         Intent intent = new Intent(LandingActivity.this, LoginActivity.class);
         startActivity(intent);
