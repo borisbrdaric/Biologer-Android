@@ -29,7 +29,7 @@ public class App extends MultiDexApplication {
         // Create Notification channel in order to send notification to android API 26+
         createNotificationChannel();
 
-        //za GreenDAO bazu, obavezno
+        // For initialisation of GreenDAO database
         DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this, "notes-db");
         Database db = helper.getWritableDb();
         daoSession = new DaoMaster(db).newSession();

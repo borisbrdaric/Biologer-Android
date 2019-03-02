@@ -158,7 +158,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
             taksonometrija1[i] = taksoni.get(i).getName();
         }
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, taksonometrija1);
-        acTextView = findViewById(R.id.tvTakson_auto);
+        acTextView = findViewById(R.id.textview_list_of_taxa);
         acTextView.setAdapter(adapter);
         acTextView.addTextChangedListener(new TextWatcher() {
 

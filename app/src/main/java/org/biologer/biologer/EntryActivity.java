@@ -71,10 +71,6 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
 
     private static final String TAG = "Biologer.Entry";
 
-    private static final int REQUEST_POL = 1001;
-    private static final int REQUEST_TAKSON = 1002;
-    private static final int REQUEST_RAZVOJNI_STADIJUM = 1003;
-    private static final int REQUEST_ZIVA = 1004;
     private static final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL = 1005;
     private static final int MY_PERMISSIONS_REQUEST_CAMERA = 1006;
     private static final int REQUEST_LOCATION = 1;
@@ -95,25 +91,22 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
     private TextView tvTakson, tv_gps, tvStage, tv_more, tv_latitude, tv_longitude;
     private CustomEditText et_razlogSmrti, et_komentar, et_brojJedinki;
     AutoCompleteTextView acTextView;
-    private ImageView ib_pic1, ib_pic2, ib_pic3, iv_map;
+    ImageView ib_pic1, ib_pic2, ib_pic3, iv_map;
     private CheckBox check_dead;
     private LinearLayout more, smrt;
-    private ArrayList<Taxon> taksoni;
     private boolean save_enabled = false;
-    private ArrayList<Stage> stages;
     private RadioButton rb_male, rb_female;
-    private Uri contentURI;
+    Uri contentURI;
     private String slika1, slika2, slika3;
     private SwipeRefreshLayout swipe;
 
     Calendar calendar;
     SimpleDateFormat simpleDateFormat;
 
-    // Get the user data
-    List<UserData> list = App.get().getDaoSession().getUserDataDao().loadAll();
-    UserData userdata = list.get(0);
-    int user_data_license = userdata.getData_license();
-    int user_image_license = userdata.getImage_license();
+    // Get the data from the GreenDao database
+    List<UserData> userDataList = App.get().getDaoSession().getUserDataDao().loadAll();
+    List<Taxon> taxaList = App.get().getDaoSession().getTaxonDao().loadAll();
+    List<Stage> stageList = App.get().getDaoSession().getStageDao().loadAll();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -130,93 +123,77 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
             actionbar.setDisplayShowHomeEnabled(true);
         }
 
-        //liste taksona i stage-ova iz baze
-        taksoni = (ArrayList<Taxon>) App.get().getDaoSession().getTaxonDao().loadAll();
-        stages = (ArrayList<Stage>) App.get().getDaoSession().getStageDao().loadAll();
+        checkWriteStoragePermission();
 
-        //proveri da li ima permisions, ako nema dodaj eksplicitno
-        if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
-
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-
-            } else {
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                        MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL);
-            }
-        }
-
+        /*
+         * Get the view...
+         */
         swipe = findViewById(R.id.swipe);
         swipe.setOnRefreshListener(this);
         tv_latitude = findViewById(R.id.tv_latitude);
         tv_longitude = findViewById(R.id.tv_longitude);
         tv_gps = findViewById(R.id.tv_gps);
-
         tvStage = findViewById(R.id.tvStage);
         tvStage.setOnClickListener(this);
         tvStage.setEnabled(false);
-
         et_razlogSmrti = (CustomEditText) findViewById(R.id.et_razlogSmrti);
         et_komentar = (CustomEditText) findViewById(R.id.et_komentar);
         et_brojJedinki = (CustomEditText) findViewById(R.id.et_brojJedinki);
         rb_male = findViewById(R.id.rb_musko);
         rb_female = findViewById(R.id.rb_zensko);
-
         more = (LinearLayout) findViewById(R.id.more);
         ViewGroup.LayoutParams params_more = more.getLayoutParams();
         params_more.height = 0;
         more.setLayoutParams(params_more);
-
-        /*
-        * This adds a checkbox for dead specimen and the comment on dead specimen.
-        */
+        // This adds a checkbox for dead specimen and the comment on dead specimen.
         check_dead = (CheckBox) findViewById(R.id.dead_specimen);
         check_dead.setOnClickListener(this);
         smrt = (LinearLayout) findViewById(R.id.smrt);
         ViewGroup.LayoutParams params = smrt.getLayoutParams();
         params.height = 0;
         smrt.setLayoutParams(params);
-
+        // Buttons to add images
         ib_pic1 = (ImageView) findViewById(R.id.ib_pic1);
         ib_pic1.setOnClickListener(this);
         ib_pic2 = (ImageView) findViewById(R.id.ib_pic2);
         ib_pic2.setOnClickListener(this);
         ib_pic3 = (ImageView) findViewById(R.id.ib_pic3);
         ib_pic3.setOnClickListener(this);
+        // Map icon
         iv_map = (ImageView) findViewById(R.id.iv_map);
         iv_map.setOnClickListener(this);
+        // Show more text
         tv_more = (TextView) findViewById(R.id.tv_more);
         tv_more.setOnClickListener(this);
-
         // Autocomplete textbox for Taxon entry
-        final String[] taksonometrija1 = new String[taksoni.size()];
-        for (int i = 0; i < taksoni.size(); i++) {
-            taksonometrija1[i] = taksoni.get(i).getName();
+        final String[] latin_names = new String[taxaList.size()];
+        for (int i = 0; i < taxaList.size(); i++) {
+            latin_names[i] = taxaList.get(i).getName();
+
         }
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, taksonometrija1);
-        acTextView = findViewById(R.id.tvTakson_auto);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, latin_names);
+        acTextView = findViewById(R.id.textview_list_of_taxa);
         acTextView.setAdapter(adapter);
         acTextView.addTextChangedListener(new TextWatcher() {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (acTextView.getText().toString().length() != 0) {
                     tvStage.setEnabled(true);
-                    // Enable/disable save button from Toolbar
+                    // Enable save button from Toolbar
                     save_enabled = true;
                     invalidateOptionsMenu();
                 } else {
                     tvStage.setEnabled(true);
-                    // Enable/disable save button from Toolbar
+                    // Disable save button from Toolbar
                     save_enabled = false;
                     invalidateOptionsMenu();
                 }
             }
+
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
+
             @Override
             public void afterTextChanged(Editable s) {
                 if (acTextView.getText().toString().length() != 0) {
@@ -265,7 +242,7 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
 
     // Add Save button in the right part of the toolbar
     @Override
-    public boolean onCreateOptionsMenu(Menu menu){
+    public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.save_menu, menu);
         return true;
@@ -288,7 +265,7 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
 
     // Process running after clicking the toolbar buttons
     @Override
-    public boolean onOptionsItemSelected(MenuItem item){
+    public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == android.R.id.home) {
             this.finish();
@@ -396,7 +373,7 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
         Entry entry1 = new Entry(null, taxon_id, taxon_name, year, month, day,
                 komentar, brojJedinki, maleFemale(), selectedStage, String.valueOf(!check_dead.isChecked()), razlogSmrti,
                 nLokacija.latitude, nLokacija.longitude, acc, elev, "", slika1, slika2, slika3,
-                project_name, "", String.valueOf(user_data_license), user_image_license, time);
+                project_name, "", String.valueOf(getGreenDaoDataLicense()), getGreenDaoImageLicense(), time);
         App.get().getDaoSession().getEntryDao().insertOrReplace(entry1);
         Toast.makeText(this, getString(R.string.saved), Toast.LENGTH_SHORT).show();
         setResult(RESULT_OK);
@@ -414,17 +391,17 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void showTaksoniDialog() {
-        if (taksoni != null) {
-            final String[] taksonometrija = new String[taksoni.size()];
-            for (int i = 0; i < taksoni.size(); i++) {
-                taksonometrija[i] = taksoni.get(i).getName();
+        if (taxaList != null) {
+            final String[] taksonometrija = new String[taxaList.size()];
+            for (int i = 0; i < taxaList.size(); i++) {
+                taksonometrija[i] = taxaList.get(i).getName();
             }
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setItems(taksonometrija, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
                     tvTakson.setText(taksonometrija[i]);
-                    tvTakson.setTag(taksoni.get(i));
+                    tvTakson.setTag(taxaList.get(i));
                     if (tvTakson.getText() == getString(R.string.please_select)) {
                         tvStage.setEnabled(false);
                     } else {
@@ -443,18 +420,18 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
 
     private void showStageDialog() {
         Taxon t = App.get().getDaoSession().getTaxonDao().queryBuilder().where(TaxonDao.Properties.Name.eq(acTextView.getText())).unique();
-        stages = (ArrayList<Stage>) App.get().getDaoSession().getStageDao().queryBuilder().where(StageDao.Properties.TaxonId.eq(t.getId())).list();
-        if (stages != null) {
-            final String[] stadijumi = new String[stages.size()];
-            for (int i = 0; i < stages.size(); i++) {
-                stadijumi[i] = stages.get(i).getName();
+        stageList = (ArrayList<Stage>) App.get().getDaoSession().getStageDao().queryBuilder().where(StageDao.Properties.TaxonId.eq(t.getId())).list();
+        if (stageList != null) {
+            final String[] stadijumi = new String[stageList.size()];
+            for (int i = 0; i < stageList.size(); i++) {
+                stadijumi[i] = stageList.get(i).getName();
             }
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setItems(stadijumi, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
                     tvStage.setText(stadijumi[i]);
-                    tvStage.setTag(stages.get(i));
+                    tvStage.setTag(stageList.get(i));
                 }
             });
             builder.show();
@@ -773,7 +750,7 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
                 .setCancelable(false)
                 .setPositiveButton(getString(R.string.wait), new DialogInterface.OnClickListener() {
                     public void onClick(final DialogInterface dialog, final int id) {
-                        getLocation(0,0);
+                        getLocation(0, 0);
                         dialog.dismiss();
                     }
                 })
@@ -783,7 +760,7 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
                         String naziv = acTextView.getText().toString();
                         Taxon taxon = App.get().getDaoSession().getTaxonDao().queryBuilder().where(TaxonDao.Properties.Name.eq(naziv)).unique();
                         entrySaver(taxon);
-                        }
+                    }
                 });
         final AlertDialog alert = builder.create();
         alert.show();
@@ -873,5 +850,40 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
         Uri contentUri = Uri.fromFile(f);
         mediaScanIntent.setData(contentUri);
         this.sendBroadcast(mediaScanIntent);
+    }
+
+    // Check for permissions and add them if required
+    private void checkWriteStoragePermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            Log.d(TAG, "No permission to write external storage");
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                Log.d(TAG, "User does not allow to set write permission for this application.");
+            } else {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL);
+                Log.d(TAG, "Requesting permission to write external storage.");
+            }
+        } else {
+            Log.d(TAG, "Permission to write external storage was already granted");
+        }
+    }
+
+    private int getGreenDaoDataLicense() {
+        if(userDataList !=null) {
+            if(!userDataList.isEmpty()) {
+                return userDataList.get(0).getData_license();
+            }
+            return 0;
+        }
+        return 0;
+    }
+
+    private int getGreenDaoImageLicense() {
+        if(userDataList != null) {
+            if (!userDataList.isEmpty()) {
+                return userDataList.get(0).getImage_license();
+            }
+            return 0;
+        }
+        return 0;
     }
 }

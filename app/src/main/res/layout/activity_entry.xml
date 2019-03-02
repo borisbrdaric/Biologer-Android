@@ -141,7 +141,7 @@
                             android:gravity="center_horizontal">
 
                             <AutoCompleteTextView
-                                android:id="@+id/tvTakson_auto"
+                                android:id="@+id/textview_list_of_taxa"
                                 android:layout_width="280dp"
                                 android:layout_height="56dp"
                                 android:background="@drawable/gray_border"
@@ -149,7 +149,7 @@
                                 android:paddingStart="14dp"
                                 android:paddingEnd="14dp"
                                 android:textColor="@color/black"
-                                android:textSize="16sp"/>
+                                android:textSize="16sp" />
                         </LinearLayout>
 
                         <LinearLayout
