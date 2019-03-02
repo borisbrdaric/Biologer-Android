@@ -128,6 +128,7 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
 
         checkWriteStoragePermission();
 
+        // Get the system locale to translate names of the taxa
         Locale locale = getCurrentLocale();
 
         /*
@@ -173,24 +174,39 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
 
         // Autocomplete textbox for Taxon entry
         final String[] latin_names = new String[taxaList.size()];
-        final String[] serbian_names = new String[taxaList.size()];
+        final String[] english_names = new String[taxaList.size()];
+        final String[] native_names = new String[taxaList.size()];
         final String[] full_names = new String[taxaList.size()];
         for (int i = 0; i < taxaList.size(); i++) {
+            // Get the latin names
             latin_names[i] = taxaList.get(i).getName();
+            // Get the localized names and "Latin name (localized name)" for the display.
             TaxonLocalization taxaLocale = App.get().getDaoSession().getTaxonLocalizationDao()
                     .queryBuilder()
                     .where(TaxonLocalizationDao.Properties.Name.eq(taxaList.get(i).getName()),
                             TaxonLocalizationDao.Properties.Locale.eq(locale.getLanguage()))
                     .unique();
             if (taxaLocale == null) {
-                full_names[i] = String.valueOf(taxaList.get(i).getName());
+                full_names[i] = String.valueOf(latin_names[i]);
             } else {
-                if (taxaLocale.getNative_name() == null) {
-                    full_names[i] = String.valueOf(taxaList.get(i).getName());
-                } if (taxaLocale.getNative_name().equals("null")) {
-                    full_names[i] = String.valueOf(taxaList.get(i).getName());
+                if (taxaLocale.getNativeName() == null) {
+                    full_names[i] = String.valueOf(latin_names[i]);
+                } if (taxaLocale.getNativeName().equals("null")) {
+                    full_names[i] = String.valueOf(latin_names[i]);
                 } else {
-                    full_names[i] = String.valueOf(taxaList.get(i).getName() + " (" + taxaLocale.getNative_name() + ")");
+                    full_names[i] = String.valueOf(latin_names[i] + " (" + taxaLocale.getNativeName() + ")");
+                    native_names[i] = taxaLocale.getNativeName();
+                }
+            }
+            // Get the english names
+            TaxonLocalization englishLocale = App.get().getDaoSession().getTaxonLocalizationDao()
+                    .queryBuilder()
+                    .where(TaxonLocalizationDao.Properties.Name.eq(taxaList.get(i).getName()),
+                            TaxonLocalizationDao.Properties.Locale.eq("en"))
+                    .unique();
+            if (taxaLocale != null) {
+                if (taxaLocale.getNativeName() != null) {
+                    english_names[i] = englishLocale.getNativeName();
                 }
             }
         }

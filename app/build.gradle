@@ -65,7 +65,7 @@ android {
 
 //ako menjam strukturu baze povecam verziju za 1
 greendao {
-    schemaVersion 112
+    schemaVersion 113
 }
 
 dependencies {
