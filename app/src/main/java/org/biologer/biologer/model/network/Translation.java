@@ -21,7 +21,7 @@ public class Translation {
     @JsonProperty("locale")
     private String locale;
     @JsonProperty("native_name")
-    private Object nativeName;
+    private String nativeName;
     @JsonProperty("description")
     private Object description;
 
@@ -56,12 +56,12 @@ public class Translation {
     }
 
     @JsonProperty("native_name")
-    public Object getNativeName() {
+    public String getNativeName() {
         return nativeName;
     }
 
     @JsonProperty("native_name")
-    public void setNativeName(Object nativeName) {
+    public void setNativeName(String nativeName) {
         this.nativeName = nativeName;
     }
 

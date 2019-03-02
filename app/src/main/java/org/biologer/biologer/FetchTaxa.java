@@ -14,6 +14,7 @@ import org.biologer.biologer.model.Stage;
 import org.biologer.biologer.model.network.Stage6;
 import org.biologer.biologer.model.network.TaksoniResponse;
 import org.biologer.biologer.model.network.Taxa;
+import org.biologer.biologer.model.network.Translation;
 
 import java.util.List;
 
@@ -287,9 +288,16 @@ public class FetchTaxa extends Service {
                         App.get().getDaoSession().getTaxonDao().insertOrReplace(taxon.toTaxon());
 
                         List<Stage6> stages = taxon.getStages();
+                        List<Translation> translations = taxon.getTranslations();
 
                         for (Stage6 stage : stages) {
                             App.get().getDaoSession().getStageDao().insert(new Stage(null, stage.getName(), stage.getId(), taxon.getId()));
+                        }
+
+                        for (Translation translation : translations) {
+                            Log.i(TAG, "ID value is: " + String.valueOf(translation.getId()));
+                            Log.i(TAG, "Localization value is: " + translation.getLocale());
+                            Log.i(TAG, "Name value is: " + translation.getNativeName());
                         }
                     }
 
