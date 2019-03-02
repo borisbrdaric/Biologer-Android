@@ -196,7 +196,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         });
 
         // Get the name of the taxon for this entry from the database
-        String taxonName = (App.get().getDaoSession().getTaxonDao().queryBuilder().where(TaxonDao.Properties.Id.eq(currentItem.getTaxon())).unique()).getName();
+        String taxonName = (App.get().getDaoSession().getTaxonDao().queryBuilder().where(TaxonDao.Properties.Id.eq(currentItem.getTaxonId())).unique()).getName();
         acTextView.setText(taxonName);
         acTextView.dismissDropDown();
 
@@ -417,8 +417,8 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         Long selectedStage = (stage != null) ? stage.getStageId() : null;
         String razlogSmrti = (et_razlogSmrti.getText() != null) ? et_razlogSmrti.getText().toString() : "";
 
-        currentItem.setTaxon(taxon.getId());
-        currentItem.setTaxon_suggestion(taxon.getName().toString());
+        currentItem.setTaxonId(taxon.getId());
+        currentItem.setTaxonSuggestion(taxon.getName().toString());
         currentItem.setComment(komentar);
         currentItem.setNumber(brojJedinki);
         currentItem.setSex(maleFemale());
@@ -451,7 +451,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private void showStageDialog() {
-        Taxon t = App.get().getDaoSession().getTaxonDao().queryBuilder().where(TaxonDao.Properties.Id.eq(currentItem.getTaxon())).unique();
+        Taxon t = App.get().getDaoSession().getTaxonDao().queryBuilder().where(TaxonDao.Properties.Id.eq(currentItem.getTaxonId())).unique();
         stages = (ArrayList<Stage>) App.get().getDaoSession().getStageDao().queryBuilder().where(StageDao.Properties.TaxonId.eq(t.getId())).list();
         if (stages != null) {
             final String[] stadijumi = new String[stages.size()];

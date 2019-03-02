@@ -13,20 +13,20 @@ import org.greenrobot.greendao.annotation.Generated;
 public class Taxon {
 
     @Id
-    private long id;
+    private Long id;
     private String name;
-    @Generated(hash = 1863565783)
-    public Taxon(long id, String name) {
+    @Generated(hash = 76152310)
+    public Taxon(Long id, String name) {
         this.id = id;
         this.name = name;
     }
     @Generated(hash = 1232389924)
     public Taxon() {
     }
-    public long getId() {
+    public Long getId() {
         return this.id;
     }
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
     public String getName() {

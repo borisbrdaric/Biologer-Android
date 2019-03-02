@@ -29,7 +29,7 @@ public class App extends MultiDexApplication {
         createNotificationChannel();
 
         // For initialisation of GreenDAO database
-        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this, "notes-db");
+        GreenDaoInitialization helper = new GreenDaoInitialization(this, "notes-db");
         Database db = helper.getWritableDb();
         daoSession = new DaoMaster(db).newSession();
     }

@@ -22,6 +22,11 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
+
+    greendao {
+        schemaVersion 117
+    }
+
     applicationVariants.all { variant ->
         variant.resValue "string", "versionName", variant.versionName
     }
@@ -63,11 +68,6 @@ android {
     }
 }
 
-//ako menjam strukturu baze povecam verziju za 1
-greendao {
-    schemaVersion 113
-}
-
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
@@ -84,7 +84,7 @@ dependencies {
     implementation 'com.google.android.gms:play-services-maps:16.1.0'
     implementation 'com.google.firebase:firebase-crash:16.2.1'
     implementation 'com.google.firebase:firebase-core:16.0.7'
-    implementation 'com.google.firebase:firebase-iid:17.0.4'
+    implementation 'com.google.firebase:firebase-iid:17.1.0'
     implementation 'com.squareup.retrofit2:retrofit:2.3.0'
     implementation 'com.squareup.retrofit2:converter-jackson:2.3.0'
     implementation 'com.github.bumptech.glide:glide:4.6.1'

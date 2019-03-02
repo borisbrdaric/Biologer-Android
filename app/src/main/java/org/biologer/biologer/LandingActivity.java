@@ -311,8 +311,8 @@ public class LandingActivity extends AppCompatActivity
         photos = new ArrayList<>();
         //napravi objekat apiEntry
         Entry entry = entryList.get(0);
-        apiEntry.setTaxonId((int) entry.getTaxon());
-        apiEntry.setTaxonSuggestion(entry.getTaxon_suggestion());
+        apiEntry.setTaxonId(entry.getTaxonId() != null ? entry.getTaxonId().intValue() : null);
+        apiEntry.setTaxonSuggestion(entry.getTaxonSuggestion());
         apiEntry.setYear(entry.getYear());
         apiEntry.setMonth(entry.getMonth());
         apiEntry.setDay(entry.getDay());
@@ -616,6 +616,7 @@ public class LandingActivity extends AppCompatActivity
         App.get().getDaoSession().getTaxonDao().deleteAll();
         App.get().getDaoSession().getStageDao().deleteAll();
         App.get().getDaoSession().getUserDataDao().deleteAll();
+        App.get().getDaoSession().getTaxonLocalizationDao().deleteAll();
     }
 
     private void showLandingFragment() {

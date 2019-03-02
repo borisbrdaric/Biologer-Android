@@ -13,8 +13,8 @@ public class Entry {
 
     @Id(autoincrement = true)
     private Long id;
-    private long taxon;
-    private String taxon_suggestion;
+    private Long taxonId;
+    private String taxonSuggestion;
     private String year;
     private String month;
     private String day;
@@ -38,16 +38,16 @@ public class Entry {
     private int image_licence;
     private String time;
 
-    @Generated(hash = 1480829414)
-    public Entry(Long id, long taxon, String taxon_suggestion, String year,
-            String month, String day, String comment, Integer number, String sex,
-            Long stage, String deadOrAlive, String causeOfDeath, double lattitude,
-            double longitude, Double accuracy, double elevation, String location,
-            String slika1, String slika2, String slika3, String projectId,
-            String foundOn, String data_licence, int image_licence, String time) {
+    @Generated(hash = 277703272)
+    public Entry(Long id, Long taxonId, String taxonSuggestion, String year, String month,
+            String day, String comment, Integer number, String sex, Long stage,
+            String deadOrAlive, String causeOfDeath, double lattitude, double longitude,
+            Double accuracy, double elevation, String location, String slika1, String slika2,
+            String slika3, String projectId, String foundOn, String data_licence,
+            int image_licence, String time) {
         this.id = id;
-        this.taxon = taxon;
-        this.taxon_suggestion = taxon_suggestion;
+        this.taxonId = taxonId;
+        this.taxonSuggestion = taxonSuggestion;
         this.year = year;
         this.month = month;
         this.day = day;
@@ -79,18 +79,6 @@ public class Entry {
     }
     public void setId(Long id) {
         this.id = id;
-    }
-    public long getTaxon() {
-        return this.taxon;
-    }
-    public void setTaxon(long taxon) {
-        this.taxon = taxon;
-    }
-    public String getTaxon_suggestion() {
-        return this.taxon_suggestion;
-    }
-    public void setTaxon_suggestion(String taxon_suggestion) {
-        this.taxon_suggestion = taxon_suggestion;
     }
     public String getYear() {
         return this.year;
@@ -223,5 +211,17 @@ public class Entry {
     }
     public void setTime(String time) {
         this.time = time;
+    }
+    public Long getTaxonId() {
+        return this.taxonId;
+    }
+    public void setTaxonId(Long taxonId) {
+        this.taxonId = taxonId;
+    }
+    public String getTaxonSuggestion() {
+        return this.taxonSuggestion;
+    }
+    public void setTaxonSuggestion(String taxonSuggestion) {
+        this.taxonSuggestion = taxonSuggestion;
     }
 }

@@ -62,6 +62,7 @@ public class FetchTaxa extends Service {
                         SettingsManager.setDatabaseVersion("0");
                         App.get().getDaoSession().getTaxonDao().deleteAll();
                         App.get().getDaoSession().getStageDao().deleteAll();
+                        App.get().getDaoSession().getTaxonLocalizationDao().deleteAll();
                         stop_fetching = "no";
                         currentPage = 1;
                         SettingsManager.setTaxaLastPageUpdated(String.valueOf(currentPage));
@@ -115,6 +116,7 @@ public class FetchTaxa extends Service {
         SettingsManager.setTaxaLastPageUpdated(String.valueOf(currentPage));
         App.get().getDaoSession().getTaxonDao().deleteAll();
         App.get().getDaoSession().getStageDao().deleteAll();
+        App.get().getDaoSession().getTaxonLocalizationDao().deleteAll();
     }
 
     private void notificationInitiate() {
@@ -275,6 +277,8 @@ public class FetchTaxa extends Service {
                 if (stop_fetching.equals("no")) {
                     if (1 == page) {
                         App.get().getDaoSession().getStageDao().deleteAll();
+                        App.get().getDaoSession().getTaxonDao().deleteAll();
+                        App.get().getDaoSession().getTaxonLocalizationDao().deleteAll();
                         totalPages = response.body().getMeta().getLastPage();
                     }
 
@@ -323,11 +327,13 @@ public class FetchTaxa extends Service {
                 // Remove partially retrieved data from the database
                 App.get().getDaoSession().getTaxonDao().deleteAll();
                 App.get().getDaoSession().getStageDao().deleteAll();
+                App.get().getDaoSession().getTaxonLocalizationDao().deleteAll();
                 SettingsManager.setDatabaseVersion("0");
                 // Inform the user on failure and write log message
                 //Toast.makeText(getActivity(), getString(R.string.database_connect_error), Toast.LENGTH_LONG).show();
                 Log.e(TAG, "Application could not get data from a server!");
                 notificationUpdateText(getString(R.string.notify_title_taxa_failed), getString(R.string.notify_desc_taxa_failed));
+                stopSelf();
             }
         });
     }

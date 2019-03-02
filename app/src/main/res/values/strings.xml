@@ -163,4 +163,5 @@
     <string name="notify_desc_taxa_paused">Downloading new taxonomic database from the server is paused.</string>
     <string name="notify_title_taxa_canceled">Update canceled</string>
     <string name="notify_desc_taxa_canceled">Downloading new taxonomic database is canceled by the user.</string>
+    <string name="invalid_taxon_name">It looks like you selected an unknown taxon. Do you wont biologer to save this taxon anyway?</string>
 </resources>
