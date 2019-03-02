@@ -185,10 +185,13 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
             if (taxaLocale == null) {
                 full_names[i] = String.valueOf(taxaList.get(i).getName());
             } else {
-                if (taxaLocale.getNative_name().equals("null")){
+                if (taxaLocale.getNative_name() == null) {
                     full_names[i] = String.valueOf(taxaList.get(i).getName());
+                } if (taxaLocale.getNative_name().equals("null")) {
+                    full_names[i] = String.valueOf(taxaList.get(i).getName());
+                } else {
+                    full_names[i] = String.valueOf(taxaList.get(i).getName() + " (" + taxaLocale.getNative_name() + ")");
                 }
-                full_names[i] = String.valueOf(taxaList.get(i).getName() + " (" + taxaLocale.getNative_name() + ")");
             }
         }
 
