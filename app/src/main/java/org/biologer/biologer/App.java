@@ -18,7 +18,6 @@ public class App extends MultiDexApplication {
 
     private static App app;
     private DaoSession daoSession;
-    public static final int NOTIFICATION_TAXA = 98;
 
     @Override
     public void onCreate() {

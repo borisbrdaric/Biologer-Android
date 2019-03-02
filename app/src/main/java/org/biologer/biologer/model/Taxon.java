@@ -1,15 +1,9 @@
 package org.biologer.biologer.model;
 
-import org.biologer.biologer.model.network.*;
-
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Generated;
-import org.greenrobot.greendao.annotation.OrderBy;
-import org.greenrobot.greendao.annotation.ToMany;
 
-import java.util.List;
-import org.greenrobot.greendao.DaoException;
 
 /**
  * Created by brjovanovic on 2/22/2018.

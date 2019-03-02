@@ -11,6 +11,7 @@ import android.support.v4.app.NotificationCompat;import android.util.Log;
 
 import org.biologer.biologer.model.RetrofitClient;
 import org.biologer.biologer.model.Stage;
+import org.biologer.biologer.model.TaxonLocalization;
 import org.biologer.biologer.model.network.Stage6;
 import org.biologer.biologer.model.network.TaksoniResponse;
 import org.biologer.biologer.model.network.Taxa;
@@ -295,9 +296,7 @@ public class FetchTaxa extends Service {
                         }
 
                         for (Translation translation : translations) {
-                            Log.i(TAG, "ID value is: " + String.valueOf(translation.getId()));
-                            Log.i(TAG, "Localization value is: " + translation.getLocale());
-                            Log.i(TAG, "Name value is: " + translation.getNativeName());
+                            App.get().getDaoSession().getTaxonLocalizationDao().insert(new TaxonLocalization(null, taxon.getName(), taxon.getId(), translation.getId(), translation.getLocale(), translation.getNativeName()));
                         }
                     }
 

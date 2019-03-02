@@ -51,6 +51,8 @@ import org.biologer.biologer.model.Stage;
 import org.biologer.biologer.model.StageDao;
 import org.biologer.biologer.model.Taxon;
 import org.biologer.biologer.model.TaxonDao;
+import org.biologer.biologer.model.TaxonLocalization;
+import org.biologer.biologer.model.TaxonLocalizationDao;
 import org.biologer.biologer.model.UserData;
 
 import java.io.ByteArrayInputStream;
@@ -106,6 +108,7 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
     // Get the data from the GreenDao database
     List<UserData> userDataList = App.get().getDaoSession().getUserDataDao().loadAll();
     List<Taxon> taxaList = App.get().getDaoSession().getTaxonDao().loadAll();
+    List<TaxonLocalization> taxaLocale = App.get().getDaoSession().getTaxonLocalizationDao().loadAll();
     List<Stage> stageList = App.get().getDaoSession().getStageDao().loadAll();
 
     @Override
@@ -124,6 +127,8 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
         }
 
         checkWriteStoragePermission();
+
+        Locale locale = getCurrentLocale();
 
         /*
          * Get the view...
@@ -165,13 +170,29 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
         // Show more text
         tv_more = (TextView) findViewById(R.id.tv_more);
         tv_more.setOnClickListener(this);
+
         // Autocomplete textbox for Taxon entry
         final String[] latin_names = new String[taxaList.size()];
+        final String[] serbian_names = new String[taxaList.size()];
+        final String[] full_names = new String[taxaList.size()];
         for (int i = 0; i < taxaList.size(); i++) {
             latin_names[i] = taxaList.get(i).getName();
-
+            TaxonLocalization taxaLocale = App.get().getDaoSession().getTaxonLocalizationDao()
+                    .queryBuilder()
+                    .where(TaxonLocalizationDao.Properties.Name.eq(taxaList.get(i).getName()),
+                            TaxonLocalizationDao.Properties.Locale.eq(locale.getLanguage()))
+                    .unique();
+            if (taxaLocale == null) {
+                full_names[i] = String.valueOf(taxaList.get(i).getName());
+            } else {
+                if (taxaLocale.getNative_name().equals("null")){
+                    full_names[i] = String.valueOf(taxaList.get(i).getName());
+                }
+                full_names[i] = String.valueOf(taxaList.get(i).getName() + " (" + taxaLocale.getNative_name() + ")");
+            }
         }
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, latin_names);
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, full_names);
         acTextView = findViewById(R.id.textview_list_of_taxa);
         acTextView.setAdapter(adapter);
         acTextView.addTextChangedListener(new TextWatcher() {
@@ -885,5 +906,17 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
             return 0;
         }
         return 0;
+    }
+
+    Locale getCurrentLocale(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
+            Locale locale = getResources().getConfiguration().getLocales().get(0);
+            Log.i(TAG, "Current System locale is set to " + locale.getDisplayLanguage() + " language. Country: " + locale.getLanguage());
+            return locale;
+        } else{
+            Locale locale = getResources().getConfiguration().locale;
+            Log.i(TAG, "Current System locate is set to: " + locale);
+            return locale;
+        }
     }
 }
