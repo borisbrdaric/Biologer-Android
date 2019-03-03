@@ -142,4 +142,10 @@
     <string name="notify_title_taxa_canceled">Update canceled</string>
     <string name="notify_desc_taxa_canceled">Downloading new taxonomic database is canceled by the user.</string>
     <string name="invalid_taxon_name">It looks like you selected an unknown taxon. Do you wont biologer to save this taxon anyway?</string>
+    <string name="image_frame">Image frame</string>
+    <string name="camera">Camera</string>
+    <string name="gallery">Gallery</string>
+    <string name="map">Map</string>
+    <string name="advanced_entry">Advanced observation entry</string>
+    <string name="advanced_entry_desc">Enables advanced options that could be entered with your occurrence (i.e. number of individuals, stage, sex).</string>
 </resources>

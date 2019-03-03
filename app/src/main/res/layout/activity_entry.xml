@@ -120,6 +120,7 @@
                                 android:layout_gravity="center"
                                 android:layout_marginEnd="5dp"
                                 android:layout_marginStart="16dp"
+                                android:contentDescription="@string/map"
                                 android:adjustViewBounds="true"
                                 android:clickable="true"
                                 android:focusable="true"
@@ -127,23 +128,38 @@
 
                         </LinearLayout>
 
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="1dp"
-                            android:layout_marginTop="16dp"
-                            android:layout_marginBottom="16dp"
-                            android:background="@color/colorDivider"/>
-
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="vertical"
+                            android:orientation="horizontal"
                             android:gravity="center_horizontal">
+
+                            <ImageView
+                                android:id="@+id/image_view_take_photo_camera"
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:contentDescription="@string/camera"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:scaleType="fitCenter"
+                                android:layout_gravity="start"
+                                android:src="@drawable/ic_photo_camera" />
+
+                            <ImageView
+                                android:id="@+id/image_view_take_photo_gallery"
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:contentDescription="@string/gallery"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:scaleType="fitCenter"
+                                android:layout_gravity="start"
+                                android:src="@drawable/ic_photo_gallery" />
 
                             <AutoCompleteTextView
                                 android:id="@+id/textview_list_of_taxa"
-                                android:layout_width="280dp"
-                                android:layout_height="56dp"
+                                android:layout_width="match_parent"
+                                android:layout_height="48dp"
                                 android:background="@drawable/gray_border"
                                 android:hint="@string/naziv_taksona"
                                 android:paddingStart="14dp"
@@ -154,63 +170,18 @@
                         </LinearLayout>
 
                         <LinearLayout
+                            android:id="@+id/detailed_entry"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:gravity="center">
+                            android:orientation="vertical"
+                            android:visibility="gone">
 
-                            <ImageView
-                                android:id="@+id/ib_pic1"
-                                android:layout_width="80dp"
-                                android:layout_height="80dp"
-                                android:layout_marginEnd="5dp"
-                                android:adjustViewBounds="true"
-                                android:clickable="true"
-                                android:focusable="true"
-                                android:scaleType="centerInside"
-                                android:src="@drawable/ic_add_a_photo_black_24dp" />
-
-                            <ImageView
-                                android:id="@+id/ib_pic2"
-                                android:layout_width="80dp"
-                                android:layout_height="80dp"
-                                android:layout_marginEnd="5dp"
-                                android:adjustViewBounds="true"
-                                android:clickable="true"
-                                android:focusable="true"
-                                android:scaleType="centerInside"
-                                android:src="@drawable/ic_add_a_photo_black_24dp" />
-
-                            <ImageView
-                                android:id="@+id/ib_pic3"
-                                android:layout_width="80dp"
-                                android:layout_height="80dp"
-                                android:adjustViewBounds="true"
-                                android:clickable="true"
-                                android:focusable="true"
-                                android:scaleType="centerInside"
-                                android:src="@drawable/ic_add_a_photo_black_24dp" />
-                        </LinearLayout>
-
-                        <TextView
-                            android:id="@+id/tv_more"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="end"
-                            android:layout_marginBottom="6dp"
-                            android:layout_marginStart="6dp"
-                            android:layout_marginEnd="6dp"
-                            android:layout_marginTop="8dp"
-                            android:clickable="true"
-                            android:focusable="true"
-                            android:text="@string/more"
-                            android:textSize="14sp"
-                            android:textStyle="italic|bold" />
-
-                        <LinearLayout
-                            android:id="@+id/more"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical">
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:layout_marginTop="16dp"
+                                android:layout_marginBottom="16dp"
+                                android:background="@color/colorDivider"/>
 
                             <LinearLayout
                                 android:layout_width="match_parent"
@@ -377,6 +348,50 @@
                                     android:layout_height="wrap_content" />
                             </LinearLayout>
 
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center">
+
+                            <ImageView
+                                android:id="@+id/ib_pic1"
+                                android:layout_width="100dp"
+                                android:layout_height="100dp"
+                                android:layout_marginEnd="5dp"
+                                android:adjustViewBounds="true"
+                                android:contentDescription="@string/image_frame"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:scaleType="centerInside"
+                                android:visibility="gone"
+                                android:src="@drawable/ic_add_a_photo_black_24dp" />
+
+                            <ImageView
+                                android:id="@+id/ib_pic2"
+                                android:layout_width="100dp"
+                                android:layout_height="100dp"
+                                android:layout_marginEnd="5dp"
+                                android:adjustViewBounds="true"
+                                android:contentDescription="@string/image_frame"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:scaleType="centerInside"
+                                android:visibility="gone"
+                                android:src="@drawable/ic_add_a_photo_black_24dp" />
+
+                            <ImageView
+                                android:id="@+id/ib_pic3"
+                                android:layout_width="100dp"
+                                android:layout_height="100dp"
+                                android:adjustViewBounds="true"
+                                android:contentDescription="@string/image_frame"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:scaleType="centerInside"
+                                android:visibility="gone"
+                                android:src="@drawable/ic_add_a_photo_black_24dp" />
                         </LinearLayout>
 
                     </LinearLayout>

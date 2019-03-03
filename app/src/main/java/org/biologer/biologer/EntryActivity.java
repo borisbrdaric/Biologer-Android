@@ -3,6 +3,7 @@ package org.biologer.biologer;
 import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -78,6 +79,7 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
     private static final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL = 1005;
     private static final int MY_PERMISSIONS_REQUEST_CAMERA = 1006;
     private static final int REQUEST_LOCATION = 1;
+
     private String mCurrentPhotoPath;
     private LocationManager locationManager;
     private LocationListener locationListener;
@@ -91,9 +93,9 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
     private TextView tvTakson, tv_gps, tvStage, tv_more, tv_latitude, tv_longitude;
     private CustomEditText et_razlogSmrti, et_komentar, et_brojJedinki;
     AutoCompleteTextView acTextView;
-    ImageView ib_pic1, ib_pic2, ib_pic3, iv_map;
+    ImageView ib_pic1, ib_pic2, ib_pic3, iv_map, iconTakePhotoCamera, iconTakePhotoGallery;
     private CheckBox check_dead;
-    private LinearLayout more, smrt;
+    private LinearLayout smrt, detailedEntry;
     private boolean save_enabled = false;
     private RadioButton rb_male, rb_female;
     Uri contentURI;
@@ -141,10 +143,6 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
         et_brojJedinki = (CustomEditText) findViewById(R.id.et_brojJedinki);
         rb_male = findViewById(R.id.rb_musko);
         rb_female = findViewById(R.id.rb_zensko);
-        more = (LinearLayout) findViewById(R.id.more);
-        ViewGroup.LayoutParams params_more = more.getLayoutParams();
-        params_more.height = 0;
-        more.setLayoutParams(params_more);
         check_dead = (CheckBox) findViewById(R.id.dead_specimen);
         check_dead.setOnClickListener(this);
         smrt = (LinearLayout) findViewById(R.id.smrt);
@@ -158,12 +156,19 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
         ib_pic2.setOnClickListener(this);
         ib_pic3 = (ImageView) findViewById(R.id.ib_pic3);
         ib_pic3.setOnClickListener(this);
+        iconTakePhotoCamera = (ImageView) findViewById(R.id.image_view_take_photo_camera);
+        iconTakePhotoCamera.setOnClickListener(this);
+        iconTakePhotoGallery = (ImageView) findViewById(R.id.image_view_take_photo_gallery);
+        iconTakePhotoGallery.setOnClickListener(this);
         // Map icon
         iv_map = (ImageView) findViewById(R.id.iv_map);
         iv_map.setOnClickListener(this);
-        // Show more text
-        tv_more = (TextView) findViewById(R.id.tv_more);
-        tv_more.setOnClickListener(this);
+        // Show advanced options for data entry if selected in preferences
+        detailedEntry = (LinearLayout) findViewById(R.id.detailed_entry);
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        if (preferences.getBoolean("advanced_interface", false)) {
+            detailedEntry.setVisibility(View.VISIBLE);
+        }
 
         // This should get the list of taxa from the database
         final String[] latin_names = new String[taxaList.size()];
@@ -269,6 +274,10 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
 
     }
 
+    /*
+    /  If new entry just get the coordinates.
+    /  If existing entry get the known values from the entry.
+    */
     private void startEntryActivity() {
         Long existing_entry_id = getIntent().getLongExtra("ENTRY_ID", 0);
         if (isNewEntry()) {
@@ -329,18 +338,21 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
                 Glide.with(this)
                         .load(slika1)
                         .into(ib_pic1);
+                ib_pic1.setVisibility(View.VISIBLE);
             }
             slika2 = currentItem.getSlika2();
             if (slika2 != null) {
                 Glide.with(this)
                         .load(slika2)
                         .into(ib_pic2);
+                ib_pic2.setVisibility(View.VISIBLE);
             }
             slika3 = currentItem.getSlika3();
             if (slika3 != null) {
                 Glide.with(this)
                         .load(slika3)
                         .into(ib_pic3);
+                ib_pic3.setVisibility(View.VISIBLE);
             }
         }
     }
@@ -392,7 +404,7 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
         super.onResume();
     }
 
-    //klikabilni view-ovi
+    // On click
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.text_view_stages:
@@ -410,22 +422,25 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
                 IMAGE_VIEW = 3;
                 showPictureDialog();
                 break;
-            case R.id.tv_more:
-                showMore();
-                break;
             case R.id.dead_specimen:
                 showDeadComment();
                 break;
             case R.id.iv_map:
                 showMap();
                 break;
+            case R.id.image_view_take_photo_camera:
+                takePhotoFromCamera();
+                break;
+            case R.id.image_view_take_photo_gallery:
+                takePhotoFromGallery();
+                break;
         }
     }
 
     /*
-    This calls other functions to get the values, check the validity of
-    the data and to finally save it into the entry
-     */
+    /  This calls other functions to get the values, check the validity of
+    /  the data and to finally save it into the entry
+    */
     private void saveEntry() {
         // Insure that the taxon is entered correctly
         Long taxonID = getSelectedTaxonId();
@@ -454,9 +469,7 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
-    /*
-    This gathers all the data into the entry
-     */
+    //  Gather all the data into the Entry and wright it into the GreenDao database.
     private void entrySaver(final Taxon taxon) {
         Stage stage = (tvStage.getTag() != null) ? (Stage) tvStage.getTag() : null;
         String komentar = (et_komentar.getText().toString() != null) ? et_komentar.getText().toString() : "";
@@ -487,7 +500,7 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
             finish();
         }
 
-        else {
+        else { // if the entry exist already
             currentItem.setTaxonId(taxon.getId());
             currentItem.setTaxonSuggestion(taxon.getName().toString());
             currentItem.setComment(komentar);
@@ -525,34 +538,6 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
         return sex;
     }
 
-    private void showTaksoniDialog() {
-        if (taxaList != null) {
-            final String[] taksonometrija = new String[taxaList.size()];
-            for (int i = 0; i < taxaList.size(); i++) {
-                taksonometrija[i] = taxaList.get(i).getName();
-            }
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setItems(taksonometrija, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    tvTakson.setText(taksonometrija[i]);
-                    tvTakson.setTag(taxaList.get(i));
-                    if (tvTakson.getText() == getString(R.string.please_select)) {
-                        tvStage.setEnabled(false);
-                    } else {
-                        tvStage.setEnabled(true);
-                        tvStage.setHint(getString(R.string.please_select));
-                        // Enable/disable save button from Toolbar
-                        save_enabled = true;
-                        invalidateOptionsMenu();
-                    }
-                }
-            });
-            tvStage.setText("");
-            builder.show();
-        }
-    }
-
     private void showStageDialog() {
         Taxon t = App.get().getDaoSession().getTaxonDao().queryBuilder()
                 .where(TaxonDao.Properties.Name.eq(getLatinName()))
@@ -582,6 +567,7 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
         startActivityForResult(intent, MAP);
     }
 
+    // This was used when we have tree images to click on them. It will probably be depracated soon...
     private void showPictureDialog() {
         AlertDialog.Builder pictureDialog = new AlertDialog.Builder(this);
         pictureDialog.setTitle(getString(R.string.choose_picture));
@@ -594,10 +580,10 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
                     public void onClick(DialogInterface dialog, int which) {
                         switch (which) {
                             case 0:
-                                choosePhotoFromGallery();
+                                takePhotoFromGallery();
                                 break;
                             case 1:
-                                checkCameraPermision();
+                                takePhotoFromCamera();
                                 break;
                         }
                     }
@@ -605,38 +591,37 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
         pictureDialog.show();
     }
 
-    public void choosePhotoFromGallery() {
+    public void takePhotoFromGallery() {
         Intent galleryIntent = new Intent(Intent.ACTION_PICK,
                 android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-
         startActivityForResult(galleryIntent, GALLERY);
     }
 
+    // Check for camera permission and run function to take photo
     private void takePhotoFromCamera() {
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            // startActivityForResult(takePictureIntent, CAMERA);
-            dispatchTakePictureIntent();
-        } else {
-            et_razlogSmrti.setText("greska");  //?????? nemam pojma sto sam ovo stavio
-        }
-    }
-
-    private void checkCameraPermision() {
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {
-
             if (ActivityCompat.shouldShowRequestPermissionRationale(this,
                     Manifest.permission.CAMERA)) {
-
+                Log.d(TAG, "Could not show camera permission dialog.");
             } else {
                 ActivityCompat.requestPermissions(this,
                         new String[]{Manifest.permission.CAMERA},
                         MY_PERMISSIONS_REQUEST_CAMERA);
             }
         } else {
-            takePhotoFromCamera();
+            takePhoto();
+        }
+    }
+
+    private void takePhoto() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            // startActivityForResult(takePictureIntent, CAMERA);
+            dispatchTakePictureIntent();
+        } else {
+            Log.d(TAG, "Take picture intent could not start for some reason.");
         }
     }
 
@@ -647,35 +632,65 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
         if (resultCode == this.RESULT_CANCELED) {
             return;
         }
+        
         if (requestCode == GALLERY) {
             if (data != null) {
                 contentURI = data.getData();
                 try {
-                    File f = createImageFile();
-                    copyFile(new File(getPath(data.getData())), f);
-                    galleryAddPic();
+                    File file = createImageFile();
+                    copyFile(new File(getPath(data.getData())), file);
+                    entryAddPic();
+                    if (slika1 == null) {
+                        slika1 = resizeImage(mCurrentPhotoPath);
+                        Glide.with(this)
+                                .load(slika1)
+                                .into(ib_pic1);
+                        ib_pic1.setVisibility(View.VISIBLE);
+                    } else if (slika2 == null) {
+                        slika2 = resizeImage(mCurrentPhotoPath);
+                        Glide.with(this)
+                                .load(slika2)
+                                .into(ib_pic2);
+                        ib_pic2.setVisibility(View.VISIBLE);
+                    } else if (slika3 == null) {
+                        slika3 = resizeImage(mCurrentPhotoPath);
+                        Glide.with(this)
+                                .load(slika3)
+                                .into(ib_pic3);
+                        ib_pic3.setVisibility(View.VISIBLE);
+                        iconTakePhotoGallery.setEnabled(false);
+                        iconTakePhotoGallery.setImageAlpha(20);
+                        iconTakePhotoCamera.setEnabled(false);
+                        iconTakePhotoCamera.setImageAlpha(20);
+                    }
+                    /*
                     switch (IMAGE_VIEW) {
                         case 1:
                             Glide.with(this)
                                     .load(mCurrentPhotoPath)
                                     .into(ib_pic1);
                             slika1 = resizeImage(mCurrentPhotoPath);
+                            ib_pic1.setVisibility(View.VISIBLE);
                             break;
                         case 2:
                             Glide.with(this)
                                     .load(mCurrentPhotoPath)
                                     .into(ib_pic2);
                             slika2 = resizeImage(mCurrentPhotoPath);
+                            ib_pic2.setVisibility(View.VISIBLE);
                             break;
                         case 3:
                             Glide.with(this)
                                     .load(mCurrentPhotoPath)
                                     .into(ib_pic3);
                             slika3 = resizeImage(mCurrentPhotoPath);
+                            ib_pic3.setVisibility(View.VISIBLE);
                             break;
                     }
+                    */
+                }
 
-                } catch (IOException e) {
+                catch (IOException e) {
                     e.printStackTrace();
                     Toast.makeText(EntryActivity.this, "Failed!", Toast.LENGTH_SHORT).show();
                 }
@@ -683,25 +698,28 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
 
         } else if (requestCode == CAMERA) {
 
-            galleryAddPic();
+            entryAddPic();
             switch (IMAGE_VIEW) {
                 case 1:
                     Glide.with(this)
                             .load(mCurrentPhotoPath)
                             .into(ib_pic1);
                     slika1 = resizeImage(mCurrentPhotoPath);
+                    ib_pic1.setVisibility(View.VISIBLE);
                     break;
                 case 2:
                     Glide.with(this)
                             .load(mCurrentPhotoPath)
                             .into(ib_pic2);
                     slika2 = resizeImage(mCurrentPhotoPath);
+                    ib_pic1.setVisibility(View.VISIBLE);
                     break;
                 case 3:
                     Glide.with(this)
                             .load(mCurrentPhotoPath)
                             .into(ib_pic3);
                     slika3 = resizeImage(mCurrentPhotoPath);
+                    ib_pic1.setVisibility(View.VISIBLE);
                     break;
             }
 
@@ -711,16 +729,121 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
         // Get data from Google MapActivity.java and save it as local variables
         if (requestCode == MAP) {
             locationManager.removeUpdates(locationListener);
-            nLokacija = data.getParcelableExtra("google_map_latlong");
-            setLocationValues(nLokacija.latitude, nLokacija.longitude);
-            acc = Double.valueOf(data.getExtras().getString("google_map_accuracy"));
-            elev = Double.valueOf(data.getExtras().getString("google_map_elevation"));
+            if(data != null) {
+                nLokacija = data.getParcelableExtra("google_map_latlong");
+                setLocationValues(nLokacija.latitude, nLokacija.longitude);
+                acc = Double.valueOf(data.getExtras().getString("google_map_accuracy"));
+                elev = Double.valueOf(data.getExtras().getString("google_map_elevation"));
+            }
             if (data.getExtras().getString("google_map_accuracy").equals("0.0")) {
                 tv_gps.setText(R.string.not_available);
             } else {
                 tv_gps.setText(String.format(Locale.ENGLISH, "%.0f", acc));
             }
         }
+    }
+
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+
+        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES), "biologer");
+
+        if (!mediaStorageDir.exists()) {
+            if (!mediaStorageDir.mkdirs()) {
+                return null;
+            }
+        }
+
+        File image = File.createTempFile(
+                imageFileName,
+                ".jpg",
+                mediaStorageDir
+        );
+
+        mCurrentPhotoPath = image.getAbsolutePath();
+        return image;
+    }
+
+    private void dispatchTakePictureIntent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        // Ensure that there's a camera activity to handle the intent
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            // Create the File where the photo should go
+            File photoFile = null;
+            try {
+                photoFile = createImageFile();
+            } catch (IOException ex) {
+                // Error occurred while creating the File
+            }
+            // Continue only if the File was successfully created
+            if (photoFile != null) {
+                /*Uri photoURI = Uri.fromFile(photoFile);*//* FileProvider.getUriForFile(this,
+                        "org.biologeruntill upload.biologer.fileprovider",
+                        photoFile)*//*;*/
+                Uri photoURI;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    photoURI = FileProvider.getUriForFile(EntryActivity.this, "org.biologer.biologer.fileprovider", photoFile);
+                    takePictureIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                } else {
+                    photoURI = Uri.fromFile(photoFile);
+                }
+
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                startActivityForResult(takePictureIntent, CAMERA);
+            }
+        }
+    }
+
+    private void entryAddPic() {
+        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        File f = new File(mCurrentPhotoPath);
+        Uri contentUri = Uri.fromFile(f);
+        mediaScanIntent.setData(contentUri);
+        this.sendBroadcast(mediaScanIntent);
+    }
+
+    // Resize the picture and save it in biologer folder
+    private String resizeImage(String path_to_image) {
+        Bitmap input_image = BitmapFactory.decodeFile(path_to_image);
+        Log.d(TAG, "Input image path is " + String.valueOf(path_to_image));
+        Bitmap output_image;
+        int longer_side = 800;
+        if (input_image.getHeight() < input_image.getWidth()) {
+            int output_height = input_image.getHeight() * longer_side / input_image.getWidth();
+            output_image = Bitmap.createScaledBitmap(input_image, longer_side, output_height, false);
+        } else {
+            int output_width = input_image.getWidth() * longer_side / input_image.getHeight();
+            output_image = Bitmap.createScaledBitmap(input_image, output_width, longer_side, false);
+        }
+
+        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES), "biologer");
+
+        String input_image_name = path_to_image.substring(path_to_image.lastIndexOf("/")+1);
+        Log.d(TAG, "Input image name is " + String.valueOf(input_image_name));
+        String output_image_name = input_image_name.split(".jpg")[0] + "_res.jpg";
+        Log.d(TAG, "Output image name is " + String.valueOf(output_image_name));
+
+        File image = new File(mediaStorageDir, output_image_name);
+
+        FileOutputStream fOut;
+        try {
+            fOut = new FileOutputStream(image);
+            output_image.compress(Bitmap.CompressFormat.JPEG, 70, fOut);
+            fOut.flush();
+            fOut.close();
+            input_image.recycle();
+            output_image.recycle();
+        } catch (Exception e) {
+            // Do something
+        }
+
+        // Return the path to the image file
+        Log.d(TAG, "Output image path is " + image.getPath());
+        return image.getPath();
     }
 
     public String getPath(Uri uri) {
@@ -752,44 +875,6 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
-    public String saveImage(Bitmap myBitmap) {
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        //myBitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-        File wallpaperDirectory = new File(
-                Environment.getExternalStorageDirectory() + IMAGE_DIRECTORY);
-        // have the object build the directory structure, if needed.
-        if (!wallpaperDirectory.exists()) {
-            wallpaperDirectory.mkdirs();
-        }
-
-        try {
-            File f = createImageFile(); /*new File(wallpaperDirectory, Calendar.getInstance()
-                    .getTimeInMillis() + ".jpg");*/
-            //f.createNewFile();
-            FileOutputStream fo = new FileOutputStream(f);
-            fo.write(bytes.toByteArray());
-            MediaScannerConnection.scanFile(this,
-                    new String[]{f.getPath()},
-                    new String[]{"image/jpeg"}, null);
-            fo.close();
-            Log.d("TAG", "File Saved::--->" + f.getAbsolutePath());
-
-            return f.getAbsolutePath();
-        } catch (IOException e1) {
-            e1.printStackTrace();
-        }
-        return "";
-    }
-
-    public void showMore() {
-        ViewGroup.LayoutParams params_btn_more = tv_more.getLayoutParams();
-        params_btn_more.height = 0;
-        tv_more.setLayoutParams(params_btn_more);
-        ViewGroup.LayoutParams params = more.getLayoutParams();
-        params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-        more.setLayoutParams(params);
-    }
-
     public void showDeadComment() {
         if (check_dead.isChecked()) {
             ViewGroup.LayoutParams params = smrt.getLayoutParams();
@@ -818,11 +903,10 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
             case MY_PERMISSIONS_REQUEST_CAMERA: {
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    takePhotoFromCamera();
+                    takePhoto();
                 } else {
                     Log.d(TAG, "Not possible to get permission to use camera.");
                 }
-                return;
             }
         }
     }
@@ -968,110 +1052,6 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
         Intent intent = new Intent(EntryActivity.this, LandingActivity.class);
         startActivity(intent);
         super.onBackPressed();
-    }
-
-    private File createImageFile() throws IOException {
-        // Create an image file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
-
-        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES), "biologer");
-
-        if (!mediaStorageDir.exists()) {
-            if (!mediaStorageDir.mkdirs()) {
-                return null;
-            }
-        }
-
-        File image = File.createTempFile(
-                imageFileName,
-                ".jpg",
-                mediaStorageDir
-        );
-
-        mCurrentPhotoPath = image.getAbsolutePath();
-        return image;
-    }
-
-    private void dispatchTakePictureIntent() {
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        // Ensure that there's a camera activity to handle the intent
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            // Create the File where the photo should go
-            File photoFile = null;
-            try {
-                photoFile = createImageFile();
-            } catch (IOException ex) {
-                // Error occurred while creating the File
-
-            }
-            // Continue only if the File was successfully created
-            if (photoFile != null) {
-                /*Uri photoURI = Uri.fromFile(photoFile);*//* FileProvider.getUriForFile(this,
-                        "org.biologeruntill upload.biologer.fileprovider",
-                        photoFile)*//*;*/
-                Uri photoURI;
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    photoURI = FileProvider.getUriForFile(EntryActivity.this, "org.biologer.biologer.fileprovider", photoFile);
-                    takePictureIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                } else {
-                    photoURI = Uri.fromFile(photoFile);
-                }
-
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                startActivityForResult(takePictureIntent, CAMERA);
-            }
-        }
-    }
-
-    private void galleryAddPic() {
-        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-        File f = new File(mCurrentPhotoPath);
-        Uri contentUri = Uri.fromFile(f);
-        mediaScanIntent.setData(contentUri);
-        this.sendBroadcast(mediaScanIntent);
-    }
-
-    // Resize the picture and save it in biologer folder
-    private String resizeImage(String path_to_image) {
-        Bitmap input_image = BitmapFactory.decodeFile(path_to_image);
-        Log.d(TAG, "Input image path is " + String.valueOf(path_to_image));
-        Bitmap output_image;
-        int longer_side = 800;
-        if (input_image.getHeight() < input_image.getWidth()) {
-            int output_height = input_image.getHeight() * longer_side / input_image.getWidth();
-            output_image = Bitmap.createScaledBitmap(input_image, longer_side, output_height, false);
-        } else {
-            int output_width = input_image.getWidth() * longer_side / input_image.getHeight();
-            output_image = Bitmap.createScaledBitmap(input_image, output_width, longer_side, false);
-        }
-
-        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES), "biologer");
-
-        String input_image_name = path_to_image.substring(path_to_image.lastIndexOf("/")+1);
-        Log.d(TAG, "Input image name is " + String.valueOf(input_image_name));
-        String output_image_name = input_image_name.split(".jpg")[0] + "_res.jpg";
-        Log.d(TAG, "Output image name is " + String.valueOf(output_image_name));
-
-        File image = new File(mediaStorageDir, output_image_name);
-
-        FileOutputStream fOut;
-        try {
-            fOut = new FileOutputStream(image);
-            output_image.compress(Bitmap.CompressFormat.JPEG, 70, fOut);
-            fOut.flush();
-            fOut.close();
-            input_image.recycle();
-            output_image.recycle();
-        } catch (Exception e) {
-            // Do something
-        }
-
-        // Return the path to the image file
-        Log.d(TAG, "Output image path is " + image.getPath());
-        return image.getPath();
     }
 
     // Check for permissions and add them if required

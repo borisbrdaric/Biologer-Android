@@ -160,7 +160,10 @@ public class PreferencesFragment extends PreferenceFragmentCompat {
     }
 
     private void updateLicense() {
-        Intent update_licences = new Intent(getActivity(), UpdateLicenses.class);
-        getActivity().startService(update_licences);
+        Activity activity = getActivity();
+        if (activity != null) {
+            Intent update_licences = new Intent(activity, UpdateLicenses.class);
+            activity.startService(update_licences);
+        }
     }
 }
