@@ -549,14 +549,7 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
         stageList = (ArrayList<Stage>) App.get().getDaoSession().getStageDao().queryBuilder()
                 .where(StageDao.Properties.TaxonId.eq(taxon.getId()))
                 .list();
-//        if (stageList != null) {
-//            final String[] stadijumi = new String[stageList.size()];
-//            for (int i = 0; i < stageList.size(); i++) {
-//                stadijumi[i] = stageList.get(i).getName();
-//            }
-            //if (stadijumi.length == 0) {
-            return stageList.size() != 0;
-  //      }
+        return stageList.size() != 0;
     }
 
     private void getStageForTaxon() {

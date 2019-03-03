@@ -141,11 +141,11 @@
     <string name="notify_desc_taxa_paused">Преузимање новог таксономског стабла са сервера је паузирано.</string>
     <string name="notify_title_taxa_canceled">Ажурирање је отказано</string>
     <string name="notify_desc_taxa_canceled">Преузимање новог таксономског стабла са сервера је отказано.</string>
-    <string name="invalid_taxon_name">It looks like you selected an unknown taxon. Do you wont biologer to save this taxon anyway?</string>
-    <string name="image_frame">Image frame</string>
-    <string name="camera">Camera</string>
-    <string name="gallery">Gallery</string>
-    <string name="map">Map</string>
+    <string name="invalid_taxon_name">Изгледа да сте унели непознати таксон. Да ли желите да га ипак сачувате у Биологер?</string>
+    <string name="image_frame">Оквир слике</string>
+    <string name="camera">Фото-апарат</string>
+    <string name="gallery">Галерија</string>
+    <string name="map">Карта</string>
     <string name="advanced_entry">Детаљнији унос налаза</string>
     <string name="advanced_entry_desc">Омогућава унос теренских налаза са више детаља, као што су број јединки, развојни стадијум или пол.</string>
 </resources>
