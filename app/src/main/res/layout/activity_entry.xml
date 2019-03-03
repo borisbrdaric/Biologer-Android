@@ -132,7 +132,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
-                            android:gravity="center_horizontal">
+                            android:gravity="center_horizontal"
+                            android:layout_marginBottom="16dp">
 
                             <ImageView
                                 android:id="@+id/image_view_take_photo_camera"
@@ -141,7 +142,7 @@
                                 android:contentDescription="@string/camera"
                                 android:clickable="true"
                                 android:focusable="true"
-                                android:scaleType="fitCenter"
+                                android:scaleType="centerInside"
                                 android:layout_gravity="start"
                                 android:src="@drawable/ic_photo_camera" />
 
@@ -152,7 +153,7 @@
                                 android:contentDescription="@string/gallery"
                                 android:clickable="true"
                                 android:focusable="true"
-                                android:scaleType="fitCenter"
+                                android:scaleType="centerInside"
                                 android:layout_gravity="start"
                                 android:src="@drawable/ic_photo_gallery" />
 
@@ -160,6 +161,8 @@
                                 android:id="@+id/textview_list_of_taxa"
                                 android:layout_width="match_parent"
                                 android:layout_height="48dp"
+                                android:layout_marginStart="12dp"
+                                android:layout_marginEnd="12dp"
                                 android:background="@drawable/gray_border"
                                 android:hint="@string/naziv_taksona"
                                 android:paddingStart="14dp"
@@ -279,8 +282,8 @@
                                     android:focusable="true"
                                     android:gravity="center_vertical"
                                     android:hint="@string/stage_hint"
-                                    android:paddingStart="5dp"
-                                    android:paddingEnd="5dp"
+                                    android:paddingStart="15dp"
+                                    android:paddingEnd="15dp"
                                     android:textColor="@color/black"
                                     android:textSize="16sp" />
                             </LinearLayout>

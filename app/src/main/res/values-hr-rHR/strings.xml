@@ -32,7 +32,7 @@
     <string name="taxon_hint">Počnite upisivati…</string>
     <string name="more">više</string>
     <string name="naziv_taksona">Naziv vrste</string>
-    <string name="stage_hint">Morate izabrati stadij</string>
+    <string name="stage_hint">Stadij taksona</string>
     <string name="jedinka_je">Nađena mrtva?</string>
     <string name="choose_picture">Izaberite fotografiju</string>
     <string name="confirmExit">Želite li napustiti aplikaciju?</string>

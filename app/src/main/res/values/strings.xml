@@ -29,7 +29,7 @@
     <string name="M">Male</string>
     <string name="Z">Female</string>
     <string name="razvojni_stadijum">Stage</string>
-    <string name="stage_hint">Please select taxon first</string>
+    <string name="stage_hint">Developemental stage of the taxon</string>
     <string name="jedinka_je">Found dead?</string>
     <string name="ziva">live</string>
     <string name="mrtva">dead</string>

@@ -12,6 +12,7 @@
         android:key="advanced_interface"
         android:title="@string/advanced_entry"
         android:summary="@string/advanced_entry_desc"
+        app:iconSpaceReserved="false"
         android:defaultValue="false"/>
     <ListPreference
         android:key="data_license"

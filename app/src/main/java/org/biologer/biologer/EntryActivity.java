@@ -62,9 +62,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.nio.channels.FileChannel;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -137,7 +139,6 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
         tv_gps = findViewById(R.id.tv_gps);
         tvStage = findViewById(R.id.text_view_stages);
         tvStage.setOnClickListener(this);
-        tvStage.setEnabled(false);
         et_razlogSmrti = (CustomEditText) findViewById(R.id.et_razlogSmrti);
         et_komentar = (CustomEditText) findViewById(R.id.et_komentar);
         et_brojJedinki = (CustomEditText) findViewById(R.id.et_brojJedinki);
@@ -210,12 +211,12 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 // Enable stage entry
                 if (getSelectedTaxonId() != null) {
-                    LinearLayout stages = findViewById(R.id.linear_layout_stages);
-                    //tvStage.setEnabled(true);
-                    stages.setVisibility(View.VISIBLE);
+                    // Check if the taxon has stages. If not hide the stages dialog.
+                    if (isStageAvailable()) {
+                        stages.setVisibility(View.VISIBLE);
+                    }
                     Log.d(TAG, "Taxon is selected from the list. Enabling Stages for this taxon.");
                 } else {
-                    //tvStage.setEnabled(false);
                     stages.setVisibility(View.GONE);
                     Log.d(TAG, "Taxon is not selected from the list. Disabling Stages for this taxon.");
                 }
@@ -293,11 +294,8 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
             tv_latitude.setText(String.format(Locale.ENGLISH, "%.4f", currentItem.getLattitude()));
             tv_longitude.setText(String.format(Locale.ENGLISH, "%.4f", currentItem.getLongitude()));
             tv_gps.setText(String.format(Locale.ENGLISH, "%.0f", currentItem.getAccuracy()));
-            // Get the name of the taxon for this entry from the database
-            String latinName = (App.get().getDaoSession().getTaxonDao().queryBuilder()
-                    .where(TaxonDao.Properties.Id.eq(currentItem.getTaxonId()))
-                    .unique()).getName();
-            acTextView.setText(latinName);
+            // Get the name of the taxon for this entry
+            acTextView.setText(currentItem.getTaxonSuggestion());
             acTextView.dismissDropDown();
             // Get the name of the stage for the entry from the database
             if (currentItem.getStage() != null) {
@@ -354,6 +352,12 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
                         .into(ib_pic3);
                 ib_pic3.setVisibility(View.VISIBLE);
             }
+
+            if (slika1 == null || slika2 == null || slika3 == null) {
+                disablePhotoButtons(false);
+            } else {
+                disablePhotoButtons(true);
+            }
         }
     }
 
@@ -408,7 +412,7 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.text_view_stages:
-                showStageDialog();
+                getStageForTaxon();
                 break;
             case R.id.ib_pic1:
                 IMAGE_VIEW = 1;
@@ -538,26 +542,56 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
         return sex;
     }
 
-    private void showStageDialog() {
-        Taxon t = App.get().getDaoSession().getTaxonDao().queryBuilder()
+    private Boolean isStageAvailable() {
+        Taxon taxon = App.get().getDaoSession().getTaxonDao().queryBuilder()
                 .where(TaxonDao.Properties.Name.eq(getLatinName()))
                 .unique();
         stageList = (ArrayList<Stage>) App.get().getDaoSession().getStageDao().queryBuilder()
-                .where(StageDao.Properties.TaxonId.eq(t.getId())).list();
+                .where(StageDao.Properties.TaxonId.eq(taxon.getId()))
+                .list();
+//        if (stageList != null) {
+//            final String[] stadijumi = new String[stageList.size()];
+//            for (int i = 0; i < stageList.size(); i++) {
+//                stadijumi[i] = stageList.get(i).getName();
+//            }
+            //if (stadijumi.length == 0) {
+            return stageList.size() != 0;
+  //      }
+    }
+
+    private void getStageForTaxon() {
+        tvStage.setError(null);
+        tvStage.setHint(R.string.stage_hint);
+        Taxon taxon = App.get().getDaoSession().getTaxonDao().queryBuilder()
+                .where(TaxonDao.Properties.Name.eq(getLatinName()))
+                .unique();
+        stageList = (ArrayList<Stage>) App.get().getDaoSession().getStageDao().queryBuilder()
+                .where(StageDao.Properties.TaxonId.eq(taxon.getId()))
+                .list();
         if (stageList != null) {
             final String[] stadijumi = new String[stageList.size()];
             for (int i = 0; i < stageList.size(); i++) {
                 stadijumi[i] = stageList.get(i).getName();
             }
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setItems(stadijumi, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    tvStage.setText(stadijumi[i]);
-                    tvStage.setTag(stageList.get(i));
-                }
-            });
-            builder.show();
+            if (stadijumi.length == 0) {
+                Log.d(TAG, "No stages are available for " + getLatinName() + ".");
+                tvStage.setError("No stages!");
+                //tvStage.setHint("Unfortunatelly this will not work!");
+            } else {
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setItems(stadijumi, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        tvStage.setText(stadijumi[i]);
+                        tvStage.setTag(stageList.get(i));
+                    }
+                });
+                builder.show();
+                Log.d(TAG, "Available stages for " + getLatinName() + " include: " + Arrays.toString(stadijumi));
+            }
+        } else {
+            tvStage.setEnabled(false);
+            Log.d(TAG, "Stage list from GreenDao is empty for taxon " + getLatinName() + ".");
         }
     }
 
@@ -663,31 +697,6 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
                         iconTakePhotoCamera.setEnabled(false);
                         iconTakePhotoCamera.setImageAlpha(20);
                     }
-                    /*
-                    switch (IMAGE_VIEW) {
-                        case 1:
-                            Glide.with(this)
-                                    .load(mCurrentPhotoPath)
-                                    .into(ib_pic1);
-                            slika1 = resizeImage(mCurrentPhotoPath);
-                            ib_pic1.setVisibility(View.VISIBLE);
-                            break;
-                        case 2:
-                            Glide.with(this)
-                                    .load(mCurrentPhotoPath)
-                                    .into(ib_pic2);
-                            slika2 = resizeImage(mCurrentPhotoPath);
-                            ib_pic2.setVisibility(View.VISIBLE);
-                            break;
-                        case 3:
-                            Glide.with(this)
-                                    .load(mCurrentPhotoPath)
-                                    .into(ib_pic3);
-                            slika3 = resizeImage(mCurrentPhotoPath);
-                            ib_pic3.setVisibility(View.VISIBLE);
-                            break;
-                    }
-                    */
                 }
 
                 catch (IOException e) {
@@ -697,31 +706,27 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
             }
 
         } else if (requestCode == CAMERA) {
-
-            entryAddPic();
-            switch (IMAGE_VIEW) {
-                case 1:
-                    Glide.with(this)
-                            .load(mCurrentPhotoPath)
-                            .into(ib_pic1);
-                    slika1 = resizeImage(mCurrentPhotoPath);
-                    ib_pic1.setVisibility(View.VISIBLE);
-                    break;
-                case 2:
-                    Glide.with(this)
-                            .load(mCurrentPhotoPath)
-                            .into(ib_pic2);
-                    slika2 = resizeImage(mCurrentPhotoPath);
-                    ib_pic1.setVisibility(View.VISIBLE);
-                    break;
-                case 3:
-                    Glide.with(this)
-                            .load(mCurrentPhotoPath)
-                            .into(ib_pic3);
-                    slika3 = resizeImage(mCurrentPhotoPath);
-                    ib_pic1.setVisibility(View.VISIBLE);
-                    break;
-            }
+                    entryAddPic();
+                    if (slika1 == null) {
+                        slika1 = resizeImage(mCurrentPhotoPath);
+                        Glide.with(this)
+                                .load(slika1)
+                                .into(ib_pic1);
+                        ib_pic1.setVisibility(View.VISIBLE);
+                    } else if (slika2 == null) {
+                        slika2 = resizeImage(mCurrentPhotoPath);
+                        Glide.with(this)
+                                .load(slika2)
+                                .into(ib_pic2);
+                        ib_pic2.setVisibility(View.VISIBLE);
+                    } else if (slika3 == null) {
+                        slika3 = resizeImage(mCurrentPhotoPath);
+                        Glide.with(this)
+                                .load(slika3)
+                                .into(ib_pic3);
+                        ib_pic3.setVisibility(View.VISIBLE);
+                        disablePhotoButtons(true);
+                    }
 
             Toast.makeText(EntryActivity.this, "Image Saved!", Toast.LENGTH_SHORT).show();
         }
@@ -740,6 +745,20 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
             } else {
                 tv_gps.setText(String.format(Locale.ENGLISH, "%.0f", acc));
             }
+        }
+    }
+
+    private void disablePhotoButtons(Boolean value) {
+        if (value) {
+            iconTakePhotoGallery.setEnabled(false);
+            iconTakePhotoGallery.setImageAlpha(20);
+            iconTakePhotoCamera.setEnabled(false);
+            iconTakePhotoCamera.setImageAlpha(20);
+        } else {
+            iconTakePhotoGallery.setEnabled(true);
+            iconTakePhotoGallery.setImageAlpha(255);
+            iconTakePhotoCamera.setEnabled(true);
+            iconTakePhotoCamera.setImageAlpha(255);
         }
     }
 
