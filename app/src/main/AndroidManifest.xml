@@ -84,13 +84,6 @@
                     android:host="biologer.org" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".DetailActivity"
-            android:windowSoftInputMode="stateAlwaysHidden|adjustResize">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="org.biologer.biologer.LandingActivity" />
-        </activity>
         <activity android:name=".IntroActivity" />
 
         <service android:name="org.biologer.biologer.FetchTaxa"

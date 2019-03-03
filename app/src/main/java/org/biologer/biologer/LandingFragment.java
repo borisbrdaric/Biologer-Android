@@ -108,10 +108,9 @@ public class LandingFragment extends Fragment {
                 long l = entry.getId();
                 Activity activity = getActivity();
                 if (activity != null) {
-                    //Toast.makeText(getActivity().getApplicationContext(), m, Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(activity.getApplicationContext(), EntryActivity.class);
                     intent.putExtra("IS_NEW_ENTRY", "NO");
-                    intent.putExtra("ID_nalaza", l);
+                    intent.putExtra("ENTRY_ID", l);
                     startActivity(intent);
                 }
             }
@@ -123,7 +122,6 @@ public class LandingFragment extends Fragment {
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(), EntryActivity.class);
                 intent.putExtra("IS_NEW_ENTRY", "YES");
-                //startActivity(intent);
                 startActivityForResult(intent, REQ_CODE_NEW_ENTRY);
             }
         });
