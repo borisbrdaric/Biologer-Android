@@ -33,7 +33,7 @@
     <string name="more">Још…</string>
     <string name="naziv_taksona">Назив таксона</string>
     <string name="razvojni_stadijum">Стадијум</string>
-    <string name="stage_hint">Морате изабрати стадијум</string>
+    <string name="stage_hint">Морате изабрати таксон</string>
     <string name="jedinka_je">Јединка је нађена мртва?</string>
     <string name="choose_picture">Изаберите фотографију</string>
     <string name="confirmExit">Да ли желите да напустите апликацију?</string>

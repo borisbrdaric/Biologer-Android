@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.design.widget.NavigationView;
@@ -269,7 +271,6 @@ public class LandingActivity extends AppCompatActivity
         entryList = (ArrayList<Entry>) App.get().getDaoSession().getEntryDao().loadAll();
         uploadEntry_step1();
     }
-
 
     private void uploadEntry_step1() {
         n = 0;

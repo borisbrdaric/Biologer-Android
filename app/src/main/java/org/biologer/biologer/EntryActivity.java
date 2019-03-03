@@ -14,6 +14,7 @@ import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
@@ -55,7 +56,6 @@ import org.biologer.biologer.model.TaxonLocalization;
 import org.biologer.biologer.model.TaxonLocalizationDao;
 import org.biologer.biologer.model.UserData;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -86,7 +86,6 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
     private LatLng nLokacija = new LatLng(0.0, 0.0);
     private Double acc = 0.0;
     private int IMAGE_VIEW = 0;
-    private static int mInterval = 5000;
     private static final String IMAGE_DIRECTORY = "/biologer";
     private int GALLERY = 1, CAMERA = 2, MAP = 3;
 
@@ -128,9 +127,6 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
 
         checkWriteStoragePermission();
 
-        // Get the system locale to translate names of the taxa
-        Locale locale = getCurrentLocale();
-
         /*
          * Get the view...
          */
@@ -139,7 +135,7 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
         tv_latitude = findViewById(R.id.tv_latitude);
         tv_longitude = findViewById(R.id.tv_longitude);
         tv_gps = findViewById(R.id.tv_gps);
-        tvStage = findViewById(R.id.tvStage);
+        tvStage = findViewById(R.id.text_view_stages);
         tvStage.setOnClickListener(this);
         tvStage.setEnabled(false);
         et_razlogSmrti = (CustomEditText) findViewById(R.id.et_razlogSmrti);
@@ -176,6 +172,8 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
         final String[] latin_names = new String[taxaList.size()];
         //final String[] native_names = new String[taxaList.size()];
         final String[] full_names = new String[taxaList.size()];
+        // Get the system locale to translate names of the taxa
+        Locale locale = getCurrentLocale();
         for (int i = 0; i < taxaList.size(); i++) {
             // Get the latin names
             latin_names[i] = taxaList.get(i).getName();
@@ -204,15 +202,20 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, full_names);
         acTextView = findViewById(R.id.textview_list_of_taxa);
         acTextView.setAdapter(adapter);
+        // This linear layout holds the stages. We will hide it before the taxon is not selected.
+        final LinearLayout stages = findViewById(R.id.linear_layout_stages);
         acTextView.addTextChangedListener(new TextWatcher() {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 // Enable stage entry
                 if (getSelectedTaxonId() != null) {
-                    tvStage.setEnabled(true);
+                    LinearLayout stages = findViewById(R.id.linear_layout_stages);
+                    //tvStage.setEnabled(true);
+                    stages.setVisibility(View.VISIBLE);
                     Log.d(TAG, "Taxon is selected from the list. Enabling Stages for this taxon.");
                 } else {
-                    tvStage.setEnabled(false);
+                    //tvStage.setEnabled(false);
+                    stages.setVisibility(View.GONE);
                     Log.d(TAG, "Taxon is not selected from the list. Disabling Stages for this taxon.");
                 }
                 // Enable/disable Save button in Toolbar
@@ -313,7 +316,7 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
     //klikabilni view-ovi
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.tvStage:
+            case R.id.text_view_stages:
                 showStageDialog();
                 break;
             case R.id.ib_pic1:
@@ -444,9 +447,10 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
 
     private void showStageDialog() {
         Taxon t = App.get().getDaoSession().getTaxonDao().queryBuilder()
-                .where(TaxonDao.Properties.Name.eq(acTextView.getText()))
+                .where(TaxonDao.Properties.Name.eq(getLatinName()))
                 .unique();
-        stageList = (ArrayList<Stage>) App.get().getDaoSession().getStageDao().queryBuilder().where(StageDao.Properties.TaxonId.eq(t.getId())).list();
+        stageList = (ArrayList<Stage>) App.get().getDaoSession().getStageDao().queryBuilder()
+                .where(StageDao.Properties.TaxonId.eq(t.getId())).list();
         if (stageList != null) {
             final String[] stadijumi = new String[stageList.size()];
             for (int i = 0; i < stageList.size(); i++) {
@@ -547,19 +551,19 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
                             Glide.with(this)
                                     .load(mCurrentPhotoPath)
                                     .into(ib_pic1);
-                            slika1 = mCurrentPhotoPath;
+                            slika1 = resizeImage(mCurrentPhotoPath);
                             break;
                         case 2:
                             Glide.with(this)
                                     .load(mCurrentPhotoPath)
                                     .into(ib_pic2);
-                            slika2 = mCurrentPhotoPath;
+                            slika2 = resizeImage(mCurrentPhotoPath);
                             break;
                         case 3:
                             Glide.with(this)
                                     .load(mCurrentPhotoPath)
                                     .into(ib_pic3);
-                            slika3 = mCurrentPhotoPath;
+                            slika3 = resizeImage(mCurrentPhotoPath);
                             break;
                     }
 
@@ -577,19 +581,19 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
                     Glide.with(this)
                             .load(mCurrentPhotoPath)
                             .into(ib_pic1);
-                    slika1 = mCurrentPhotoPath;
+                    slika1 = resizeImage(mCurrentPhotoPath);
                     break;
                 case 2:
                     Glide.with(this)
                             .load(mCurrentPhotoPath)
                             .into(ib_pic2);
-                    slika2 = mCurrentPhotoPath;
+                    slika2 = resizeImage(mCurrentPhotoPath);
                     break;
                 case 3:
                     Glide.with(this)
                             .load(mCurrentPhotoPath)
                             .into(ib_pic3);
-                    slika3 = mCurrentPhotoPath;
+                    slika3 = resizeImage(mCurrentPhotoPath);
                     break;
             }
 
@@ -708,7 +712,7 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     takePhotoFromCamera();
                 } else {
-
+                    // do something
                 }
                 return;
             }
@@ -720,6 +724,13 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(EntryActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION);
+            // Sometimes there is a problem with first run of the program. So, request location again in 10 secounds...
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    getLocation(100, 2);
+                }
+            }, 10000);
         } else {
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, time, distance, locationListener);
         }
@@ -823,14 +834,6 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
         swipe.setRefreshing(false);
     }
 
-    // Resize the picture
-    private Bitmap resizePic(Bitmap image) {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        image.compress(Bitmap.CompressFormat.JPEG, 87, out);
-        Bitmap decoded = BitmapFactory.decodeStream(new ByteArrayInputStream(out.toByteArray()));
-        return decoded;
-    }
-
     @Override
     public void onBackPressed() {
         Intent intent = new Intent(EntryActivity.this, LandingActivity.class);
@@ -877,7 +880,7 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
             // Continue only if the File was successfully created
             if (photoFile != null) {
                 /*Uri photoURI = Uri.fromFile(photoFile);*//* FileProvider.getUriForFile(this,
-                        "org.biologer.biologer.fileprovider",
+                        "org.biologeruntill upload.biologer.fileprovider",
                         photoFile)*//*;*/
                 Uri photoURI;
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -899,6 +902,47 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
         Uri contentUri = Uri.fromFile(f);
         mediaScanIntent.setData(contentUri);
         this.sendBroadcast(mediaScanIntent);
+    }
+
+    // Resize the picture and save it in biologer folder
+    private String resizeImage(String path_to_image) {
+        Bitmap input_image = BitmapFactory.decodeFile(path_to_image);
+        Log.d(TAG, "Input image path is " + String.valueOf(path_to_image));
+        Bitmap output_image;
+        int longer_side = 800;
+        if (input_image.getHeight() < input_image.getWidth()) {
+            int output_height = input_image.getHeight() * longer_side / input_image.getWidth();
+            output_image = Bitmap.createScaledBitmap(input_image, longer_side, output_height, false);
+        } else {
+            int output_width = input_image.getWidth() * longer_side / input_image.getHeight();
+            output_image = Bitmap.createScaledBitmap(input_image, output_width, longer_side, false);
+        }
+
+        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES), "biologer");
+
+        String input_image_name = path_to_image.substring(path_to_image.lastIndexOf("/")+1);
+        Log.d(TAG, "Input image name is " + String.valueOf(input_image_name));
+        String output_image_name = input_image_name.split(".jpg")[0] + "_res.jpg";
+        Log.d(TAG, "Output image name is " + String.valueOf(output_image_name));
+
+        File image = new File(mediaStorageDir, output_image_name);
+
+        FileOutputStream fOut;
+        try {
+            fOut = new FileOutputStream(image);
+            output_image.compress(Bitmap.CompressFormat.JPEG, 70, fOut);
+            fOut.flush();
+            fOut.close();
+            input_image.recycle();
+            output_image.recycle();
+        } catch (Exception e) {
+            // Do something
+        }
+
+        // Return the path to the image file
+        Log.d(TAG, "Output image path is " + image.getPath());
+        return image.getPath();
     }
 
     // Check for permissions and add them if required
@@ -949,10 +993,8 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private Long getSelectedTaxonId() {
-        String entered_taxon_name = acTextView.getText().toString();
-        String latin_name = entered_taxon_name.split(" \\(")[0];
         Taxon taxon = App.get().getDaoSession().getTaxonDao().queryBuilder()
-                .where(TaxonDao.Properties.Name.eq(latin_name))
+                .where(TaxonDao.Properties.Name.eq(getLatinName()))
                 .unique();
         if (taxon != null) {
             Log.d(TAG, "Selected taxon latin name is: " + taxon.getName() + ". Taxon ID: " + String.valueOf(taxon.getId()));
@@ -960,5 +1002,10 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
         } else {
             return null;
         }
+    }
+
+    private String getLatinName() {
+        String entered_taxon_name = acTextView.getText().toString();
+        return entered_taxon_name.split(" \\(")[0];
     }
 }

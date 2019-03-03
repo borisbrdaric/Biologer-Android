@@ -281,10 +281,12 @@
                             </LinearLayout>
 
                             <LinearLayout
+                                android:id="@+id/linear_layout_stages"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="8dp"
                                 android:orientation="vertical"
+                                android:visibility="gone"
                                 android:padding="5dp">
 
                                 <org.biologer.biologer.CustomTextView
@@ -294,7 +296,7 @@
                                 </org.biologer.biologer.CustomTextView>
 
                                 <TextView
-                                    android:id="@+id/tvStage"
+                                    android:id="@+id/text_view_stages"
                                     android:layout_width="match_parent"
                                     android:layout_height="35dp"
                                     android:layout_marginTop="10dp"

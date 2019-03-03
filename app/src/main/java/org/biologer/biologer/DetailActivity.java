@@ -148,7 +148,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         tv_longitude.setText(String.format(Locale.ENGLISH, "%.4f", currentItem.getLongitude()));
         tv_gps = findViewById(R.id.tv_gps);
         tv_gps.setText(String.format(Locale.ENGLISH, "%.0f", currentItem.getAccuracy()));
-        tvStage = findViewById(R.id.tvStage);
+        tvStage = findViewById(R.id.text_view_stages);
         tvStage.setOnClickListener(this);
         tvStage.setEnabled(true);
 
@@ -357,7 +357,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
     //klikabilni view-ovi
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.tvStage:
+            case R.id.text_view_stages:
                 showStageDialog();
                 break;
             case R.id.ib_pic1:
