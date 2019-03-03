@@ -106,13 +106,11 @@ public class LandingFragment extends Fragment {
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                 Entry entry = adapter.getItem(position);
                 long l = entry.getId();
-                String m = String.valueOf(l);
                 Activity activity = getActivity();
                 if (activity != null) {
                     //Toast.makeText(getActivity().getApplicationContext(), m, Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(activity.getApplicationContext(), DetailActivity.class);
-                    //Entry entry = adapter.getItem(position);
-                    intent.putExtra("extra_obj", m);
+                    Intent intent = new Intent(activity.getApplicationContext(), EntryActivity.class);
+                    intent.putExtra("IS_NEW_ENTRY", "NO");
                     intent.putExtra("ID_nalaza", l);
                     startActivity(intent);
                 }
@@ -124,6 +122,7 @@ public class LandingFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(), EntryActivity.class);
+                intent.putExtra("IS_NEW_ENTRY", "YES");
                 //startActivity(intent);
                 startActivityForResult(intent, REQ_CODE_NEW_ENTRY);
             }

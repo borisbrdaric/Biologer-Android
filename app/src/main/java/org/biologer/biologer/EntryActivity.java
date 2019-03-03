@@ -100,6 +100,7 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
     Uri contentURI;
     private String slika1, slika2, slika3;
     private SwipeRefreshLayout swipe;
+    private Entry currentItem;
 
     Calendar calendar;
     SimpleDateFormat simpleDateFormat;
@@ -168,7 +169,99 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
         tv_more = (TextView) findViewById(R.id.tv_more);
         tv_more.setOnClickListener(this);
 
-        // Get the list of taxa from the database
+        String is_new_entry = getIntent().getStringExtra("IS_NEW_ENTRY");
+        if (is_new_entry.equals("YES")) {
+            Log.i(TAG, "Starting new entry.");
+        } if (is_new_entry.equals("NO")) {
+                Log.i(TAG, "Opening existing entry.");
+                // Find selected record
+                Bundle bundle = getIntent().getExtras();
+                if (bundle != null) {
+                    Long id = bundle.getLong("ID_nalaza");
+                    currentItem = App.get().getDaoSession().getEntryDao().load(id);
+                    // Get the latitude, longitude, coordinate precision and elevation
+                    // from the previous record. These are to be overwriten only if
+                    // the user refresh the location!!!!
+                    nLokacija = new LatLng(currentItem.getLattitude(), currentItem.getLongitude());
+                    elev = currentItem.getElevation();
+                    acc = currentItem.getAccuracy();
+                    tv_latitude.setText(String.format(Locale.ENGLISH, "%.4f", currentItem.getLattitude()));
+                    tv_longitude.setText(String.format(Locale.ENGLISH, "%.4f", currentItem.getLongitude()));
+                    tv_gps.setText(String.format(Locale.ENGLISH, "%.0f", currentItem.getAccuracy()));
+                    // Get the name of the taxon for this entry from the database
+                    String taxonName = (App.get().getDaoSession().getTaxonDao().queryBuilder().where(TaxonDao.Properties.Id.eq(currentItem.getTaxonId())).unique()).getName();
+                    acTextView.setText(taxonName);
+                    acTextView.dismissDropDown();
+                    // Get the name of the stage for the entry from the database
+                    if (currentItem.getStage() != null) {
+                        String stageName = (App.get().getDaoSession().getStageDao().queryBuilder().where(StageDao.Properties.StageId.eq(currentItem.getStage())).list().get(1).getName());
+                        long Id = (App.get().getDaoSession().getStageDao().queryBuilder().where(StageDao.Properties.StageId.eq(currentItem.getStage())).list().get(1).getId());
+                        tvStage.setTag(Id);
+                        tvStage.setText(stageName);
+                    }
+
+                    if (currentItem.getCauseOfDeath().length() != 0){
+                        et_razlogSmrti.setText(currentItem.getCauseOfDeath());
+                    }
+                    et_komentar = (CustomEditText) findViewById(R.id.et_komentar);
+                    if (currentItem.getComment().length() != 0) {
+                        et_komentar.setText(currentItem.getComment());
+                    }
+                    et_brojJedinki = (CustomEditText) findViewById(R.id.et_brojJedinki);
+                    if (currentItem.getNumber() != null) {
+                        et_brojJedinki.setText(String.valueOf(currentItem.getNumber()));
+                    }
+                    rb_male = findViewById(R.id.rb_musko);
+                    if (currentItem.getSex().equalsIgnoreCase("male")){
+                        rb_male.setChecked(true);
+                    }
+                    rb_female = findViewById(R.id.rb_zensko);
+                    if (currentItem.getSex().equalsIgnoreCase("female")) {
+                        rb_female.setChecked(true);
+                    }
+
+                    /*
+                     * This adds a checkbox for dead specimen and the comment on dead specimen.
+                     */
+                    check_dead = (CheckBox) findViewById(R.id.dead_specimen);
+                    check_dead.setOnClickListener(this);
+                    if (currentItem.getDeadOrAlive().equals("true")){
+                        // Specimen is a live
+                        check_dead.setChecked(false);
+                    }
+                    else {
+                        // Specimen is dead, checkbox should be activated
+                        check_dead.setChecked(true);
+                    }
+
+                    slika1 = currentItem.getSlika1();
+                    slika2 = currentItem.getSlika2();
+                    slika3 = currentItem.getSlika3();
+
+                    ib_pic1 = (ImageView) findViewById(R.id.ib_pic1);
+                    ib_pic1.setOnClickListener(this);
+                    Glide.with(this)
+                            .load(currentItem.getSlika1())
+                            .into(ib_pic1);
+                    ib_pic2 = (ImageView) findViewById(R.id.ib_pic2);
+                    ib_pic2.setOnClickListener(this);
+                    Glide.with(this)
+                            .load(currentItem.getSlika2())
+                            .into(ib_pic2);
+                    ib_pic3 = (ImageView) findViewById(R.id.ib_pic3);
+                    ib_pic3.setOnClickListener(this);
+                    Glide.with(this)
+                            .load(currentItem.getSlika3())
+                            .into(ib_pic3);
+                    iv_map = (ImageView) findViewById(R.id.iv_map);
+                    iv_map.setOnClickListener(this);
+                    tv_more = (TextView) findViewById(R.id.tv_more);
+                    tv_more.setOnClickListener(this);
+                }
+        }
+
+        // Get th
+        // e list of taxa from the database
         final String[] latin_names = new String[taxaList.size()];
         //final String[] native_names = new String[taxaList.size()];
         final String[] full_names = new String[taxaList.size()];
@@ -405,6 +498,36 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
         Toast.makeText(this, getString(R.string.saved), Toast.LENGTH_SHORT).show();
         setResult(RESULT_OK);
         finish();
+    }
+
+    private void entrySaverEdited(final Taxon taxon) {
+        Stage stage = (tvStage.getTag() != null) ? (Stage) tvStage.getTag() : null;
+        String komentar = (et_komentar.getText().toString() != null) ? et_komentar.getText().toString() : "";
+        Integer brojJedinki = (et_brojJedinki.getText().toString().trim().length() > 0) ? Integer.valueOf(et_brojJedinki.getText().toString()) : null;
+        Long selectedStage = (stage != null) ? stage.getStageId() : null;
+        String razlogSmrti = (et_razlogSmrti.getText() != null) ? et_razlogSmrti.getText().toString() : "";
+
+        currentItem.setTaxonId(taxon.getId());
+        currentItem.setTaxonSuggestion(taxon.getName().toString());
+        currentItem.setComment(komentar);
+        currentItem.setNumber(brojJedinki);
+        currentItem.setSex(maleFemale());
+        currentItem.setStage(selectedStage);
+        currentItem.setDeadOrAlive(String.valueOf(!check_dead.isChecked()));
+        currentItem.setCauseOfDeath(razlogSmrti);
+        currentItem.setLattitude(nLokacija.latitude);
+        currentItem.setLongitude(nLokacija.longitude);
+        currentItem.setElevation(elev);
+        currentItem.setAccuracy(acc);
+        currentItem.setSlika1(slika1);
+        currentItem.setSlika2(slika2);
+        currentItem.setSlika3(slika3);
+
+        // Now just update the database with new data...
+        App.get().getDaoSession().getEntryDao().updateInTx(currentItem);
+        Toast.makeText(this, getString(R.string.saved), Toast.LENGTH_SHORT).show();
+        Intent intent1 = new Intent(this, LandingActivity.class);
+        startActivity(intent1);
     }
 
     private String maleFemale() {
@@ -701,7 +824,7 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
+                    Log.d(TAG, "Not possible to get permission to write external storage.");
                 } else {
                     finish();
                 }
@@ -712,7 +835,7 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     takePhotoFromCamera();
                 } else {
-                    // do something
+                    Log.d(TAG, "Not possible to get permission to use camera.");
                 }
                 return;
             }
