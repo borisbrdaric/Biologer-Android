@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Biologer</string>
+    <string name="app_name">Biologer Otis</string>
 
     <!--  Login  -->
     <string name="username">Username (email)</string>

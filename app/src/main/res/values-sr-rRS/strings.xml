@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Биологер</string>
+    <string name="app_name">Биологер Отис</string>
     <string name="username">Корисничко име (е-адреса)</string>
     <string name="password">Лозинка</string>
     <string name="login">Пријави ме</string>

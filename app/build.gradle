@@ -12,12 +12,12 @@ android {
     compileSdkVersion 28
     buildToolsVersion "28.0.3"
     defaultConfig {
-        applicationId "org.biologer.biologer"
+        applicationId "org.biologer.otis"
         // API level 19 = Android 4.4
         minSdkVersion 19
         targetSdkVersion 28
         versionCode 17
-        versionName "0.7.1"
+        versionName "0.1"
         multiDexEnabled true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }

@@ -828,11 +828,11 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
             // Continue only if the File was successfully created
             if (photoFile != null) {
                 /*Uri photoURI = Uri.fromFile(photoFile);*//* FileProvider.getUriForFile(this,
-                        "org.biologer.biologer.fileprovider",
+                        "org.biologer.otis.fileprovider",
                         photoFile)*//*;*/
                 Uri photoURI;
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    photoURI = FileProvider.getUriForFile(EntryActivity.this, "org.biologer.biologer.fileprovider", photoFile);
+                    photoURI = FileProvider.getUriForFile(EntryActivity.this, "org.biologer.otis.fileprovider", photoFile);
                     takePictureIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 } else {
                     photoURI = Uri.fromFile(photoFile);

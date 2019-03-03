@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Biologer</string>
+    <string name="app_name">Biologer Otis</string>
     <string name="username">Korisničko ime (e-adresa)</string>
     <string name="password">Lozinka</string>
     <string name="login">Prijavi me</string>
