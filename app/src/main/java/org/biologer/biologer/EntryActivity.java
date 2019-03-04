@@ -599,7 +599,13 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
         builder.setItems(sex, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                select_sex.setText(sex[i]);
+                if (sex[i].equals(getString(R.string.unknown_sex))) {
+                    select_sex.setText(null);
+                    Log.d(TAG, "No sex is selected.");
+                } else {
+                    select_sex.setText(sex[i]);
+                    Log.d(TAG, "Selected sex for this entry is " + sex[i] + ".");
+                }
             }
         });
         builder.show();

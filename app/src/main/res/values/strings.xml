@@ -24,7 +24,7 @@
     <string name="more">More…</string>
     <string name="naziv_taksona">Taxon name</string>
     <string name="pleaseSelect">Please select</string>
-    <string name="broj_jedinki">No. individuals</string>
+    <string name="broj_jedinki">Number of individuals</string>
     <string name="pol">Sex</string>
     <string name="M">Male</string>
     <string name="Z">Female</string>
