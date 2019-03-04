@@ -16,10 +16,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
             <android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:id="@+id/swipe"
                 android:layout_width="match_parent"
@@ -167,70 +163,65 @@
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
                             android:layout_marginBottom="12dp"
-                            android:visibility="visible">
+                            android:visibility="gone">
 
                             <GridLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:columnCount="2">
+                                android:columnCount="2"
+                                android:layout_marginBottom="12dp">
 
-                                <EditText
-                                    android:id="@+id/et_brojJedinki"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:hint="@string/broj_jedinki"
-                                    android:maxLength="10"
-                                    android:gravity="center"
-                                    android:inputType="number" />
+                                <android.support.design.widget.TextInputLayout
+                                    android:layout_width="140dp"
+                                    android:layout_height="wrap_content">
+                                    <android.support.design.widget.TextInputEditText
+                                        android:id="@+id/et_brojJedinki"
+                                        android:layout_width="140dp"
+                                        android:layout_height="wrap_content"
+                                        android:hint="@string/broj_jedinki"
+                                        android:maxLength="10"
+                                        android:inputType="number" />
+                                </android.support.design.widget.TextInputLayout>
 
                                 <android.support.v7.widget.AppCompatSpinner
                                     android:id="@+id/spinner_sex"
                                     android:layout_width="wrap_content"
-                                    android:layout_height="48dp"
+                                    android:layout_height="56dp"
                                     android:hint="@string/select_sex"
+                                    android:prompt="@string/select_sex"
                                     android:layout_gravity="end"
                                     android:entries="@array/sex">
                                 </android.support.v7.widget.AppCompatSpinner>
                             </GridLayout>
 
-                            <LinearLayout
-                                android:id="@+id/linear_layout_stages"
+                            <android.support.design.widget.TextInputLayout
+                                android:id="@+id/text_input_stages"
                                 android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="8dp"
-                                android:orientation="vertical"
-                                android:visibility="gone"
-                                android:padding="5dp">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="@string/razvojni_stadijum">
-                                </TextView>
-
-                                <TextView
+                                android:layout_height="56dp"
+                                android:layout_marginBottom="12dp"
+                                android:visibility="gone">
+                                <android.support.design.widget.TextInputEditText
                                     android:id="@+id/text_view_stages"
                                     android:layout_width="match_parent"
-                                    android:layout_height="35dp"
-                                    android:layout_marginTop="10dp"
-                                    android:background="@drawable/gray_border"
-                                    android:clickable="true"
+                                    android:layout_height="wrap_content"
                                     android:drawableEnd="@drawable/ic_arrow_drop_down"
-                                    android:focusable="true"
-                                    android:gravity="center_vertical"
-                                    android:hint="@string/stage_hint"
-                                    android:paddingStart="15dp"
-                                    android:paddingEnd="15dp"
-                                    android:textColor="@color/black"
-                                    android:textSize="16sp" />
-                            </LinearLayout>
+                                    android:clickable="false"
+                                    android:editable="false"
+                                    android:focusable="false"
+                                    android:hint="@string/stage_hint"/>
+                            </android.support.design.widget.TextInputLayout>
 
-                            <EditText
-                                android:id="@+id/et_komentar"
+                            <android.support.design.widget.TextInputLayout
                                 android:layout_width="match_parent"
-                                android:maxLength="1000"
-                                android:hint="@string/komentar"
-                                android:layout_height="wrap_content" />
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="12dp">
+                                <android.support.design.widget.TextInputEditText
+                                    android:id="@+id/et_komentar"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:maxLength="1000"
+                                    android:hint="@string/komentar"/>
+                            </android.support.design.widget.TextInputLayout>
 
                             <LinearLayout
                                 android:layout_width="match_parent"
@@ -253,14 +244,19 @@
 
                             </LinearLayout>
 
-                                <EditText
+                            <android.support.design.widget.TextInputLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content">
+                                <android.support.design.widget.TextInputEditText
                                     android:id="@+id/edit_text_death_comment"
                                     android:layout_width="match_parent"
                                     android:maxLength="1000"
                                     android:layout_height="wrap_content"
                                     android:hint="@string/razlog_smrti"
                                     android:visibility="gone"
+                                    android:layout_marginBottom="12dp"
                                     android:inputType="text"/>
+                            </android.support.design.widget.TextInputLayout>
 
                         </LinearLayout>
 
@@ -313,6 +309,5 @@
 
             </android.support.v4.widget.SwipeRefreshLayout>
 
-        </FrameLayout>
     </LinearLayout>
 </android.support.v4.widget.DrawerLayout>

@@ -171,4 +171,8 @@
     <string name="advanced_entry">Advanced observation entry</string>
     <string name="advanced_entry_desc">Enables advanced options that could be entered with your occurrence (i.e. number of individuals, stage, sex).</string>
     <string name="select_sex">Sex of the individual</string>
+    <string name="stage_egg">Egg</string>
+    <string name="stage_larva">Larva</string>
+    <string name="stage_pupa">Pupa</string>
+    <string name="stage_adult">Adult</string>
 </resources>

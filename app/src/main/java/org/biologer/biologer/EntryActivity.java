@@ -17,6 +17,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.provider.Settings;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
@@ -86,7 +87,6 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
     private LatLng nLokacija = new LatLng(0.0, 0.0);
     private Double acc = 0.0;
     private int IMAGE_VIEW = 0;
-    private static final String IMAGE_DIRECTORY = "/biologer";
     private int GALLERY = 1, CAMERA = 2, MAP = 3;
     private TextView tvTakson, tv_gps, tvStage, tv_more, tv_latitude, tv_longitude;
     private EditText et_razlogSmrti, et_komentar, et_brojJedinki;
@@ -94,7 +94,7 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
     ImageView ib_pic1, ib_pic2, ib_pic3, iv_map, iconTakePhotoCamera, iconTakePhotoGallery;
     private CheckBox check_dead;
     private Spinner select_sex;
-    private LinearLayout smrt, detailedEntry;
+    LinearLayout detailedEntry;
     private boolean save_enabled = false;
     Uri contentURI;
     private String slika1, slika2, slika3;
@@ -141,9 +141,6 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
         select_sex = (Spinner) findViewById(R.id.spinner_sex);
         check_dead = (CheckBox) findViewById(R.id.dead_specimen);
         check_dead.setOnClickListener(this);
-        ViewGroup.LayoutParams params = smrt.getLayoutParams();
-        params.height = 0;
-        smrt.setLayoutParams(params);
         // Buttons to add images
         ib_pic1 = (ImageView) findViewById(R.id.ib_pic1);
         ib_pic1.setOnClickListener(this);
@@ -199,7 +196,7 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
         acTextView = findViewById(R.id.textview_list_of_taxa);
         acTextView.setAdapter(adapter);
         // This linear layout holds the stages. We will hide it before the taxon is not selected.
-        final LinearLayout stages = findViewById(R.id.linear_layout_stages);
+        final TextInputLayout stages = findViewById(R.id.text_input_stages);
         acTextView.addTextChangedListener(new TextWatcher() {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -296,13 +293,13 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
                 String stageName = (App.get().getDaoSession().getStageDao().queryBuilder()
                         .where(StageDao.Properties.StageId.eq(currentItem.getStage()))
                         .list().get(1).getName());
-                long stage_id = (App.get().getDaoSession().getStageDao().queryBuilder()
+                Long stage_id = (App.get().getDaoSession().getStageDao().queryBuilder()
                         .where(StageDao.Properties.StageId.eq(currentItem.getStage()))
-                        .list().get(1).getId());
-                tvStage.setTag(stage_id);
+                        .list().get(1).getStageId());
+                Stage stage = new Stage(null, stageName, stage_id, currentItem.getTaxonId());
+                tvStage.setTag(stage);
                 tvStage.setText(stageName);
             }
-
             if (currentItem.getCauseOfDeath().length() != 0) {
                 et_razlogSmrti.setText(currentItem.getCauseOfDeath());
             }
@@ -312,18 +309,22 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
             if (currentItem.getNumber() != null) {
                 et_brojJedinki.setText(String.valueOf(currentItem.getNumber()));
             }
-            if (currentItem.getSex().equalsIgnoreCase("male")) {
+            // Get the selected sex. If not selected set spinner to default...
+            Log.d(TAG, "Sex of individual from previous entry is " + currentItem.getSex());
+            if (currentItem.getSex().equals("male")) {
+                Log.d(TAG, "Setting spinner selected item to male.");
                 select_sex.setSelection(1);
-            }
-            if (currentItem.getSex().equalsIgnoreCase("female")) {
+            } if (currentItem.getSex().equals("female")) {
+                Log.d(TAG, "Setting spinner selected item to female.");
                 select_sex.setSelection(2);
             }
             if (currentItem.getDeadOrAlive().equals("true")) {
                 // Specimen is a live
                 check_dead.setChecked(false);
             } else {
-                // Specimen is dead, checkbox should be activated
+                // Specimen is dead, Checkbox should be activated and Dead Comment shown
                 check_dead.setChecked(true);
+                showDeadComment();
             }
             slika1 = currentItem.getSlika1();
             if (slika1 != null) {
@@ -529,8 +530,10 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
     private String maleFemale() {
         String sex = "";
         if (select_sex.getSelectedItemPosition() == 1) {
+            Log.d(TAG, "Sex from spinner index 1 selected with value " + select_sex.getSelectedItem());
             sex = "male";
         } else if (select_sex.getSelectedItemPosition() == 2) {
+            Log.d(TAG, "Sex from spinner index 2 selected with value " + select_sex.getSelectedItem());
             sex = "female";
         }
         return sex;
@@ -559,11 +562,14 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
             final String[] stadijumi = new String[stageList.size()];
             for (int i = 0; i < stageList.size(); i++) {
                 stadijumi[i] = stageList.get(i).getName();
+                // Translate this to interface...
+                if (stadijumi[i].equals("egg")) {stadijumi[i] = getString(R.string.stage_egg);}
+                if (stadijumi[i].equals("larva")) {stadijumi[i] = getString(R.string.stage_larva);}
+                if (stadijumi[i].equals("pupa")) {stadijumi[i] = getString(R.string.stage_pupa);}
+                if (stadijumi[i].equals("adult")) {stadijumi[i] = getString(R.string.stage_adult);}
             }
             if (stadijumi.length == 0) {
                 Log.d(TAG, "No stages are available for " + getLatinName() + ".");
-                tvStage.setError("No stages!");
-                //tvStage.setHint("Unfortunatelly this will not work!");
             } else {
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setItems(stadijumi, new DialogInterface.OnClickListener() {
