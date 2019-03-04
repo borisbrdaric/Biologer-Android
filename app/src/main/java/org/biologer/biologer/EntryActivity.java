@@ -88,12 +88,11 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
     private Double acc = 0.0;
     private int IMAGE_VIEW = 0;
     private int GALLERY = 1, CAMERA = 2, MAP = 3;
-    private TextView tvTakson, tv_gps, tvStage, tv_more, tv_latitude, tv_longitude;
+    private TextView tvTakson, tv_gps, tvStage, tv_latitude, tv_longitude, select_sex;
     private EditText et_razlogSmrti, et_komentar, et_brojJedinki;
     AutoCompleteTextView acTextView;
     ImageView ib_pic1, ib_pic2, ib_pic3, iv_map, iconTakePhotoCamera, iconTakePhotoGallery;
     private CheckBox check_dead;
-    private Spinner select_sex;
     LinearLayout detailedEntry;
     private boolean save_enabled = false;
     Uri contentURI;
@@ -138,7 +137,9 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
         et_razlogSmrti = (EditText) findViewById(R.id.edit_text_death_comment);
         et_komentar = (EditText) findViewById(R.id.et_komentar);
         et_brojJedinki = (EditText) findViewById(R.id.et_brojJedinki);
-        select_sex = (Spinner) findViewById(R.id.spinner_sex);
+        // In order not to use spinner to choose sex, we will put this into EditText
+        select_sex = findViewById(R.id.text_view_sex);
+        select_sex.setOnClickListener(this);
         check_dead = (CheckBox) findViewById(R.id.dead_specimen);
         check_dead.setOnClickListener(this);
         // Buttons to add images
@@ -313,10 +314,10 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
             Log.d(TAG, "Sex of individual from previous entry is " + currentItem.getSex());
             if (currentItem.getSex().equals("male")) {
                 Log.d(TAG, "Setting spinner selected item to male.");
-                select_sex.setSelection(1);
+                select_sex.setText(getString(R.string.is_male));
             } if (currentItem.getSex().equals("female")) {
                 Log.d(TAG, "Setting spinner selected item to female.");
-                select_sex.setSelection(2);
+                select_sex.setText(getString(R.string.is_female));
             }
             if (currentItem.getDeadOrAlive().equals("true")) {
                 // Specimen is a live
@@ -408,6 +409,9 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
         switch (view.getId()) {
             case R.id.text_view_stages:
                 getStageForTaxon();
+                break;
+            case R.id.text_view_sex:
+                getSexForList();
                 break;
             case R.id.ib_pic1:
                 IMAGE_VIEW = 1;
@@ -528,15 +532,18 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private String maleFemale() {
-        String sex = "";
-        if (select_sex.getSelectedItemPosition() == 1) {
-            Log.d(TAG, "Sex from spinner index 1 selected with value " + select_sex.getSelectedItem());
-            sex = "male";
-        } else if (select_sex.getSelectedItemPosition() == 2) {
-            Log.d(TAG, "Sex from spinner index 2 selected with value " + select_sex.getSelectedItem());
-            sex = "female";
+        String return_sex = "";
+        String[] sex = {getString(R.string.unknown_sex), getString(R.string.is_male), getString(R.string.is_female)};
+        String sex_is = select_sex.getText().toString();
+        int sex_id = Arrays.asList(sex).indexOf(sex_is);
+        if (sex_id == 1) {
+            Log.d(TAG, "Sex from spinner index 1 selected with value " + sex_is);
+            return_sex = "male";
+        } else if (sex_id == 2) {
+            Log.d(TAG, "Sex from spinner index 2 selected with value " + sex_is);
+            return_sex = "female";
         }
-        return sex;
+        return return_sex;
     }
 
     private Boolean isStageAvailable() {
@@ -550,8 +557,6 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void getStageForTaxon() {
-        tvStage.setError(null);
-        tvStage.setHint(R.string.stage_hint);
         Taxon taxon = App.get().getDaoSession().getTaxonDao().queryBuilder()
                 .where(TaxonDao.Properties.Name.eq(getLatinName()))
                 .unique();
@@ -586,6 +591,18 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
             tvStage.setEnabled(false);
             Log.d(TAG, "Stage list from GreenDao is empty for taxon " + getLatinName() + ".");
         }
+    }
+
+    private void getSexForList() {
+        final String[] sex = {getString(R.string.unknown_sex), getString(R.string.is_male), getString(R.string.is_female)};
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setItems(sex, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                select_sex.setText(sex[i]);
+            }
+        });
+        builder.show();
     }
 
     private void showMap() {
