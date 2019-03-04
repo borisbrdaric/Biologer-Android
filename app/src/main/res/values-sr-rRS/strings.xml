@@ -28,7 +28,7 @@
     <string name="about">О Биологеру</string>
     <string name="list">Списак налаза</string>
     <string name="pleaseSelect">Изаберите</string>
-    <string name="broj_jedinki">Број</string>
+    <string name="broj_jedinki">Број јединки</string>
     <string name="taxon_hint">Почните да куцате…</string>
     <string name="more">Још…</string>
     <string name="naziv_taksona">Назив таксона</string>
@@ -148,4 +148,5 @@
     <string name="map">Карта</string>
     <string name="advanced_entry">Детаљнији унос налаза</string>
     <string name="advanced_entry_desc">Омогућава унос теренских налаза са више детаља, као што су број јединки, развојни стадијум или пол.</string>
+    <string name="select_sex">Пол јединке</string>
 </resources>

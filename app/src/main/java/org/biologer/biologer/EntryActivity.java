@@ -11,7 +11,6 @@ import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
@@ -38,10 +37,11 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RadioButton;
 import android.view.View;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -57,12 +57,10 @@ import org.biologer.biologer.model.TaxonLocalization;
 import org.biologer.biologer.model.TaxonLocalizationDao;
 import org.biologer.biologer.model.UserData;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.nio.channels.FileChannel;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -71,8 +69,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-
-import freemarker.template.utility.StringUtil;
 
 public class EntryActivity extends AppCompatActivity implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
 
@@ -93,13 +89,13 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
     private static final String IMAGE_DIRECTORY = "/biologer";
     private int GALLERY = 1, CAMERA = 2, MAP = 3;
     private TextView tvTakson, tv_gps, tvStage, tv_more, tv_latitude, tv_longitude;
-    private CustomEditText et_razlogSmrti, et_komentar, et_brojJedinki;
+    private EditText et_razlogSmrti, et_komentar, et_brojJedinki;
     AutoCompleteTextView acTextView;
     ImageView ib_pic1, ib_pic2, ib_pic3, iv_map, iconTakePhotoCamera, iconTakePhotoGallery;
     private CheckBox check_dead;
+    private Spinner select_sex;
     private LinearLayout smrt, detailedEntry;
     private boolean save_enabled = false;
-    private RadioButton rb_male, rb_female;
     Uri contentURI;
     private String slika1, slika2, slika3;
     private SwipeRefreshLayout swipe;
@@ -139,14 +135,12 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
         tv_gps = findViewById(R.id.tv_gps);
         tvStage = findViewById(R.id.text_view_stages);
         tvStage.setOnClickListener(this);
-        et_razlogSmrti = (CustomEditText) findViewById(R.id.et_razlogSmrti);
-        et_komentar = (CustomEditText) findViewById(R.id.et_komentar);
-        et_brojJedinki = (CustomEditText) findViewById(R.id.et_brojJedinki);
-        rb_male = findViewById(R.id.rb_musko);
-        rb_female = findViewById(R.id.rb_zensko);
+        et_razlogSmrti = (EditText) findViewById(R.id.edit_text_death_comment);
+        et_komentar = (EditText) findViewById(R.id.et_komentar);
+        et_brojJedinki = (EditText) findViewById(R.id.et_brojJedinki);
+        select_sex = (Spinner) findViewById(R.id.spinner_sex);
         check_dead = (CheckBox) findViewById(R.id.dead_specimen);
         check_dead.setOnClickListener(this);
-        smrt = (LinearLayout) findViewById(R.id.smrt);
         ViewGroup.LayoutParams params = smrt.getLayoutParams();
         params.height = 0;
         smrt.setLayoutParams(params);
@@ -319,10 +313,10 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
                 et_brojJedinki.setText(String.valueOf(currentItem.getNumber()));
             }
             if (currentItem.getSex().equalsIgnoreCase("male")) {
-                rb_male.setChecked(true);
+                select_sex.setSelection(1);
             }
             if (currentItem.getSex().equalsIgnoreCase("female")) {
-                rb_female.setChecked(true);
+                select_sex.setSelection(2);
             }
             if (currentItem.getDeadOrAlive().equals("true")) {
                 // Specimen is a live
@@ -534,9 +528,9 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
 
     private String maleFemale() {
         String sex = "";
-        if (rb_male.isChecked()) {
+        if (select_sex.getSelectedItemPosition() == 1) {
             sex = "male";
-        } else if (rb_female.isChecked()) {
+        } else if (select_sex.getSelectedItemPosition() == 2) {
             sex = "female";
         }
         return sex;
@@ -889,13 +883,9 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
 
     public void showDeadComment() {
         if (check_dead.isChecked()) {
-            ViewGroup.LayoutParams params = smrt.getLayoutParams();
-            params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-            smrt.setLayoutParams(params);
+            et_razlogSmrti.setVisibility(View.VISIBLE);
         } else {
-            ViewGroup.LayoutParams params = smrt.getLayoutParams();
-            params.height = 0;
-            smrt.setLayoutParams(params);
+            et_razlogSmrti.setVisibility(View.GONE);
         }
     }
 

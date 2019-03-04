@@ -130,7 +130,7 @@ public class FetchTaxa extends Service {
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
 
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, "biologer_taxa")
-                .setSmallIcon(R.drawable.ic_kornjaca)
+                .setSmallIcon(R.mipmap.ic_notification)
                 .setContentTitle(getString(R.string.notify_title_taxa))
                 .setContentText(getString(R.string.notify_desc_taxa))
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
@@ -172,7 +172,7 @@ public class FetchTaxa extends Service {
         NotificationCompat.Action cancelAction = new NotificationCompat.Action(android.R.drawable.ic_menu_close_clear_cancel, getString(R.string.cancel), pendingCancelIntent);
 
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, "biologer_taxa")
-                .setSmallIcon(R.drawable.ic_kornjaca)
+                .setSmallIcon(android.R.drawable.stat_sys_download)
                 .setContentTitle(getString(R.string.notify_title_taxa))
                 .setContentText(getString(R.string.notify_desc_taxa))
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
@@ -203,7 +203,6 @@ public class FetchTaxa extends Service {
         PendingIntent pendingResumeIntent = PendingIntent.getService(this, 0, resumeIntent, 0);
         NotificationCompat.Action resumeAction = new NotificationCompat.Action(android.R.drawable.ic_media_play, getString(R.string.resume_action), pendingResumeIntent);
 
-
         // Add Cancel button intent in notification.
         Intent cancelIntent = new Intent(this, FetchTaxa.class);
         cancelIntent.setAction(ACTION_CANCEL);
@@ -211,7 +210,7 @@ public class FetchTaxa extends Service {
         NotificationCompat.Action cancelAction = new NotificationCompat.Action(android.R.drawable.ic_menu_close_clear_cancel, getString(R.string.cancel), pendingCancelIntent);
 
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, "biologer_taxa")
-                .setSmallIcon(R.drawable.ic_kornjaca)
+                .setSmallIcon(android.R.drawable.stat_sys_download)
                 .setContentTitle(getString(R.string.notify_title_taxa))
                 .setContentText(getString(R.string.notify_desc_taxa))
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
@@ -237,7 +236,7 @@ public class FetchTaxa extends Service {
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
 
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, "biologer_taxa")
-                    .setSmallIcon(R.drawable.ic_kornjaca)
+                    .setSmallIcon(R.mipmap.ic_notification)
                     .setContentTitle(title)
                     .setContentText(description)
                     .setPriority(NotificationCompat.PRIORITY_DEFAULT)

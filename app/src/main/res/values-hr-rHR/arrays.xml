@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="unknown_sex">Unknown sex</string>
+    <string name="is_male">Male</string>
+    <string name="is_female">Female</string>
+</resources>

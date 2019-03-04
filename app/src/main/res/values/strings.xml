@@ -24,7 +24,7 @@
     <string name="more">More…</string>
     <string name="naziv_taksona">Taxon name</string>
     <string name="pleaseSelect">Please select</string>
-    <string name="broj_jedinki">Number</string>
+    <string name="broj_jedinki">No. individuals</string>
     <string name="pol">Sex</string>
     <string name="M">Male</string>
     <string name="Z">Female</string>
@@ -170,4 +170,5 @@
     <string name="map">Map</string>
     <string name="advanced_entry">Advanced observation entry</string>
     <string name="advanced_entry_desc">Enables advanced options that could be entered with your occurrence (i.e. number of individuals, stage, sex).</string>
+    <string name="select_sex">Sex of the individual</string>
 </resources>

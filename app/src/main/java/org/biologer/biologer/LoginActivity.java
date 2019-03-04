@@ -87,7 +87,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
         // Register link.
-        CustomTextView registerTextView = (CustomTextView) findViewById(R.id.ctv_register);
+        TextView registerTextView = (TextView) findViewById(R.id.ctv_register);
         registerTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -95,7 +95,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
         // Forgot password link.
-        CustomTextView forgotPassTextView = (CustomTextView) findViewById(R.id.ctv_forgotPass);
+        TextView forgotPassTextView = (TextView) findViewById(R.id.ctv_forgotPass);
         forgotPassTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

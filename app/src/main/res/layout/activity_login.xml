@@ -89,7 +89,7 @@
                     android:layout_gravity="center"
                     android:src="@mipmap/user_round" />
 
-                <org.biologer.biologer.CustomEditText
+                <EditText
                     android:id="@+id/et_username"
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
@@ -131,7 +131,7 @@
                     android:layout_gravity="center"
                     android:src="@mipmap/user_round" />
 
-                <org.biologer.biologer.CustomEditText
+                <EditText
                     android:id="@+id/et_password"
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
@@ -182,14 +182,14 @@
                 android:orientation="horizontal"
                 android:gravity="center">
 
-                <org.biologer.biologer.CustomTextView
+                <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="14sp"
                     android:text="@string/nemas_nalog"
                     android:layout_marginEnd="8dp"/>
 
-                <org.biologer.biologer.CustomTextView
+                <TextView
                     android:id="@+id/ctv_register"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -201,7 +201,7 @@
                     android:focusable="true"/>
             </LinearLayout>
 
-            <org.biologer.biologer.CustomTextView
+            <TextView
                 android:id="@+id/ctv_forgotPass"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

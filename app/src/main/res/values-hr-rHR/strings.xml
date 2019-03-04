@@ -28,7 +28,7 @@
     <string name="about">O Biologeru</string>
     <string name="list">Popis nalaza</string>
     <string name="pleaseSelect">Izaberite</string>
-    <string name="broj_jedinki">Broj</string>
+    <string name="broj_jedinki">Broj jedinki</string>
     <string name="taxon_hint">Počnite upisivati…</string>
     <string name="more">više</string>
     <string name="naziv_taksona">Naziv vrste</string>
@@ -148,4 +148,5 @@
     <string name="map">Map</string>
     <string name="advanced_entry">Advanced observation entry</string>
     <string name="advanced_entry_desc">Enables advanced options that could be entered with your occurrence (i.e. number of individuals, stage, sex).</string>
+    <string name="select_sex">Sex of the individual</string>
 </resources>

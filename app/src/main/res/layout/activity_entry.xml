@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -22,8 +21,6 @@
             android:layout_height="match_parent">
 
             <android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:app="http://schemas.android.com/apk/res-auto"
-                xmlns:tools="http://schemas.android.com/tools"
                 android:id="@+id/swipe"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
@@ -36,104 +33,90 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:orientation="vertical"
-                        android:padding="8dp"
+                        android:padding="12dp"
                         android:verticalScrollbarPosition="right">
 
-                        <LinearLayout
+                        <GridLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:layout_marginTop="16dp"
+                            android:columnCount="2"
                             android:paddingStart="6dp"
-                            android:paddingEnd="6dp">
+                            android:paddingEnd="6dp"
+                            android:layout_marginBottom="14dp">
 
-                            <!--levi deo-->
                             <LinearLayout
                                 android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center_vertical"
-                                android:orientation="vertical">
-
-                                <LinearLayout
-                                    android:layout_width="260dp"
+                                android:layout_height="match_parent"
+                                android:orientation="horizontal">
+                                <TextView
+                                    android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginBottom="6dp"
-                                    android:gravity="start"
-                                    android:orientation="horizontal">
-                                    <TextView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:text="@string/latitude"/>
-                                    <TextView
-                                        android:id="@+id/tv_latitude"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:paddingStart="16dp"
-                                        android:paddingEnd="0dp"
-                                        android:text="@string/unknown" />
-                                </LinearLayout>
-
-                                <LinearLayout
-                                    android:layout_width="260dp"
+                                    android:text="@string/latitude"/>
+                                <TextView
+                                    android:id="@+id/tv_latitude"
+                                    android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginBottom="6dp"
-                                    android:gravity="start"
-                                    android:orientation="horizontal">
-                                    <TextView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:text="@string/longitude"/>
-                                    <TextView
-                                        android:id="@+id/tv_longitude"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:paddingStart="16dp"
-                                        android:paddingEnd="0dp"
-                                        android:text="@string/unknown" />
-                                </LinearLayout>
-
-                                <LinearLayout
-                                    android:layout_width="260dp"
-                                    android:layout_height="wrap_content"
-                                    android:gravity="start"
-                                    android:orientation="horizontal">
-                                    <TextView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:text="@string/GPSaccuracy"/>
-                                    <TextView
-                                        android:id="@+id/tv_gps"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:paddingStart="16dp"
-                                        android:paddingEnd="0dp"
-                                        android:text="@string/unknown"/>
-                                </LinearLayout>
-
+                                    android:paddingStart="10dp"
+                                    android:paddingEnd="0dp"
+                                    android:text="@string/unknown" />
                             </LinearLayout>
 
                             <!--desni deo(mapa)-->
                             <ImageView
                                 android:id="@+id/iv_map"
-                                android:layout_width="match_parent"
+                                android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_gravity="center"
-                                android:layout_marginEnd="5dp"
-                                android:layout_marginStart="16dp"
                                 android:contentDescription="@string/map"
-                                android:adjustViewBounds="true"
                                 android:clickable="true"
                                 android:focusable="true"
-                                android:src="@drawable/mapicon_192dp"/>
+                                android:layout_gravity="end"
+                                android:layout_rowSpan="3"
+                                android:layout_columnSpan="1"
+                                android:layout_marginEnd="12dp"
+                                android:layout_marginStart="12dp"
+                                android:src="@mipmap/ic_map"/>
 
-                        </LinearLayout>
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:orientation="horizontal">
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/longitude"/>
+                                <TextView
+                                    android:id="@+id/tv_longitude"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:paddingStart="10dp"
+                                    android:paddingEnd="0dp"
+                                    android:text="@string/unknown" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:orientation="horizontal">
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/GPSaccuracy"/>
+                                <TextView
+                                    android:id="@+id/tv_gps"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:paddingStart="10dp"
+                                    android:paddingEnd="0dp"
+                                    android:text="@string/unknown"/>
+                            </LinearLayout>
+                        </GridLayout>
 
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
                             android:gravity="center_horizontal"
-                            android:layout_marginBottom="16dp">
+                            android:layout_marginBottom="12dp">
 
                             <ImageView
                                 android:id="@+id/image_view_take_photo_camera"
@@ -172,89 +155,43 @@
                                 android:textSize="16sp" />
                         </LinearLayout>
 
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginBottom="12dp"
+                            android:background="@color/colorDivider"/>
+
                         <LinearLayout
                             android:id="@+id/detailed_entry"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
-                            android:visibility="gone">
+                            android:layout_marginBottom="12dp"
+                            android:visibility="visible">
 
-                            <View
-                                android:layout_width="match_parent"
-                                android:layout_height="1dp"
-                                android:layout_marginTop="16dp"
-                                android:layout_marginBottom="16dp"
-                                android:background="@color/colorDivider"/>
-
-                            <LinearLayout
+                            <GridLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:orientation="horizontal">
+                                android:columnCount="2">
 
-                                <LinearLayout
+                                <EditText
+                                    android:id="@+id/et_brojJedinki"
                                     android:layout_width="wrap_content"
-                                    android:layout_height="56dp"
-                                    android:orientation="horizontal"
-                                    android:padding="5dp">
+                                    android:layout_height="wrap_content"
+                                    android:hint="@string/broj_jedinki"
+                                    android:maxLength="10"
+                                    android:gravity="center"
+                                    android:inputType="number" />
 
-                                    <org.biologer.biologer.CustomTextView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:layout_gravity="center_vertical"
-                                        android:layout_marginEnd="10dp"
-                                        android:text="@string/broj_jedinki" />
-
-                                    <org.biologer.biologer.CustomEditText
-                                        android:id="@+id/et_brojJedinki"
-                                        android:layout_width="60dp"
-                                        android:layout_height="wrap_content"
-                                        android:maxLength="10"
-                                        android:gravity="center"
-                                        android:inputType="number" />
-                                </LinearLayout>
-
-
-                                <View
-                                    android:layout_width="0dp"
-                                    android:layout_height="0dp"
-                                    android:layout_weight="1" />
-
-                                <LinearLayout
+                                <android.support.v7.widget.AppCompatSpinner
+                                    android:id="@+id/spinner_sex"
                                     android:layout_width="wrap_content"
-                                    android:layout_height="56dp"
-                                    android:orientation="horizontal"
+                                    android:layout_height="48dp"
+                                    android:hint="@string/select_sex"
                                     android:layout_gravity="end"
-                                    android:padding="5dp">
-
-                                    <org.biologer.biologer.CustomTextView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:layout_gravity="center_vertical"
-                                        android:layout_marginEnd="10dp"
-                                        android:text="@string/pol" />
-
-                                    <RadioGroup
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:layout_gravity="center_vertical"
-                                        android:orientation="horizontal">
-
-                                        <RadioButton
-                                            android:id="@+id/rb_musko"
-                                            android:layout_width="wrap_content"
-                                            android:layout_height="wrap_content"
-                                            android:layout_marginEnd="6dp"
-                                            android:text="@string/M" />
-
-                                        <RadioButton
-                                            android:id="@+id/rb_zensko"
-                                            android:layout_width="wrap_content"
-                                            android:layout_height="wrap_content"
-                                            android:text="@string/Z" />
-                                    </RadioGroup>
-                                </LinearLayout>
-
-                            </LinearLayout>
+                                    android:entries="@array/sex">
+                                </android.support.v7.widget.AppCompatSpinner>
+                            </GridLayout>
 
                             <LinearLayout
                                 android:id="@+id/linear_layout_stages"
@@ -265,11 +202,11 @@
                                 android:visibility="gone"
                                 android:padding="5dp">
 
-                                <org.biologer.biologer.CustomTextView
+                                <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="@string/razvojni_stadijum">
-                                </org.biologer.biologer.CustomTextView>
+                                </TextView>
 
                                 <TextView
                                     android:id="@+id/text_view_stages"
@@ -288,25 +225,12 @@
                                     android:textSize="16sp" />
                             </LinearLayout>
 
-                            <LinearLayout
+                            <EditText
+                                android:id="@+id/et_komentar"
                                 android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="8dp"
-                                android:orientation="vertical"
-                                android:padding="5dp">
-
-                                <org.biologer.biologer.CustomTextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="8dp"
-                                    android:text="@string/komentar" />
-
-                                <org.biologer.biologer.CustomEditText
-                                    android:id="@+id/et_komentar"
-                                    android:layout_width="match_parent"
-                                    android:maxLength="1000"
-                                    android:layout_height="wrap_content" />
-                            </LinearLayout>
+                                android:maxLength="1000"
+                                android:hint="@string/komentar"
+                                android:layout_height="wrap_content" />
 
                             <LinearLayout
                                 android:layout_width="match_parent"
@@ -321,7 +245,7 @@
                                     android:layout_height="match_parent"
                                     android:layout_marginEnd="8dp"/>
 
-                                <org.biologer.biologer.CustomTextView
+                                <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="match_parent"
                                     android:gravity="center"
@@ -329,27 +253,14 @@
 
                             </LinearLayout>
 
-                            <LinearLayout
-                                android:id="@+id/smrt"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="8dp"
-                                android:orientation="vertical"
-                                android:padding="5dp">
-
-                                <org.biologer.biologer.CustomTextView
-                                    android:id="@+id/tv_razlogSmrti"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="8dp"
-                                    android:text="@string/razlog_smrti" />
-
-                                <org.biologer.biologer.CustomEditText
-                                    android:id="@+id/et_razlogSmrti"
+                                <EditText
+                                    android:id="@+id/edit_text_death_comment"
                                     android:layout_width="match_parent"
                                     android:maxLength="1000"
-                                    android:layout_height="wrap_content" />
-                            </LinearLayout>
+                                    android:layout_height="wrap_content"
+                                    android:hint="@string/razlog_smrti"
+                                    android:visibility="gone"
+                                    android:inputType="text"/>
 
                         </LinearLayout>
 

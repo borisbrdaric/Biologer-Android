@@ -70,7 +70,7 @@
             android:gravity="center"
             android:text="@string/textAbout2" />
 
-        <org.biologer.biologer.CustomTextView
+        <TextView
             android:id="@+id/biologerorg_url"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
