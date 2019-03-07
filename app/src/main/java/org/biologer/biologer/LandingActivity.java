@@ -65,7 +65,7 @@ public class LandingActivity extends AppCompatActivity
 
     private static final String TAG = "Biologer.Landing";
 
-    public static String[] full_taxon_names;
+    public static String[] full_taxa_names;
 
     ArrayList<String> slike = new ArrayList<>();
     int n = 0;
@@ -90,7 +90,7 @@ public class LandingActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        full_taxon_names = getTaxaNames();
+        full_taxa_names = getTaxaNames();
 
         progressBar = findViewById(R.id.progress);
         progressBar4Taxa = findViewById(R.id.progress_taxa);
@@ -637,7 +637,7 @@ public class LandingActivity extends AppCompatActivity
         ft.commit();
     }
 
-    public String[] getTaxaNames() {
+    public static String[] getTaxaNames() {
         List<Taxon> taxaList = App.get().getDaoSession().getTaxonDao().loadAll();
 
         // This should get the list of taxa from the database
@@ -671,7 +671,7 @@ public class LandingActivity extends AppCompatActivity
         return full_names;
     }
 
-    private Locale getCurrentLocale(){
+    private static Locale getCurrentLocale(){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
             Locale locale = App.get().getResources().getConfiguration().getLocales().get(0);
             Log.i(TAG, "Current System locale is set to " + locale.getDisplayLanguage() + ".");

@@ -71,7 +71,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import static org.biologer.biologer.LandingActivity.full_taxon_names;
+import static org.biologer.biologer.LandingActivity.full_taxa_names;
 
 public class EntryActivity extends AppCompatActivity implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
 
@@ -166,7 +166,7 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
         }
 
         // Fill in the drop down menu with list of taxa
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, full_taxon_names);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, full_taxa_names);
         acTextView = findViewById(R.id.textview_list_of_taxa);
         acTextView.setAdapter(adapter);
         // This linear layout holds the stages. We will hide it before the taxon is not selected.
