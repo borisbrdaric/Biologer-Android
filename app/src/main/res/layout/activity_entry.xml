@@ -286,7 +286,7 @@
                                 android:clickable="true"
                                 android:focusable="true"
                                 android:scaleType="centerInside"
-                                android:visibility="gone"
+                                android:visibility="visible"
                                 android:src="@drawable/ic_add_a_photo_black_24dp" />
 
                             <ImageView

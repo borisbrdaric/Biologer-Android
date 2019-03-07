@@ -77,10 +77,6 @@ public class LandingActivity extends AppCompatActivity
 
     private FrameLayout progressBar;
 
-    private FrameLayout progressBar4Taxa;
-    private ProgressBar progressBarTaxa;
-    private int oldProgress = 0;
-
     android.support.v4.app.Fragment fragment = null;
 
     @Override
@@ -93,10 +89,6 @@ public class LandingActivity extends AppCompatActivity
         full_taxa_names = getTaxaNames();
 
         progressBar = findViewById(R.id.progress);
-        progressBar4Taxa = findViewById(R.id.progress_taxa);
-        progressBarTaxa = findViewById(R.id.progress_bar_taxa1);
-
-        Button button = findViewById(R.id.btn_cancel_update);
 
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.nav_open_drawer, R.string.nav_close_drawer);
@@ -122,13 +114,6 @@ public class LandingActivity extends AppCompatActivity
         } else {
             Log.d(TAG, "There is no network available. Application will not be able to get new data from the server.");
         }
-
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                cancelTaxaUpdate();
-            }
-        });
     }
 
     // Send a short request to the server that will return if the taxonomic tree is up to date.
@@ -447,32 +432,6 @@ public class LandingActivity extends AppCompatActivity
         }
     }
 
-    // Start a thread to monitor taxa update and remove the progress bar when updated
-    Thread updateStatusBar = new Thread() {
-        @Override
-        public void run() {
-            try {
-                sleep(2000);
-                while (FetchTaxa.isInstanceCreated()) {
-                    int progress_value = FetchTaxa.getProgressStatus();
-                    if (progress_value != oldProgress) {
-                        oldProgress = progress_value;
-                        progressBarTaxa.setProgress(progress_value);
-                    }
-                }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } finally {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        progressBar4Taxa.setVisibility(View.GONE);
-                    }
-                });
-            }
-        }
-    };
-
     protected void buildAlertMessageNewerTaxaDb() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         // intent used to start service for fetching taxa
@@ -482,8 +441,6 @@ public class LandingActivity extends AppCompatActivity
                 .setCancelable(false)
                 .setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
                     public void onClick(final DialogInterface dialog, final int id) {
-                        progressBar4Taxa.setVisibility(View.VISIBLE);
-                        updateStatusBar.start();
                         startService(fetchTaxa);
                     }
                 })
@@ -506,8 +463,6 @@ public class LandingActivity extends AppCompatActivity
                 .setCancelable(false)
                 .setPositiveButton(getString(R.string.contin), new DialogInterface.OnClickListener() {
                     public void onClick(final DialogInterface dialog, final int id) {
-                        progressBar4Taxa.setVisibility(View.VISIBLE);
-                        updateStatusBar.start();
                         startService(fetchTaxa);
                     }
                 })
@@ -527,7 +482,6 @@ public class LandingActivity extends AppCompatActivity
                 .setCancelable(false)
                 .setPositiveButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
                     public void onClick(final DialogInterface dialog, final int id) {
-                        progressBar4Taxa.setVisibility(View.GONE);
                         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
                         Intent fetchTaxa = new Intent(LandingActivity.this, FetchTaxa.class);
                         fetchTaxa.setAction(FetchTaxa.ACTION_CANCEL);
