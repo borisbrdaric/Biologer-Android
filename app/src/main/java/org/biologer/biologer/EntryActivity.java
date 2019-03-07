@@ -71,6 +71,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import static org.biologer.biologer.LandingActivity.full_taxon_names;
+
 public class EntryActivity extends AppCompatActivity implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
 
     private static final String TAG = "Biologer.Entry";
@@ -163,37 +165,8 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
             detailedEntry.setVisibility(View.VISIBLE);
         }
 
-        // This should get the list of taxa from the database
-        final String[] latin_names = new String[taxaList.size()];
-        final String[] full_names = new String[taxaList.size()];
-        // Get the system locale to translate names of the taxa
-        Locale locale = getCurrentLocale();
-        for (int i = 0; i < taxaList.size(); i++) {
-            // Get the latin names
-            latin_names[i] = taxaList.get(i).getName();
-            // Get the localized names and "Latin name (localized name)" for the display.
-            TaxonLocalization taxaLocale = App.get().getDaoSession().getTaxonLocalizationDao()
-                    .queryBuilder()
-                    .where(TaxonLocalizationDao.Properties.Name.eq(taxaList.get(i).getName()),
-                            TaxonLocalizationDao.Properties.Locale.eq(locale.getLanguage()))
-                    .unique();
-            if (taxaLocale != null) {
-                if (taxaLocale.getNativeName() != null) {
-                    full_names[i] = String.valueOf(latin_names[i] + " (" + taxaLocale.getNativeName() + ")");
-                    //native_names[i] = taxaLocale.getNativeName();
-                    if (taxaLocale.getNativeName().equals("null")) {
-                        full_names[i] = String.valueOf(latin_names[i]);
-                    }
-                } else {
-                    full_names[i] = String.valueOf(latin_names[i]);
-                }
-            } else {
-                full_names[i] = String.valueOf(latin_names[i]);
-            }
-        }
-
         // Fill in the drop down menu with list of taxa
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, full_names);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, full_taxon_names);
         acTextView = findViewById(R.id.textview_list_of_taxa);
         acTextView.setAdapter(adapter);
         // This linear layout holds the stages. We will hide it before the taxon is not selected.
@@ -266,6 +239,28 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
         startEntryActivity();
 
     }
+/*
+    // Start a thread to monitor taxa update and remove the progress bar when updated
+    Thread getTaxaForList = new Thread() {
+        @Override
+        public void run() {
+            try {
+                while (FetchTaxa.isInstanceCreated()) {
+                    // Do domething
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } finally {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        // Set the view
+                    }
+                });
+            }
+        }
+    };
+*/
 
     /*
     /  If new entry just get the coordinates.
