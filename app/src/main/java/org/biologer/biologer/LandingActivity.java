@@ -47,6 +47,7 @@ import org.biologer.biologer.model.network.APIEntryResponse;
 import org.biologer.biologer.model.network.TaksoniResponse;
 import org.biologer.biologer.model.network.UserDataResponse;
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.greendao.query.QueryBuilder;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -592,36 +593,20 @@ public class LandingActivity extends AppCompatActivity
     }
 
     public static String[] getTaxaNames() {
-        List<Taxon> taxaList = App.get().getDaoSession().getTaxonDao().loadAll();
-
-        // This should get the list of taxa from the database
-        final String[] latin_names = new String[taxaList.size()];
-        final String[] full_names = new String[taxaList.size()];
         // Get the system locale to translate names of the taxa
         Locale locale = getCurrentLocale();
+        List<TaxonLocalization> taxaList = App.get().getDaoSession().getTaxonLocalizationDao()
+                .queryBuilder()
+                .where(TaxonLocalizationDao.Properties.Locale.eq(locale.getLanguage()))
+                .list();
+
+        // This should get the list of taxa from the database
+        String[] full_names = new String[taxaList.size()];
         for (int i = 0; i < taxaList.size(); i++) {
             // Get the latin names
-            latin_names[i] = taxaList.get(i).getName();
-            // Get the localized names and "Latin name (localized name)" for the display.
-            TaxonLocalization taxaLocale = App.get().getDaoSession().getTaxonLocalizationDao()
-                    .queryBuilder()
-                    .where(TaxonLocalizationDao.Properties.Name.eq(taxaList.get(i).getName()),
-                            TaxonLocalizationDao.Properties.Locale.eq(locale.getLanguage()))
-                    .unique();
-            if (taxaLocale != null) {
-                if (taxaLocale.getNativeName() != null) {
-                    full_names[i] = String.valueOf(latin_names[i] + " (" + taxaLocale.getNativeName() + ")");
-                    //native_names[i] = taxaLocale.getNativeName();
-                    if (taxaLocale.getNativeName().equals("null")) {
-                        full_names[i] = String.valueOf(latin_names[i]);
-                    }
-                } else {
-                    full_names[i] = String.valueOf(latin_names[i]);
-                }
-            } else {
-                full_names[i] = String.valueOf(latin_names[i]);
-            }
+            full_names[i] = taxaList.get(i).getLatinAndNativeName();
         }
+
         return full_names;
     }
 

@@ -17,14 +17,17 @@ public class TaxonLocalization {
     private long translationID;
     private String locale;
     private String nativeName;
-    @Generated(hash = 1251469198)
-    public TaxonLocalization(Long id, String name, long taxonId, long translationID, String locale, String nativeName) {
+    private String latinAndNativeName;
+    @Generated(hash = 1649918886)
+    public TaxonLocalization(Long id, String name, long taxonId, long translationID, String locale, String nativeName,
+            String latinAndNativeName) {
         this.id = id;
         this.name = name;
         this.taxonId = taxonId;
         this.translationID = translationID;
         this.locale = locale;
         this.nativeName = nativeName;
+        this.latinAndNativeName = latinAndNativeName;
     }
     @Generated(hash = 1201112011)
     public TaxonLocalization() {
@@ -68,6 +71,12 @@ public class TaxonLocalization {
     }
     public void setNativeName(String nativeName) {
         this.nativeName = nativeName;
+    }
+    public String getLatinAndNativeName() {
+        return this.latinAndNativeName;
+    }
+    public void setLatinAndNativeName(String latinAndNativeName) {
+        this.latinAndNativeName = latinAndNativeName;
     }
     }
 

@@ -16,14 +16,14 @@ android {
         // API level 19 = Android 4.4
         minSdkVersion 19
         targetSdkVersion 28
-        versionCode 22
-        versionName "Beta 0.9.4"
+        versionCode 23
+        versionName "Beta 0.9.5"
         multiDexEnabled true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
 greendao {
-        schemaVersion 117
+        schemaVersion 118
     }
 
     applicationVariants.all { variant ->
