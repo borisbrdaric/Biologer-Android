@@ -298,10 +298,14 @@ public class FetchTaxa extends Service {
                             for (Translation translation : translations) {
                                 String latin = taxon.getName();
                                 String nat = translation.getNativeName();
-                                if (nat == null) {
-                                    App.get().getDaoSession().getTaxonLocalizationDao().insert(new TaxonLocalization(null, latin, taxon.getId(), translation.getId(), translation.getLocale(), nat, latin));
+                                if (nat != null) {
+                                    if (nat.equals("")) {
+                                        App.get().getDaoSession().getTaxonLocalizationDao().insert(new TaxonLocalization(null, latin, taxon.getId(), translation.getId(), translation.getLocale(), nat, latin));
+                                    } else {
+                                        App.get().getDaoSession().getTaxonLocalizationDao().insert(new TaxonLocalization(null, latin, taxon.getId(), translation.getId(), translation.getLocale(), nat, latin + " (" + nat + ")"));
+                                    }
                                 } else {
-                                    App.get().getDaoSession().getTaxonLocalizationDao().insert(new TaxonLocalization(null, latin, taxon.getId(), translation.getId(), translation.getLocale(), nat, latin + " (" + nat + ")"));
+                                    App.get().getDaoSession().getTaxonLocalizationDao().insert(new TaxonLocalization(null, latin, taxon.getId(), translation.getId(), translation.getLocale(), nat, latin));
                                 }
                             }
                         }
