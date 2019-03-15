@@ -89,7 +89,6 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
     private double elev = 0.0;
     private LatLng nLokacija = new LatLng(0.0, 0.0);
     private Double acc = 0.0;
-    private int IMAGE_VIEW = 0;
     private int GALLERY = 1, CAMERA = 2, MAP = 3;
     private TextView tvTakson, tv_gps, tvStage, tv_latitude, tv_longitude, select_sex;
     private EditText et_razlogSmrti, et_komentar, et_brojJedinki;
@@ -417,16 +416,19 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
                 getSexForList();
                 break;
             case R.id.ib_pic1_del:
-                IMAGE_VIEW = 1;
-                showPictureDialog();
+                ib_pic1_frame.setVisibility(View.GONE);
+                disablePhotoButtons(false);
+                slika1 = null;
                 break;
             case R.id.ib_pic2_del:
-                IMAGE_VIEW = 2;
-                showPictureDialog();
+                ib_pic2_frame.setVisibility(View.GONE);
+                disablePhotoButtons(false);
+                slika2 = null;
                 break;
             case R.id.ib_pic3_del:
-                IMAGE_VIEW = 3;
-                showPictureDialog();
+                ib_pic3_frame.setVisibility(View.GONE);
+                disablePhotoButtons(false);
+                slika3 = null;
                 break;
             case R.id.dead_specimen:
                 showDeadComment();
@@ -618,30 +620,6 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
         Intent intent = new Intent(this, MapActivity.class);
         intent.putExtra("latlong", nLokacija);
         startActivityForResult(intent, MAP);
-    }
-
-    // This was used when we have tree images to click on them. It will probably be depracated soon...
-    private void showPictureDialog() {
-        AlertDialog.Builder pictureDialog = new AlertDialog.Builder(this);
-        pictureDialog.setTitle(getString(R.string.choose_picture));
-        String[] pictureDialogItems = {
-                getString(R.string.choose_picture_gallery),
-                getString(R.string.choose_picture_camera)};
-        pictureDialog.setItems(pictureDialogItems,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        switch (which) {
-                            case 0:
-                                takePhotoFromGallery();
-                                break;
-                            case 1:
-                                takePhotoFromCamera();
-                                break;
-                        }
-                    }
-                });
-        pictureDialog.show();
     }
 
     public void takePhotoFromGallery() {
