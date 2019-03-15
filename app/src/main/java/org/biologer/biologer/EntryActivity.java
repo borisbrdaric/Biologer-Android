@@ -39,6 +39,7 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.view.View;
@@ -93,7 +94,8 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
     private TextView tvTakson, tv_gps, tvStage, tv_latitude, tv_longitude, select_sex;
     private EditText et_razlogSmrti, et_komentar, et_brojJedinki;
     AutoCompleteTextView acTextView;
-    ImageView ib_pic1, ib_pic2, ib_pic3, iv_map, iconTakePhotoCamera, iconTakePhotoGallery;
+    FrameLayout ib_pic1_frame, ib_pic2_frame, ib_pic3_frame;
+    ImageView ib_pic1, ib_pic1_del, ib_pic2, ib_pic2_del, ib_pic3, ib_pic3_del, iv_map, iconTakePhotoCamera, iconTakePhotoGallery;
     private CheckBox check_dead;
     LinearLayout detailedEntry;
     private boolean save_enabled = false;
@@ -145,12 +147,18 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
         check_dead = (CheckBox) findViewById(R.id.dead_specimen);
         check_dead.setOnClickListener(this);
         // Buttons to add images
+        ib_pic1_frame = (FrameLayout) findViewById(R.id.ib_pic1_frame);
         ib_pic1 = (ImageView) findViewById(R.id.ib_pic1);
-        ib_pic1.setOnClickListener(this);
+        ib_pic1_del = (ImageView) findViewById(R.id.ib_pic1_del);
+        ib_pic1_del.setOnClickListener(this);
+        ib_pic2_frame = (FrameLayout) findViewById(R.id.ib_pic2_frame);
         ib_pic2 = (ImageView) findViewById(R.id.ib_pic2);
-        ib_pic2.setOnClickListener(this);
+        ib_pic2_del = (ImageView) findViewById(R.id.ib_pic2_del);
+        ib_pic2_del.setOnClickListener(this);
+        ib_pic3_frame = (FrameLayout) findViewById(R.id.ib_pic3_frame);
         ib_pic3 = (ImageView) findViewById(R.id.ib_pic3);
-        ib_pic3.setOnClickListener(this);
+        ib_pic3_del = (ImageView) findViewById(R.id.ib_pic3_del);
+        ib_pic3_del.setOnClickListener(this);
         iconTakePhotoCamera = (ImageView) findViewById(R.id.image_view_take_photo_camera);
         iconTakePhotoCamera.setOnClickListener(this);
         iconTakePhotoGallery = (ImageView) findViewById(R.id.image_view_take_photo_gallery);
@@ -327,21 +335,21 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
                 Glide.with(this)
                         .load(slika1)
                         .into(ib_pic1);
-                ib_pic1.setVisibility(View.VISIBLE);
+                ib_pic1_frame.setVisibility(View.VISIBLE);
             }
             slika2 = currentItem.getSlika2();
             if (slika2 != null) {
                 Glide.with(this)
                         .load(slika2)
                         .into(ib_pic2);
-                ib_pic2.setVisibility(View.VISIBLE);
+                ib_pic2_frame.setVisibility(View.VISIBLE);
             }
             slika3 = currentItem.getSlika3();
             if (slika3 != null) {
                 Glide.with(this)
                         .load(slika3)
                         .into(ib_pic3);
-                ib_pic3.setVisibility(View.VISIBLE);
+                ib_pic3_frame.setVisibility(View.VISIBLE);
             }
 
             if (slika1 == null || slika2 == null || slika3 == null) {
@@ -408,15 +416,15 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
             case R.id.text_view_sex:
                 getSexForList();
                 break;
-            case R.id.ib_pic1:
+            case R.id.ib_pic1_del:
                 IMAGE_VIEW = 1;
                 showPictureDialog();
                 break;
-            case R.id.ib_pic2:
+            case R.id.ib_pic2_del:
                 IMAGE_VIEW = 2;
                 showPictureDialog();
                 break;
-            case R.id.ib_pic3:
+            case R.id.ib_pic3_del:
                 IMAGE_VIEW = 3;
                 showPictureDialog();
                 break;
@@ -690,19 +698,19 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
                         Glide.with(this)
                                 .load(slika1)
                                 .into(ib_pic1);
-                        ib_pic1.setVisibility(View.VISIBLE);
+                        ib_pic1_frame.setVisibility(View.VISIBLE);
                     } else if (slika2 == null) {
                         slika2 = resizeImage(mCurrentPhotoPath);
                         Glide.with(this)
                                 .load(slika2)
                                 .into(ib_pic2);
-                        ib_pic2.setVisibility(View.VISIBLE);
+                        ib_pic2_frame.setVisibility(View.VISIBLE);
                     } else if (slika3 == null) {
                         slika3 = resizeImage(mCurrentPhotoPath);
                         Glide.with(this)
                                 .load(slika3)
                                 .into(ib_pic3);
-                        ib_pic3.setVisibility(View.VISIBLE);
+                        ib_pic3_frame.setVisibility(View.VISIBLE);
                         iconTakePhotoGallery.setEnabled(false);
                         iconTakePhotoGallery.setImageAlpha(20);
                         iconTakePhotoCamera.setEnabled(false);
@@ -723,19 +731,19 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
                         Glide.with(this)
                                 .load(slika1)
                                 .into(ib_pic1);
-                        ib_pic1.setVisibility(View.VISIBLE);
+                        ib_pic1_frame.setVisibility(View.VISIBLE);
                     } else if (slika2 == null) {
                         slika2 = resizeImage(mCurrentPhotoPath);
                         Glide.with(this)
                                 .load(slika2)
                                 .into(ib_pic2);
-                        ib_pic2.setVisibility(View.VISIBLE);
+                        ib_pic2_frame.setVisibility(View.VISIBLE);
                     } else if (slika3 == null) {
                         slika3 = resizeImage(mCurrentPhotoPath);
                         Glide.with(this)
                                 .load(slika3)
                                 .into(ib_pic3);
-                        ib_pic3.setVisibility(View.VISIBLE);
+                        ib_pic3_frame.setVisibility(View.VISIBLE);
                         disablePhotoButtons(true);
                     }
 
