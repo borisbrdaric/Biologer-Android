@@ -22,8 +22,6 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Response;
 
-import static org.biologer.biologer.LandingActivity.full_taxa_names;
-
 public class FetchTaxa extends Service {
 
     private static final String TAG = "Biologer.FetchTaxa";
@@ -318,8 +316,6 @@ public class FetchTaxa extends Service {
                     if (isLastPage(page)) {
                         // Inform the user of success
                         Log.i(TAG, "All taxa were successfully updated from the server!");
-                        // Update combination fo Latin name (localized name) saved in static String[]
-                        full_taxa_names = LandingActivity.getTaxaNames();
                         // Stop the foreground service and update notification
                         stopForeground(true);
                         notificationUpdateText(getString(R.string.notify_title_taxa_updated), getString(R.string.notify_desc_taxa_updated));

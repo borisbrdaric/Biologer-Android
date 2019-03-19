@@ -71,8 +71,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-
-import static org.biologer.biologer.LandingActivity.full_taxa_names;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class EntryActivity extends AppCompatActivity implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
 
@@ -106,8 +106,6 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
     SimpleDateFormat simpleDateFormat;
     // Get the data from the GreenDao database
     List<UserData> userDataList = App.get().getDaoSession().getUserDataDao().loadAll();
-    List<Taxon> taxaList = App.get().getDaoSession().getTaxonDao().loadAll();
-    List<TaxonLocalization> taxaLocale = App.get().getDaoSession().getTaxonLocalizationDao().loadAll();
     List<Stage> stageList = App.get().getDaoSession().getStageDao().loadAll();
 
     @Override
@@ -172,36 +170,73 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
             detailedEntry.setVisibility(View.VISIBLE);
         }
 
+        // Get the system locale to translate names of the taxa
+        final Locale locale = getCurrentLocale();
         // Fill in the drop down menu with list of taxa
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, full_taxa_names);
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, new String[1]);
         acTextView = findViewById(R.id.textview_list_of_taxa);
         acTextView.setAdapter(adapter);
+        acTextView.setThreshold(2);
         // This linear layout holds the stages. We will hide it before the taxon is not selected.
         final TextInputLayout stages = findViewById(R.id.text_input_stages);
         acTextView.addTextChangedListener(new TextWatcher() {
+            final android.os.Handler handler = new android.os.Handler();
+            Runnable runnable;
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                // Enable stage entry
-                if (getSelectedTaxonId() != null) {
-                    // Check if the taxon has stages. If not hide the stages dialog.
-                    if (isStageAvailable()) {
-                        stages.setVisibility(View.VISIBLE);
+                handler.removeCallbacks(runnable);
+
+                final String input_text = String.valueOf(s);
+
+                runnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        /*
+                        Get the list of taxa from the GreenDao database
+                         */
+                        List<TaxonLocalization> taxaList = App.get().getDaoSession().getTaxonLocalizationDao()
+                                .queryBuilder()
+                                .where(TaxonLocalizationDao.Properties.Locale.eq(locale.getLanguage()),
+                                        TaxonLocalizationDao.Properties.LatinAndNativeName.like("%" + String.valueOf(input_text) + "%"))
+                                .limit(10)
+                                .list();
+                        String[] taxaNames = new String[taxaList.size()];
+                        for (int i = 0; i < taxaList.size(); i++) {
+                            // Get the latin names
+                            taxaNames[i] = taxaList.get(i).getLatinAndNativeName();
+                        }
+                        ArrayAdapter<String> adapter = new ArrayAdapter<String>(EntryActivity.this, android.R.layout.simple_dropdown_item_1line, taxaNames);
+                        acTextView.setAdapter(adapter);
+                        adapter.notifyDataSetChanged();
+
+                        /*
+                        Update the UI elements
+                         */
+                        // Enable stage entry
+                        if (getSelectedTaxonId() != null) {
+                            // Check if the taxon has stages. If not hide the stages dialog.
+                            if (isStageAvailable()) {
+                                stages.setVisibility(View.VISIBLE);
+                            }
+                            Log.d(TAG, "Taxon is selected from the list. Enabling Stages for this taxon.");
+                        } else {
+                            stages.setVisibility(View.GONE);
+                            Log.d(TAG, "Taxon is not selected from the list. Disabling Stages for this taxon.");
+                        }
+                        // Enable/disable Save button in Toolbar
+                        if (acTextView.getText().toString().length() > 1) {
+                            save_enabled = true;
+                            Log.d(TAG, "Taxon is set to: " + acTextView.getText());
+                            invalidateOptionsMenu();
+                        } else {
+                            save_enabled = false;
+                            Log.d(TAG, "Taxon entry field is empty.");
+                            invalidateOptionsMenu();
+                        }
                     }
-                    Log.d(TAG, "Taxon is selected from the list. Enabling Stages for this taxon.");
-                } else {
-                    stages.setVisibility(View.GONE);
-                    Log.d(TAG, "Taxon is not selected from the list. Disabling Stages for this taxon.");
-                }
-                // Enable/disable Save button in Toolbar
-                if (acTextView.getText().toString().length() != 0) {
-                    save_enabled = true;
-                    Log.d(TAG, "Taxon is set to: " + acTextView.getText());
-                    invalidateOptionsMenu();
-                } else {
-                    save_enabled = false;
-                    Log.d(TAG, "Taxon entry field is empty.");
-                    invalidateOptionsMenu();
-                }
+                };
+                handler.postDelayed(runnable, 600);
             }
 
             @Override
