@@ -61,7 +61,7 @@ public class FetchTaxa extends Service {
                     case ACTION_START:
                         Log.i(TAG, "Action start selected, starting foreground service.");
                         // Clean previous data just in case
-                        // cleanDatabase();
+                        cleanDatabase();
                         stop_fetching = "no";
                         // Start the service
                         notificationInitiate();
@@ -78,14 +78,14 @@ public class FetchTaxa extends Service {
                         if(stop_fetching.equals("no")) {
                             Log.i(TAG, "Action cancel selected, killing the paused foreground service.");
                             stop_fetching = "cancel";
-                            cleanDatabase();
+                            //cleanDatabase();
                             stopForeground(true);
                             notificationUpdateText(getString(R.string.notify_title_taxa_canceled), getString(R.string.notify_desc_taxa_canceled));
                             stopSelf();
                         } else {
                             Log.i(TAG, "Action cancel selected, killing the running foreground service.");
                             stop_fetching = "cancel";
-                            cleanDatabase();
+                            //cleanDatabase();
                             stopForeground(true);
                         }
                         break;
@@ -335,9 +335,8 @@ public class FetchTaxa extends Service {
             @Override
             public void onFailure(Call<TaksoniResponse> call, Throwable t) {
                 // Remove partially retrieved data from the database
-                cleanDatabase();
+                // cleanDatabase();
                 // Inform the user on failure and write log message
-                //Toast.makeText(getActivity(), getString(R.string.database_connect_error), Toast.LENGTH_LONG).show();
                 Log.e(TAG, "Application could not get data from a server!");
                 notificationUpdateText(getString(R.string.notify_title_taxa_failed), getString(R.string.notify_desc_taxa_failed));
                 stopSelf();
