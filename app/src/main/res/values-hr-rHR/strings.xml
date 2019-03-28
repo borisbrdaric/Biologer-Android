@@ -79,7 +79,7 @@
     <string name="accurcy">Preciznost lokacije (m)</string>
     <string name="updating_database">Nadograđujem bazu taksona…</string>
     <string name="Slide1_title">Opcije baze podataka</string>
-    <string name="first_slide">Ova se aplikacija može spojiti sa više Biologer baza podataka. Započinjete tako da odaberete vašu željenu bazu podataka i registrirate se</string>
+    <string name="first_slide">Biologer aplikacija može spojiti sa više baza podataka. Započinjete tako da odaberete vašu željenu bazu podataka i registrirate se</string>
     <string name="second_slide">Bočni panel pruža sve kratice potrebne za postavku vaše aplikacije</string>
     <string name="database_empty">Biologer taksonomska baza podataka još uvijek nije preuzeta sa servera. Provijerite imate li stabilnu internetsku vezu kako bi nastavili.</string>
     <string name="contin">Preuzmi</string>
