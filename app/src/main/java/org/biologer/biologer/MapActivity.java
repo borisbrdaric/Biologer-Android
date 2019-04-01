@@ -120,10 +120,34 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         if (mMap != null) {
             // Add marker at the GPS position on the map
-            mMap.addMarker(new MarkerOptions().position(latlong).title(getString(R.string.you_are_here)).draggable(true));
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latlong, 16));
-            mMap.animateCamera(CameraUpdateFactory.zoomIn());
-            mMap.animateCamera(CameraUpdateFactory.zoomTo(16), 1000, null);
+            if (latlong.latitude == 0.0) {
+                if (SettingsManager.getDatabaseName().equals("https://biologer.hr")) {
+                    mMap.addMarker(new MarkerOptions().position(new LatLng(16.377937, 16.377937)).title(getString(R.string.you_are_here)).draggable(true));
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(16.377937, 16.377937), 7));
+                    mMap.animateCamera(CameraUpdateFactory.zoomIn());
+                    mMap.animateCamera(CameraUpdateFactory.zoomTo(7), 1000, null);
+                }
+
+                if (SettingsManager.getDatabaseName().equals("https://biologer.org")) {
+                    mMap.addMarker(new MarkerOptions().position(new LatLng(44.150681, 20.725708)).title(getString(R.string.you_are_here)).draggable(true));
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(44.150681, 20.725708), 7));
+                    mMap.animateCamera(CameraUpdateFactory.zoomIn());
+                    mMap.animateCamera(CameraUpdateFactory.zoomTo(7), 1000, null);
+                }
+
+                if (SettingsManager.getDatabaseName().equals("https://dev.biologer.org")) {
+                    mMap.addMarker(new MarkerOptions().position(new LatLng(44.150681, 20.725708)).title(getString(R.string.you_are_here)).draggable(true));
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(44.150681, 20.725708), 7));
+                    mMap.animateCamera(CameraUpdateFactory.zoomIn());
+                    mMap.animateCamera(CameraUpdateFactory.zoomTo(7), 1000, null);
+                }
+
+            } else {
+                mMap.addMarker(new MarkerOptions().position(latlong).title(getString(R.string.you_are_here)).draggable(true));
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latlong, 16));
+                mMap.animateCamera(CameraUpdateFactory.zoomIn());
+                mMap.animateCamera(CameraUpdateFactory.zoomTo(16), 1000, null);
+            }
 
             mMap.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
                 @Override
