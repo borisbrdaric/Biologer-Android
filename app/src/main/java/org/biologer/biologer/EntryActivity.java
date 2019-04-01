@@ -271,7 +271,8 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
 
             @Override
             public void onProviderDisabled(String s) {
-                buildAlertMessageNoGps();
+                //buildAlertMessageNoGps();
+                startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
             }
         };
 
@@ -982,9 +983,10 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
         tv_longitude.setText(longitude);
     }
 
+    /*
     protected void buildAlertMessageNoGps() {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(getString(R.string.enable_location))
+        final AlertDialog.Builder builder_gps = new AlertDialog.Builder(this);
+        builder_gps.setMessage(getString(R.string.enable_location))
                 .setCancelable(false)
                 .setPositiveButton(getString(R.string.enable_location_yes), new DialogInterface.OnClickListener() {
                     public void onClick(final DialogInterface dialog, final int id) {
@@ -996,14 +998,15 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
                         dialog.cancel();
                     }
                 });
-        final AlertDialog alert = builder.create();
+        final AlertDialog alert = builder_gps.create();
         alert.show();
     }
+    */
 
     // Show the message if the taxon is not chosen from the taxonomic list
     protected void buildAlertMessageInvalidTaxon() {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(getString(R.string.invalid_taxon_name))
+        final AlertDialog.Builder builder_taxon = new AlertDialog.Builder(EntryActivity.this);
+        builder_taxon.setMessage(getString(R.string.invalid_taxon_name))
                 .setCancelable(false)
                 .setPositiveButton(getString(R.string.save_anyway), new DialogInterface.OnClickListener() {
                     public void onClick(final DialogInterface dialog, final int id) {
@@ -1018,14 +1021,14 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
                         finish();
                     }
                 });
-        final AlertDialog alert = builder.create();
+        final AlertDialog alert = builder_taxon.create();
         alert.show();
     }
 
     // Show the message if the location is not loaded
     protected void buildAlertMessageNoCoordinates() {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(getString(R.string.location_is_zero))
+        final AlertDialog.Builder builder_no_coords = new AlertDialog.Builder(this);
+        builder_no_coords.setMessage(getString(R.string.location_is_zero))
                 .setCancelable(false)
                 .setPositiveButton(getString(R.string.wait), new DialogInterface.OnClickListener() {
                     public void onClick(final DialogInterface dialog, final int id) {
@@ -1038,13 +1041,13 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
                         finish();
                     }
                 });
-        final AlertDialog alert = builder.create();
+        final AlertDialog alert = builder_no_coords.create();
         alert.show();
     }
 
     protected void buildAlertMessageUnpreciseCoordinates() {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(getString(R.string.unprecise_coordinates))
+        final AlertDialog.Builder builder_unprecise_coords = new AlertDialog.Builder(this);
+        builder_unprecise_coords.setMessage(getString(R.string.unprecise_coordinates))
                 .setCancelable(false)
                 .setPositiveButton(getString(R.string.wait), new DialogInterface.OnClickListener() {
                     public void onClick(final DialogInterface dialog, final int id) {
@@ -1061,7 +1064,7 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
                         entrySaver(taxon);
                     }
                 });
-        final AlertDialog alert = builder.create();
+        final AlertDialog alert = builder_unprecise_coords.create();
         alert.show();
     }
 

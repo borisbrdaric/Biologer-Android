@@ -63,7 +63,7 @@ public class RetrofitClient {
     public static RetrofitService getService(String base_url) {
         retrofit = getClient(base_url);
         RetrofitService service;
-        service = retrofit.create(RetrofitService .class);
+        service = retrofit.create(RetrofitService.class);
         return service;
     }
 }

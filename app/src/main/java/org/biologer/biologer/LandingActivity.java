@@ -120,16 +120,18 @@ public class LandingActivity extends AppCompatActivity
             @Override
             public void onResponse(Call<TaksoniResponse> call, Response<TaksoniResponse> response) {
                 // Check if version of taxa from Server and Preferences match. If server version is newer ask for update
-                if (Long.toString(response.body().getMeta().getLastUpdatedAt()).equals(SettingsManager.getDatabaseVersion())) {
-                    Log.i(TAG,"It looks like this taxonomic database is already up to date. Nothing to do here!");
-                } else  {
-                    Log.i(TAG,"Taxa database on the server seems to be newer that your version.");
-                    if (SettingsManager.getDatabaseVersion().equals("0")) {
-                        // If the database was never updated...
-                        buildAlertMessageEmptyTaxaDb();
+                if(response.body().getMeta() != null) {
+                    if (Long.toString(response.body().getMeta().getLastUpdatedAt()).equals(SettingsManager.getDatabaseVersion())) {
+                        Log.i(TAG,"It looks like this taxonomic database is already up to date. Nothing to do here!");
                     } else {
-                        // If the online database is more recent...
-                        buildAlertMessageNewerTaxaDb();
+                        Log.i(TAG, "Taxa database on the server seems to be newer that your version.");
+                        if (SettingsManager.getDatabaseVersion().equals("0")) {
+                            // If the database was never updated...
+                            buildAlertMessageEmptyTaxaDb();
+                        } else {
+                            // If the online database is more recent...
+                            buildAlertMessageNewerTaxaDb();
+                        }
                     }
                 }
             }
@@ -354,18 +356,21 @@ public class LandingActivity extends AppCompatActivity
         call.enqueue(new Callback<APIEntryResponse>() {
             @Override
             public void onResponse(Call<APIEntryResponse> call, Response<APIEntryResponse> response) {
-                App.get().getDaoSession().getEntryDao().delete(entryList.get(0));
                 if (response.isSuccessful()) {
+                    App.get().getDaoSession().getEntryDao().delete(entryList.get(0));
                     entryList.remove(0);
                     EventBus.getDefault().post(new DeleteEntryFromList());
                     m = 0;
+                    uploadEntry_step1();
+                } else {
+                    Log.i(TAG, "Upload entry didn’t work or some reason. No internet?");
+
                 }
-                uploadEntry_step1();
             }
 
             @Override
             public void onFailure(Call<APIEntryResponse> call, Throwable t) {
-                Log.i("GRESKA", t.getLocalizedMessage());
+                Log.i(TAG, t.getLocalizedMessage());
             }
         });
     }
@@ -385,12 +390,12 @@ public class LandingActivity extends AppCompatActivity
                 if (m == n) {
                     uploadEntry_step2();
                 }
-                Log.d("file", response.body().getFile());
+                Log.d(TAG, "File: " + response.body().getFile());
             }
 
             @Override
             public void onFailure(Call<UploadFileResponse> call, Throwable t) {
-                Log.d("file", t.getLocalizedMessage());
+                Log.d(TAG, t.getLocalizedMessage());
             }
         });
     }
