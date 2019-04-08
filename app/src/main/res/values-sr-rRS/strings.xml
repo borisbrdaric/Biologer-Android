@@ -156,4 +156,6 @@
     <string name="Biologer">Биологер</string>
     <string name="logging_in">Пријављујем се…</string>
     <string name="cannot_connect_token">Не могу да добијем одговор (токен) са сервера. Проверите интернет везу.</string>
+    <string name="database">База</string>
+    <string name="User">Корисник</string>
 </resources>

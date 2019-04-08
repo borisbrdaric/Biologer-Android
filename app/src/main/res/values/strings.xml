@@ -178,4 +178,6 @@
     <string name="Biologer">Biologer</string>
     <string name="logging_in">Logging in…</string>
     <string name="cannot_connect_token">Cannot get response (token) from the server. Check the internet connection.</string>
+    <string name="database">Database</string>
+    <string name="User">User</string>
 </resources>
