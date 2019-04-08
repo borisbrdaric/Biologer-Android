@@ -19,6 +19,7 @@
             android:layout_width="match_parent"
             android:layout_height="127dp"
             android:src="@drawable/banner"
+            android:contentDescription="@string/Biologer"
             android:layout_marginStart="50dp"
             android:layout_marginEnd="50dp"/>
 

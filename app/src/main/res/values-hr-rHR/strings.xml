@@ -153,4 +153,7 @@
     <string name="stage_larva">Larva</string>
     <string name="stage_pupa">Pupa</string>
     <string name="stage_adult">Adult</string>
+    <string name="Biologer">Biologer</string>
+    <string name="logging_in">Logging in…</string>
+    <string name="cannot_connect_token">Cannot get response (token) from the server. Check the internet connection.</string>
 </resources>

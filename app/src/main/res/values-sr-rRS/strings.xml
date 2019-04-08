@@ -153,4 +153,7 @@
     <string name="stage_larva">Ларва</string>
     <string name="stage_pupa">Лутка</string>
     <string name="stage_adult">Одрасли</string>
+    <string name="Biologer">Биологер</string>
+    <string name="logging_in">Пријављујем се…</string>
+    <string name="cannot_connect_token">Не могу да добијем одговор (токен) са сервера. Проверите интернет везу.</string>
 </resources>
