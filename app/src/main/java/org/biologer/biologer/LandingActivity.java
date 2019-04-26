@@ -73,8 +73,8 @@ public class LandingActivity extends AppCompatActivity
     List<APIEntry.Photo> photos = null;
 
     private DrawerLayout drawer;
-
     private FrameLayout progressBar;
+    private String last_updated;
 
     android.support.v4.app.Fragment fragment = null;
 
@@ -121,10 +121,11 @@ public class LandingActivity extends AppCompatActivity
             public void onResponse(Call<TaksoniResponse> call, Response<TaksoniResponse> response) {
                 // Check if version of taxa from Server and Preferences match. If server version is newer ask for update
                 if(response.body().getMeta() != null) {
-                    if (Long.toString(response.body().getMeta().getLastUpdatedAt()).equals(SettingsManager.getDatabaseVersion())) {
+                    last_updated = Long.toString(response.body().getMeta().getLastUpdatedAt());
+                    if (last_updated.equals(SettingsManager.getDatabaseVersion())) {
                         Log.i(TAG,"It looks like this taxonomic database is already up to date. Nothing to do here!");
                     } else {
-                        Log.i(TAG, "Taxa database on the server seems to be newer that your version.");
+                        Log.i(TAG, "Taxa database on the server (version: " + last_updated + ") seems to be newer that your version (" + SettingsManager.getDatabaseVersion() + ").");
                         if (SettingsManager.getDatabaseVersion().equals("0")) {
                             // If the database was never updated...
                             buildAlertMessageEmptyTaxaDb();
@@ -449,6 +450,7 @@ public class LandingActivity extends AppCompatActivity
                 .setNegativeButton(getString(R.string.no), new DialogInterface.OnClickListener() {
                     public void onClick(final DialogInterface dialog, final int id) {
                         // If user don’t update just ignore updates until next session
+                        SettingsManager.setDatabaseVersion(last_updated);
                         dialog.cancel();
                     }
                 });
