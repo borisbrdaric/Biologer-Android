@@ -613,6 +613,7 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
                 if (stadijumi[i].equals("larva")) {stadijumi[i] = getString(R.string.stage_larva);}
                 if (stadijumi[i].equals("pupa")) {stadijumi[i] = getString(R.string.stage_pupa);}
                 if (stadijumi[i].equals("adult")) {stadijumi[i] = getString(R.string.stage_adult);}
+                if (stadijumi[i].equals("juvenile")) {stadijumi[i] = getString(R.string.stage_juvenile);}
             }
             if (stadijumi.length == 0) {
                 Log.d(TAG, "No stages are available for " + getLatinName() + ".");

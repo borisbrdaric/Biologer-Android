@@ -158,4 +158,5 @@
     <string name="cannot_connect_token">Не могу да добијем одговор (токен) са сервера. Проверите интернет везу.</string>
     <string name="database">База</string>
     <string name="User">Корисник</string>
+    <string name="stage_juvenile">Младунац</string>
 </resources>
