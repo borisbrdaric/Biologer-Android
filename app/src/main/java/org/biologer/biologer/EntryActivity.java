@@ -71,8 +71,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class EntryActivity extends AppCompatActivity implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
 
@@ -102,6 +100,7 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
     private String slika1, slika2, slika3;
     private SwipeRefreshLayout swipe;
     private Entry currentItem;
+    private String locale_script = "en";
     Calendar calendar;
     SimpleDateFormat simpleDateFormat;
     // Get the data from the GreenDao database
@@ -172,16 +171,27 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
 
         // Get the system locale to translate names of the taxa
         final Locale locale = getCurrentLocale();
-        // Fill in the drop down menu with list of taxa
+        // Workaround to get the taxon names for Serbian Latin locale
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (locale.getLanguage().equals("sr") && locale.getScript().equals("Latn")) {
+                locale_script = "sr-Latn";
+            } else {
+                locale_script = locale.getLanguage();
+            }
+        } else {
+            locale_script = locale.getLanguage();
+        }
 
+        // Fill in the drop down menu with list of taxa
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, new String[1]);
         acTextView = findViewById(R.id.textview_list_of_taxa);
         acTextView.setAdapter(adapter);
         acTextView.setThreshold(2);
         // This linear layout holds the stages. We will hide it before the taxon is not selected.
         final TextInputLayout stages = findViewById(R.id.text_input_stages);
+        // When user type taxon name...
         acTextView.addTextChangedListener(new TextWatcher() {
-            final android.os.Handler handler = new android.os.Handler();
+            final Handler handler = new Handler();
             Runnable runnable;
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -197,7 +207,7 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
                          */
                         List<TaxonLocalization> taxaList = App.get().getDaoSession().getTaxonLocalizationDao()
                                 .queryBuilder()
-                                .where(TaxonLocalizationDao.Properties.Locale.eq(locale.getLanguage()),
+                                .where(TaxonLocalizationDao.Properties.Locale.eq(locale_script),
                                         TaxonLocalizationDao.Properties.LatinAndNativeName.like("%" + String.valueOf(input_text) + "%"))
                                 .limit(10)
                                 .list();
@@ -1143,11 +1153,11 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
     Locale getCurrentLocale(){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
             Locale locale = getResources().getConfiguration().getLocales().get(0);
-            Log.i(TAG, "Current System locale is set to " + locale.getDisplayLanguage() + ".");
+            Log.i(TAG, "Current System locale is set to " + locale.getDisplayLanguage() + " (" + locale.getLanguage() + "-" + locale.getScript() + ".");
             return locale;
         } else{
             Locale locale = getResources().getConfiguration().locale;
-            Log.i(TAG, "Current System locale is set to " + locale.getDisplayLanguage() + ".");
+            Log.i(TAG, "Current System locale is set to " + locale.getDisplayLanguage() + " (" + locale.getLanguage() + "-" + locale.getScript() + ").");
             return locale;
         }
     }
