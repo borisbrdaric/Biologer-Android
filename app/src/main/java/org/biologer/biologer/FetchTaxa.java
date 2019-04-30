@@ -11,9 +11,11 @@ import android.support.v4.app.NotificationCompat;import android.util.Log;
 
 import org.biologer.biologer.model.RetrofitClient;
 import org.biologer.biologer.model.Stage;
+import org.biologer.biologer.model.TaxonLocalization;
 import org.biologer.biologer.model.network.Stage6;
 import org.biologer.biologer.model.network.TaksoniResponse;
 import org.biologer.biologer.model.network.Taxa;
+import org.biologer.biologer.model.network.Translation;
 
 import java.util.List;
 
@@ -25,7 +27,7 @@ public class FetchTaxa extends Service {
     private static final String TAG = "Biologer.FetchTaxa";
 
     public static final String ACTION_START = "ACTION_START";
-    public static final String ACTION_STOP = "ACTION_STOP";
+    public static final String ACTION_PAUSE = "ACTION_PAUSE";
     public static final String ACTION_CANCEL = "ACTION_CANCEL";
     public static final String ACTION_RESUME = "ACTION_RESUME";
     private String stop_fetching = "no";
@@ -57,19 +59,15 @@ public class FetchTaxa extends Service {
                     case ACTION_START:
                         Log.i(TAG, "Action start selected, starting foreground service.");
                         // Clean previous data just in case
-                        SettingsManager.setDatabaseVersion("0");
-                        App.get().getDaoSession().getTaxonDao().deleteAll();
-                        App.get().getDaoSession().getStageDao().deleteAll();
+                        cleanDatabase();
                         stop_fetching = "no";
-                        currentPage = 1;
-                        SettingsManager.setTaxaLastPageUpdated(String.valueOf(currentPage));
                         // Start the service
                         notificationInitiate();
                         break;
-                    case ACTION_STOP:
-                        Log.i(TAG, "Action stop selected, pausing foreground service.");
+                    case ACTION_PAUSE:
+                        Log.i(TAG, "Action pause selected, pausing foreground service.");
                         SettingsManager.setTaxaLastPageUpdated(String.valueOf(currentPage));
-                        stop_fetching = "stop";
+                        stop_fetching = "pause";
                         stopForeground(true);
                         break;
                     case ACTION_CANCEL:
@@ -78,14 +76,14 @@ public class FetchTaxa extends Service {
                         if(stop_fetching.equals("no")) {
                             Log.i(TAG, "Action cancel selected, killing the paused foreground service.");
                             stop_fetching = "cancel";
-                            cleanDatabase();
+                            //cleanDatabase();
                             stopForeground(true);
                             notificationUpdateText(getString(R.string.notify_title_taxa_canceled), getString(R.string.notify_desc_taxa_canceled));
                             stopSelf();
                         } else {
                             Log.i(TAG, "Action cancel selected, killing the running foreground service.");
                             stop_fetching = "cancel";
-                            cleanDatabase();
+                            //cleanDatabase();
                             stopForeground(true);
                         }
                         break;
@@ -113,6 +111,7 @@ public class FetchTaxa extends Service {
         SettingsManager.setTaxaLastPageUpdated(String.valueOf(currentPage));
         App.get().getDaoSession().getTaxonDao().deleteAll();
         App.get().getDaoSession().getStageDao().deleteAll();
+        App.get().getDaoSession().getTaxonLocalizationDao().deleteAll();
     }
 
     private void notificationInitiate() {
@@ -126,7 +125,7 @@ public class FetchTaxa extends Service {
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
 
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, "biologer_taxa")
-                .setSmallIcon(R.drawable.ic_kornjaca)
+                .setSmallIcon(R.mipmap.ic_notification)
                 .setContentTitle(getString(R.string.notify_title_taxa))
                 .setContentText(getString(R.string.notify_desc_taxa))
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
@@ -157,7 +156,7 @@ public class FetchTaxa extends Service {
 
         // Add Pause button intent in notification.
         Intent pauseIntent = new Intent(this, FetchTaxa.class);
-        pauseIntent.setAction(ACTION_STOP);
+        pauseIntent.setAction(ACTION_PAUSE);
         PendingIntent pendingPauseIntent = PendingIntent.getService(this, 0, pauseIntent, 0);
         NotificationCompat.Action pauseAction = new NotificationCompat.Action(android.R.drawable.ic_media_pause, getString(R.string.pause_action), pendingPauseIntent);
 
@@ -168,7 +167,7 @@ public class FetchTaxa extends Service {
         NotificationCompat.Action cancelAction = new NotificationCompat.Action(android.R.drawable.ic_menu_close_clear_cancel, getString(R.string.cancel), pendingCancelIntent);
 
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, "biologer_taxa")
-                .setSmallIcon(R.drawable.ic_kornjaca)
+                .setSmallIcon(android.R.drawable.stat_sys_download)
                 .setContentTitle(getString(R.string.notify_title_taxa))
                 .setContentText(getString(R.string.notify_desc_taxa))
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
@@ -199,7 +198,6 @@ public class FetchTaxa extends Service {
         PendingIntent pendingResumeIntent = PendingIntent.getService(this, 0, resumeIntent, 0);
         NotificationCompat.Action resumeAction = new NotificationCompat.Action(android.R.drawable.ic_media_play, getString(R.string.resume_action), pendingResumeIntent);
 
-
         // Add Cancel button intent in notification.
         Intent cancelIntent = new Intent(this, FetchTaxa.class);
         cancelIntent.setAction(ACTION_CANCEL);
@@ -207,7 +205,7 @@ public class FetchTaxa extends Service {
         NotificationCompat.Action cancelAction = new NotificationCompat.Action(android.R.drawable.ic_menu_close_clear_cancel, getString(R.string.cancel), pendingCancelIntent);
 
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, "biologer_taxa")
-                .setSmallIcon(R.drawable.ic_kornjaca)
+                .setSmallIcon(android.R.drawable.stat_sys_download)
                 .setContentTitle(getString(R.string.notify_title_taxa))
                 .setContentText(getString(R.string.notify_desc_taxa))
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
@@ -233,7 +231,7 @@ public class FetchTaxa extends Service {
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
 
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, "biologer_taxa")
-                    .setSmallIcon(R.drawable.ic_kornjaca)
+                    .setSmallIcon(R.mipmap.ic_notification)
                     .setContentTitle(title)
                     .setContentText(description)
                     .setPriority(NotificationCompat.PRIORITY_DEFAULT)
@@ -253,13 +251,13 @@ public class FetchTaxa extends Service {
             return;
         }
 
-        Call<TaksoniResponse> call = RetrofitClient.getService(SettingsManager.getDatabaseName()).getTaxons(page, 40);
+        Call<TaksoniResponse> call = RetrofitClient.getService(SettingsManager.getDatabaseName()).getTaxons(page, 100);
 
         call.enqueue(new CallbackWithRetry<TaksoniResponse>(call) {
             @Override
             public void onResponse(Call<TaksoniResponse> call, Response<TaksoniResponse> response) {
                 // If user selected pause or cancel we will stop the script
-                if (stop_fetching.equals("stop")) {
+                if (stop_fetching.equals("pause")) {
                     Log.d(TAG, "Fetching of taxa data is paused by the user!");
                     notificationResumeFetchButton(progressStatus);
                     stopSelf();
@@ -272,24 +270,42 @@ public class FetchTaxa extends Service {
                 // Else fetch the next page of data
                 if (stop_fetching.equals("no")) {
                     if (1 == page) {
-                        App.get().getDaoSession().getStageDao().deleteAll();
-                        totalPages = response.body().getMeta().getLastPage();
+                        if (response.body() != null) {
+                            totalPages = response.body().getMeta().getLastPage();
+                        }
                     }
 
-                    List<Taxa> taxa = response.body().getData();
+                    if (response.body() != null) {
+                        List<Taxa> taxa = response.body().getData();
 
-                    // Variables used to update the Progress Bar status
-                    progressStatus = (page * 100 / totalPages);
-                    currentPage = page;
-                    notificationUpdateProgress(progressStatus);
+                        // Variables used to update the Progress Bar status
+                        progressStatus = (page * 100 / totalPages);
+                        currentPage = page;
+                        notificationUpdateProgress(progressStatus);
 
-                    for (Taxa taxon : taxa) {
-                        App.get().getDaoSession().getTaxonDao().insertOrReplace(taxon.toTaxon());
+                        for (Taxa taxon : taxa) {
+                            App.get().getDaoSession().getTaxonDao().insertOrReplace(taxon.toTaxon());
 
-                        List<Stage6> stages = taxon.getStages();
+                            List<Stage6> stages = taxon.getStages();
+                            List<Translation> translations = taxon.getTranslations();
 
-                        for (Stage6 stage : stages) {
-                            App.get().getDaoSession().getStageDao().insert(new Stage(null, stage.getName(), stage.getId(), taxon.getId()));
+                            for (Stage6 stage : stages) {
+                                App.get().getDaoSession().getStageDao().insert(new Stage(null, stage.getName(), stage.getId(), taxon.getId()));
+                            }
+
+                            for (Translation translation : translations) {
+                                String latin = taxon.getName();
+                                String nat = translation.getNativeName();
+                                if (nat != null) {
+                                    if (nat.equals("")) {
+                                        App.get().getDaoSession().getTaxonLocalizationDao().insert(new TaxonLocalization(null, latin, taxon.getId(), translation.getId(), translation.getLocale(), nat, latin));
+                                    } else {
+                                        App.get().getDaoSession().getTaxonLocalizationDao().insert(new TaxonLocalization(null, latin, taxon.getId(), translation.getId(), translation.getLocale(), nat, latin + " (" + nat + ")"));
+                                    }
+                                } else {
+                                    App.get().getDaoSession().getTaxonLocalizationDao().insert(new TaxonLocalization(null, latin, taxon.getId(), translation.getId(), translation.getLocale(), nat, latin));
+                                }
+                            }
                         }
                     }
 
@@ -300,6 +316,7 @@ public class FetchTaxa extends Service {
                     if (isLastPage(page)) {
                         // Inform the user of success
                         Log.i(TAG, "All taxa were successfully updated from the server!");
+                        // Stop the foreground service and update notification
                         stopForeground(true);
                         notificationUpdateText(getString(R.string.notify_title_taxa_updated), getString(R.string.notify_desc_taxa_updated));
                         // Set the preference to know when the taxonomic data was updates
@@ -314,13 +331,11 @@ public class FetchTaxa extends Service {
             @Override
             public void onFailure(Call<TaksoniResponse> call, Throwable t) {
                 // Remove partially retrieved data from the database
-                App.get().getDaoSession().getTaxonDao().deleteAll();
-                App.get().getDaoSession().getStageDao().deleteAll();
-                SettingsManager.setDatabaseVersion("0");
+                // cleanDatabase();
                 // Inform the user on failure and write log message
-                //Toast.makeText(getActivity(), getString(R.string.database_connect_error), Toast.LENGTH_LONG).show();
                 Log.e(TAG, "Application could not get data from a server!");
                 notificationUpdateText(getString(R.string.notify_title_taxa_failed), getString(R.string.notify_desc_taxa_failed));
+                stopSelf();
             }
         });
     }

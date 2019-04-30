@@ -17,13 +17,13 @@ public class IntroActivity extends AppIntro2 {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        addSlide(AppIntro2Fragment.newInstance(getString(R.string.Slide1_title), getString(R.string.first_slide), R.drawable.intro_login,
+        addSlide(AppIntro2Fragment.newInstance(getString(R.string.Slide1_title), getString(R.string.first_slide), R.drawable.intro1,
                 ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryLight)));
-        addSlide(AppIntro2Fragment.newInstance(getString(R.string.Slide2_title), getString(R.string.second_slide), R.drawable.intro_side_panel,
+        addSlide(AppIntro2Fragment.newInstance(getString(R.string.Slide2_title), getString(R.string.second_slide), R.drawable.intro2,
                 ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryLight)));
-        addSlide(AppIntro2Fragment.newInstance(getString(R.string.Slide3_title), getString(R.string.third_slide), R.drawable.intro_main_screen,
+        addSlide(AppIntro2Fragment.newInstance(getString(R.string.Slide3_title), getString(R.string.third_slide), R.drawable.intro3,
                 ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryLight)));
-        addSlide(AppIntro2Fragment.newInstance(getString(R.string.Slide4_title), getString(R.string.fourth_slide), R.drawable.intro_entry,
+        addSlide(AppIntro2Fragment.newInstance(getString(R.string.Slide4_title), getString(R.string.fourth_slide), R.drawable.intro4,
                 ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryLight)));
         //setNavBarColor(R.color.colorPrimaryLight);
         setFlowAnimation();

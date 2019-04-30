@@ -1,6 +1,10 @@
 package org.biologer.biologer;
 
+import android.app.Activity;
+import android.app.ActivityManager;
+import android.content.Context;
 import android.content.Intent;
+import android.drm.DrmStore;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -34,21 +38,22 @@ import java.util.ArrayList;
 public class LandingFragment extends Fragment {
 
     public static final int REQ_CODE_NEW_ENTRY = 1001;
-    private ListView list_entries;
     private Adapter adapter;
     private ArrayList<Entry> entries;
     private SwipeMenuListView listView;
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_landing, container, false);
+        // Load the entries from the database
         entries = (ArrayList<Entry>) App.get().getDaoSession().getEntryDao().loadAll();
-        if (entries == null) {
-            entries = new ArrayList<>();
+        // If there are no entries display the empty list
+        if (entries == null) {entries = new ArrayList<>();}
+        // If there are entries display the list with taxa
+        Activity activity = getActivity();
+        if (activity != null) {
+            adapter = new Adapter(activity.getApplicationContext(), entries);
         }
-        adapter = new Adapter(getActivity().getApplicationContext(), entries);
-
         listView = rootView.findViewById(R.id.list_entries);
         listView.setAdapter(adapter);
 
@@ -56,13 +61,16 @@ public class LandingFragment extends Fragment {
             @Override
             public void create(SwipeMenu menu) {
                 // create "delete" item
-                SwipeMenuItem deleteItem = new SwipeMenuItem(
-                        getActivity().getApplicationContext());
-                deleteItem.setBackground(new ColorDrawable(Color.rgb(0xFF,
-                        0xC2, 0xB3)));
-                deleteItem.setWidth(200);
-                deleteItem.setIcon(R.drawable.ic_delete);
-                menu.addMenuItem(deleteItem);
+                Activity activity = getActivity();
+                if (activity != null) {
+                    SwipeMenuItem deleteItem = new SwipeMenuItem(
+                            activity.getApplicationContext());
+                    deleteItem.setBackground(new ColorDrawable(Color.rgb(0xFF,
+                            0xC2, 0xB3)));
+                    deleteItem.setWidth(200);
+                    deleteItem.setIcon(R.drawable.ic_delete);
+                    menu.addMenuItem(deleteItem);
+                }
             }
         };
 
@@ -80,8 +88,11 @@ public class LandingFragment extends Fragment {
                         if (entries == null) {
                             entries = new ArrayList<>();
                         }
-                        adapter = new Adapter(getActivity().getApplicationContext(), entries);
-                        listView.setAdapter(adapter);
+                        Activity activity = getActivity();
+                        if (activity!= null) {
+                            adapter = new Adapter(activity.getApplicationContext(), entries);
+                            listView.setAdapter(adapter);
+                        }
                         break;
 
                 }
@@ -95,13 +106,13 @@ public class LandingFragment extends Fragment {
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                 Entry entry = adapter.getItem(position);
                 long l = entry.getId();
-                String m = String.valueOf(l);
-                //Toast.makeText(getActivity().getApplicationContext(), m, Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(getActivity().getApplicationContext(), DetailActivity.class);
-                //Entry entry = adapter.getItem(position);
-                intent.putExtra("extra_obj", m);
-                intent.putExtra("ID_nalaza", l);
-                startActivity(intent);
+                Activity activity = getActivity();
+                if (activity != null) {
+                    Intent intent = new Intent(activity.getApplicationContext(), EntryActivity.class);
+                    intent.putExtra("IS_NEW_ENTRY", "NO");
+                    intent.putExtra("ENTRY_ID", l);
+                    startActivity(intent);
+                }
             }
         });
 
@@ -110,7 +121,7 @@ public class LandingFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(), EntryActivity.class);
-                //startActivity(intent);
+                intent.putExtra("IS_NEW_ENTRY", "YES");
                 startActivityForResult(intent, REQ_CODE_NEW_ENTRY);
             }
         });

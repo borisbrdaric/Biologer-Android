@@ -16,7 +16,6 @@ public class PreferencesFragment extends PreferenceFragmentCompat {
 
     private static final String TAG = "Biologer.Preferences";
 
-    Boolean licence_has_changed = false;
     Boolean should_resume = false;
 
     @Override
@@ -110,7 +109,7 @@ public class PreferencesFragment extends PreferenceFragmentCompat {
                 @Override
                 public boolean onPreferenceChange(Preference preference, Object newValue) {
                     Log.d(TAG, "Data license changed to: " + newValue);
-                    licence_has_changed = true;
+                    updateLicense();
                     return true;
                 }
             });
@@ -121,25 +120,10 @@ public class PreferencesFragment extends PreferenceFragmentCompat {
                 @Override
                 public boolean onPreferenceChange(Preference preference, Object newValue) {
                     Log.d(TAG, "Data license changed to: " + newValue);
-                    licence_has_changed = true;
+                    updateLicense();
                     return true;
                 }
             });
-        }
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        Activity activity = getActivity();
-        if (activity != null) {
-            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(activity);
-            Log.d(TAG, "Data license set to: " + preferences.getString("data_license", "0"));
-            Log.d(TAG, "Image license set to: " + preferences.getString("image_license", "0"));
-            Log.d(TAG, "Project name is set to: " + preferences.getString("project_name", "0"));
-            if (licence_has_changed) {
-                updateLicense();
-            }
         }
     }
 
@@ -160,7 +144,10 @@ public class PreferencesFragment extends PreferenceFragmentCompat {
     }
 
     private void updateLicense() {
-        Intent update_licences = new Intent(getActivity(), UpdateLicenses.class);
-        getActivity().startService(update_licences);
+        Activity activity = getActivity();
+        if (activity != null) {
+            Intent update_licences = new Intent(activity, UpdateLicenses.class);
+            activity.startService(update_licences);
+        }
     }
 }

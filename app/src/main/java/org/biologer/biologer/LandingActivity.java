@@ -4,8 +4,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.support.design.widget.NavigationView;
 
 import android.support.v4.app.Fragment;
@@ -35,16 +38,21 @@ import org.biologer.biologer.bus.DeleteEntryFromList;
 import org.biologer.biologer.model.Entry;
 import org.biologer.biologer.model.APIEntry;
 import org.biologer.biologer.model.RetrofitClient;
+import org.biologer.biologer.model.Taxon;
+import org.biologer.biologer.model.TaxonLocalization;
+import org.biologer.biologer.model.TaxonLocalizationDao;
 import org.biologer.biologer.model.UploadFileResponse;
 import org.biologer.biologer.model.UserData;
 import org.biologer.biologer.model.network.APIEntryResponse;
 import org.biologer.biologer.model.network.TaksoniResponse;
 import org.biologer.biologer.model.network.UserDataResponse;
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.greendao.query.QueryBuilder;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -65,12 +73,8 @@ public class LandingActivity extends AppCompatActivity
     List<APIEntry.Photo> photos = null;
 
     private DrawerLayout drawer;
-
     private FrameLayout progressBar;
-
-    private FrameLayout progressBar4Taxa;
-    private ProgressBar progressBarTaxa;
-    private int oldProgress = 0;
+    private String last_updated;
 
     android.support.v4.app.Fragment fragment = null;
 
@@ -82,10 +86,6 @@ public class LandingActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         progressBar = findViewById(R.id.progress);
-        progressBar4Taxa = findViewById(R.id.progress_taxa);
-        progressBarTaxa = findViewById(R.id.progress_bar_taxa1);
-
-        Button button = findViewById(R.id.btn_cancel_update);
 
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.nav_open_drawer, R.string.nav_close_drawer);
@@ -111,13 +111,6 @@ public class LandingActivity extends AppCompatActivity
         } else {
             Log.d(TAG, "There is no network available. Application will not be able to get new data from the server.");
         }
-
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                cancelTaxaUpdate();
-            }
-        });
     }
 
     // Send a short request to the server that will return if the taxonomic tree is up to date.
@@ -127,16 +120,19 @@ public class LandingActivity extends AppCompatActivity
             @Override
             public void onResponse(Call<TaksoniResponse> call, Response<TaksoniResponse> response) {
                 // Check if version of taxa from Server and Preferences match. If server version is newer ask for update
-                if (Long.toString(response.body().getMeta().getLastUpdatedAt()).equals(SettingsManager.getDatabaseVersion())) {
-                    Log.i(TAG,"It looks like this taxonomic database is already up to date. Nothing to do here!");
-                } else  {
-                    Log.i(TAG,"Taxa database on the server seems to be newer that your version.");
-                    if (SettingsManager.getDatabaseVersion().equals("0")) {
-                        // If the database was never updated...
-                        buildAlertMessageEmptyTaxaDb();
+                if(response.body().getMeta() != null) {
+                    last_updated = Long.toString(response.body().getMeta().getLastUpdatedAt());
+                    if (last_updated.equals(SettingsManager.getDatabaseVersion())) {
+                        Log.i(TAG,"It looks like this taxonomic database is already up to date. Nothing to do here!");
                     } else {
-                        // If the online database is more recent...
-                        buildAlertMessageNewerTaxaDb();
+                        Log.i(TAG, "Taxa database on the server (version: " + last_updated + ") seems to be newer that your version (" + SettingsManager.getDatabaseVersion() + ").");
+                        if (SettingsManager.getDatabaseVersion().equals("0")) {
+                            // If the database was never updated...
+                            buildAlertMessageEmptyTaxaDb();
+                        } else {
+                            // If the online database is more recent...
+                            buildAlertMessageNewerTaxaDb();
+                        }
                     }
                 }
             }
@@ -270,7 +266,6 @@ public class LandingActivity extends AppCompatActivity
         uploadEntry_step1();
     }
 
-
     private void uploadEntry_step1() {
         n = 0;
         ArrayList<String> nizSlika = new ArrayList<>();
@@ -311,8 +306,8 @@ public class LandingActivity extends AppCompatActivity
         photos = new ArrayList<>();
         //napravi objekat apiEntry
         Entry entry = entryList.get(0);
-        apiEntry.setTaxonId((int) entry.getTaxon());
-        apiEntry.setTaxonSuggestion(entry.getTaxon_suggestion());
+        apiEntry.setTaxonId(entry.getTaxonId() != null ? entry.getTaxonId().intValue() : null);
+        apiEntry.setTaxonSuggestion(entry.getTaxonSuggestion());
         apiEntry.setYear(entry.getYear());
         apiEntry.setMonth(entry.getMonth());
         apiEntry.setDay(entry.getDay());
@@ -362,18 +357,21 @@ public class LandingActivity extends AppCompatActivity
         call.enqueue(new Callback<APIEntryResponse>() {
             @Override
             public void onResponse(Call<APIEntryResponse> call, Response<APIEntryResponse> response) {
-                App.get().getDaoSession().getEntryDao().delete(entryList.get(0));
                 if (response.isSuccessful()) {
+                    App.get().getDaoSession().getEntryDao().delete(entryList.get(0));
                     entryList.remove(0);
                     EventBus.getDefault().post(new DeleteEntryFromList());
                     m = 0;
+                    uploadEntry_step1();
+                } else {
+                    Log.i(TAG, "Upload entry didn’t work or some reason. No internet?");
+
                 }
-                uploadEntry_step1();
             }
 
             @Override
             public void onFailure(Call<APIEntryResponse> call, Throwable t) {
-                Log.i("GRESKA", t.getLocalizedMessage());
+                Log.i(TAG, t.getLocalizedMessage());
             }
         });
     }
@@ -393,12 +391,12 @@ public class LandingActivity extends AppCompatActivity
                 if (m == n) {
                     uploadEntry_step2();
                 }
-                Log.d("file", response.body().getFile());
+                Log.d(TAG, "File: " + response.body().getFile());
             }
 
             @Override
             public void onFailure(Call<UploadFileResponse> call, Throwable t) {
-                Log.d("file", t.getLocalizedMessage());
+                Log.d(TAG, t.getLocalizedMessage());
             }
         });
     }
@@ -437,32 +435,6 @@ public class LandingActivity extends AppCompatActivity
         }
     }
 
-    // Start a thread to monitor taxa update and remove the progress bar when updated
-    Thread updateStatusBar = new Thread() {
-        @Override
-        public void run() {
-            try {
-                sleep(2000);
-                while (FetchTaxa.isInstanceCreated()) {
-                    int progress_value = FetchTaxa.getProgressStatus();
-                    if (progress_value != oldProgress) {
-                        oldProgress = progress_value;
-                        progressBarTaxa.setProgress(progress_value);
-                    }
-                }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } finally {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        progressBar4Taxa.setVisibility(View.GONE);
-                    }
-                });
-            }
-        }
-    };
-
     protected void buildAlertMessageNewerTaxaDb() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         // intent used to start service for fetching taxa
@@ -472,14 +444,13 @@ public class LandingActivity extends AppCompatActivity
                 .setCancelable(false)
                 .setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
                     public void onClick(final DialogInterface dialog, final int id) {
-                        progressBar4Taxa.setVisibility(View.VISIBLE);
-                        updateStatusBar.start();
                         startService(fetchTaxa);
                     }
                 })
                 .setNegativeButton(getString(R.string.no), new DialogInterface.OnClickListener() {
                     public void onClick(final DialogInterface dialog, final int id) {
                         // If user don’t update just ignore updates until next session
+                        SettingsManager.setDatabaseVersion(last_updated);
                         dialog.cancel();
                     }
                 });
@@ -496,8 +467,6 @@ public class LandingActivity extends AppCompatActivity
                 .setCancelable(false)
                 .setPositiveButton(getString(R.string.contin), new DialogInterface.OnClickListener() {
                     public void onClick(final DialogInterface dialog, final int id) {
-                        progressBar4Taxa.setVisibility(View.VISIBLE);
-                        updateStatusBar.start();
                         startService(fetchTaxa);
                     }
                 })
@@ -517,7 +486,6 @@ public class LandingActivity extends AppCompatActivity
                 .setCancelable(false)
                 .setPositiveButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
                     public void onClick(final DialogInterface dialog, final int id) {
-                        progressBar4Taxa.setVisibility(View.GONE);
                         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
                         Intent fetchTaxa = new Intent(LandingActivity.this, FetchTaxa.class);
                         fetchTaxa.setAction(FetchTaxa.ACTION_CANCEL);
@@ -616,6 +584,7 @@ public class LandingActivity extends AppCompatActivity
         App.get().getDaoSession().getTaxonDao().deleteAll();
         App.get().getDaoSession().getStageDao().deleteAll();
         App.get().getDaoSession().getUserDataDao().deleteAll();
+        App.get().getDaoSession().getTaxonLocalizationDao().deleteAll();
     }
 
     private void showLandingFragment() {
@@ -625,4 +594,5 @@ public class LandingActivity extends AppCompatActivity
         ft.addToBackStack("landing fragment");
         ft.commit();
     }
+
 }

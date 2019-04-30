@@ -2,6 +2,7 @@ package org.biologer.biologer;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
@@ -24,6 +25,10 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import org.biologer.biologer.model.RetrofitClient;
+import org.biologer.biologer.model.UserData;
+import org.biologer.biologer.model.network.ElevationResponse;
+import org.biologer.biologer.model.network.UserDataResponse;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -35,6 +40,11 @@ import java.net.URL;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import freemarker.template.utility.StringUtil;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private static final String TAG = "Biologer.GoogleMaps";
@@ -42,7 +52,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private GoogleMap mMap;
     private String acc = "0.0";
     private String elevation = "0.0";
-    private FloatingActionButton fbtn_set;
     ImageView fbtn_mapType;
     private EditText text_imput_acc;
     private LatLng latlong;
@@ -111,10 +120,34 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         if (mMap != null) {
             // Add marker at the GPS position on the map
-            mMap.addMarker(new MarkerOptions().position(latlong).title(getString(R.string.you_are_here)).draggable(true));
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latlong, 16));
-            mMap.animateCamera(CameraUpdateFactory.zoomIn());
-            mMap.animateCamera(CameraUpdateFactory.zoomTo(16), 1000, null);
+            if (latlong.latitude == 0.0) {
+                if (SettingsManager.getDatabaseName().equals("https://biologer.hr")) {
+                    mMap.addMarker(new MarkerOptions().position(new LatLng(16.377937, 16.377937)).title(getString(R.string.you_are_here)).draggable(true));
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(16.377937, 16.377937), 7));
+                    mMap.animateCamera(CameraUpdateFactory.zoomIn());
+                    mMap.animateCamera(CameraUpdateFactory.zoomTo(7), 1000, null);
+                }
+
+                if (SettingsManager.getDatabaseName().equals("https://biologer.org")) {
+                    mMap.addMarker(new MarkerOptions().position(new LatLng(44.150681, 20.725708)).title(getString(R.string.you_are_here)).draggable(true));
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(44.150681, 20.725708), 7));
+                    mMap.animateCamera(CameraUpdateFactory.zoomIn());
+                    mMap.animateCamera(CameraUpdateFactory.zoomTo(7), 1000, null);
+                }
+
+                if (SettingsManager.getDatabaseName().equals("https://dev.biologer.org")) {
+                    mMap.addMarker(new MarkerOptions().position(new LatLng(44.150681, 20.725708)).title(getString(R.string.you_are_here)).draggable(true));
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(44.150681, 20.725708), 7));
+                    mMap.animateCamera(CameraUpdateFactory.zoomIn());
+                    mMap.animateCamera(CameraUpdateFactory.zoomTo(7), 1000, null);
+                }
+
+            } else {
+                mMap.addMarker(new MarkerOptions().position(latlong).title(getString(R.string.you_are_here)).draggable(true));
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latlong, 16));
+                mMap.animateCamera(CameraUpdateFactory.zoomIn());
+                mMap.animateCamera(CameraUpdateFactory.zoomTo(16), 1000, null);
+            }
 
             mMap.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
                 @Override
@@ -127,7 +160,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
                 @Override
                 public void onMarkerDragEnd(Marker marker) {
-                    setlatlong(marker.getPosition().latitude, marker.getPosition().longitude);
+                    setLatLong(marker.getPosition().latitude, marker.getPosition().longitude);
                 }
 
             });
@@ -209,34 +242,15 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             if (text_imput_acc.getText().toString().length() != 0) {
                 setAcc(text_imput_acc.getText().toString());
             }
-            // Get the elevation data form Google Elevation API
-            try {
-                getElevation(latlong);
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
 
-            // Foward the result to previous Activity
-            Intent returnLocation = new Intent();
-            returnLocation.putExtra("google_map_accuracy", acc);
-            returnLocation.putExtra("google_map_latlong", latlong);
-            returnLocation.putExtra("google_map_elevation", elevation);
-            setResult(3, returnLocation);
-
-            Log.d(TAG, "Latitude: " + latlong.latitude);
-            Log.d(TAG, "Longitude: " + latlong.longitude);
-            Log.d(TAG, "Accuracy: " + acc);
-            Log.d(TAG, "Elevation: " + elevation);
-
-            finish();
+            // Get elevation from biologer server, save all data and exit
+            updateElevationAndSave(latlong);
         }
         return true;
     }
 
     // This function calls Google Elevation API
-    public void getElevation(LatLng location) throws IOException, JSONException {
+    public void getGoogleElevation(LatLng location) throws IOException, JSONException {
 
         final URL url = new URL("https://maps.googleapis.com/maps/api/elevation/json?locations=" +
                 String.valueOf(location.latitude) + "," +
@@ -301,6 +315,48 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
+    private void updateElevationAndSave(LatLng coordinates) {
+        Call<ElevationResponse> call = RetrofitClient.getService(SettingsManager.getDatabaseName()).getElevation(coordinates.latitude, coordinates.longitude);
+        Log.d(TAG, "Requesting altitude for Latitude: " + coordinates.latitude + "; Longitude: " + coordinates.longitude);
+        call.enqueue(new Callback<ElevationResponse>() {
+            @Override
+            public void onResponse(Call<ElevationResponse> call, Response<ElevationResponse> response) {
+                if (response.body() != null) {
+                    elevation = String.valueOf(response.body().getElevation());
+                    Log.d(TAG, "Elevation for this point is " + String.valueOf(elevation) + ".");
+                    saveAndExit();
+                } else {
+                    elevation = "0.0";
+                    saveAndExit();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ElevationResponse> call, Throwable t) {
+                Log.d(TAG, "No elevation returned from server...");
+                elevation = "0.0";
+
+                saveAndExit();
+            }
+        });
+    }
+
+    private void saveAndExit() {
+        // Forward the result to previous Activity
+        Intent returnLocation = new Intent();
+        returnLocation.putExtra("google_map_accuracy", acc);
+        returnLocation.putExtra("google_map_latlong", latlong);
+        returnLocation.putExtra("google_map_elevation", elevation);
+        setResult(3, returnLocation);
+
+        Log.d(TAG, "Latitude: " + latlong.latitude);
+        Log.d(TAG, "Longitude: " + latlong.longitude);
+        Log.d(TAG, "Accuracy: " + acc);
+        Log.d(TAG, "Elevation: " + elevation);
+
+        finish();
+    }
+
     public String getAcc() {
         return acc;
     }
@@ -309,11 +365,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         this.acc = acc;
     }
 
-    public LatLng getlatlong() {
+    public LatLng getLatLong() {
         return latlong;
     }
 
-    public void setlatlong(double lat, double lon) {
+    public void setLatLong(double lat, double lon) {
         this.latlong = new LatLng(lat, lon);
     }
 }

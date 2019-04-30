@@ -1,14 +1,20 @@
 package org.biologer.biologer;
 
-import android.app.Application;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.os.Build;
 import android.support.multidex.MultiDexApplication;
+import android.util.Log;
 
 import org.biologer.biologer.model.DaoMaster;
 import org.biologer.biologer.model.DaoSession;
+import org.biologer.biologer.model.Taxon;
+import org.biologer.biologer.model.TaxonLocalization;
+import org.biologer.biologer.model.TaxonLocalizationDao;
 import org.greenrobot.greendao.database.Database;
+
+import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by brjovanovic on 12/24/2017.
@@ -16,9 +22,10 @@ import org.greenrobot.greendao.database.Database;
 
 public class App extends MultiDexApplication {
 
+    private static final String TAG = "Biologer.App";
+
     private static App app;
     private DaoSession daoSession;
-    public static final int NOTIFICATION_TAXA = 98;
 
     @Override
     public void onCreate() {
@@ -30,7 +37,7 @@ public class App extends MultiDexApplication {
         createNotificationChannel();
 
         // For initialisation of GreenDAO database
-        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this, "notes-db");
+        GreenDaoInitialization helper = new GreenDaoInitialization(this, "notes-db");
         Database db = helper.getWritableDb();
         daoSession = new DaoMaster(db).newSession();
     }

@@ -49,9 +49,6 @@ public class Taxa {
     @JsonProperty("activity")
     private List<Object> activity = null;
 
-
-
-
     public Taxon toTaxon(){
         Taxon taxon = new Taxon(id, name);
         return taxon;
