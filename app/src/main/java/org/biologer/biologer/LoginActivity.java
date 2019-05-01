@@ -45,7 +45,7 @@ public class LoginActivity extends AppCompatActivity {
      should put the key in ~/.gradle/gradle.properties.
       */
     String rsKey = BuildConfig.BiologerRS_Key;
-    String hrKey = BuildConfig.BiologerHR_Key;
+    String devRsKey = BuildConfig.DevBiologerRS_Key;
 
     Call <LoginResponse> login;
 
@@ -145,10 +145,13 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         // Change the call according to the database selected
-        if (database_name.equals("https://biologer.hr")) {
-            login = RetrofitClient.getService(database_name).login("password", "2", hrKey, "*", et_username.getText().toString(), et_password.getText().toString());
+        if (database_name.equals("https://biologer.org")) {
+            login = RetrofitClient.getService(database_name).login("password", "3", rsKey, "*", et_username.getText().toString(), et_password.getText().toString());
+        } else if (database_name.equals("https://dev.biologer.org")){
+            login = RetrofitClient.getService(database_name).login("password", "4", devRsKey, "*", et_username.getText().toString(), et_password.getText().toString());
         } else {
-            login = RetrofitClient.getService(database_name).login("password", "2", rsKey, "*", et_username.getText().toString(), et_password.getText().toString());
+            Log.e(TAG, "Invalid database name: " + database_name);
+            return;
         }
         Log.d(TAG, "Logging into " + database_name + " as user " + et_username.getText().toString());
 
