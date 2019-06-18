@@ -70,7 +70,7 @@ public class Adapter extends BaseAdapter {
 
             convertView = inflater.inflate(R.layout.list_item, parent, false);
 
-            viewHolder.taxon = (TextView) convertView.findViewById(R.id.taxon);
+            viewHolder.taxon = (TextView) convertView.findViewById(R.id.taxon_name);
             viewHolder.stage = (TextView) convertView.findViewById(R.id.stage);
 //            viewHolder.entryId = (TextView) convertView.findViewById(R.id.entryId);
             viewHolder.slika = (ImageView) convertView.findViewById(slika);
@@ -81,23 +81,20 @@ public class Adapter extends BaseAdapter {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        long j = getItem(position).getTaxon();
-        Taxon t = App.get().getDaoSession().getTaxonDao().load(j);
-        if (t != null)
-            viewHolder.taxon.setText(t.getName());
+        Entry taxon_entry = getItem(position);
+        if (taxon_entry.getTaxonSuggestion() != null) {
+            viewHolder.taxon.setText(taxon_entry.getTaxonSuggestion());
+        } else {
+            viewHolder.taxon.setText("");
+        }
 
-        if (getItem(position).getStage() != null) {
-            long i = getItem(position).getStage();
-            //Stage s = (Stage) App.get().getDaoSession().getStageDao().load(i);
+        if (taxon_entry.getStage() != null) {
+            long i = taxon_entry.getStage();
             Stage s = App.get().getDaoSession().getStageDao().queryBuilder().where(StageDao.Properties.StageId.eq(i)).limit(1).unique();
             viewHolder.stage.setText(s.getName());
         } else {
             viewHolder.stage.setText("");
         }
-
-//        long id = getItem(position).getId();
-//        String entryId = String.valueOf(id);
-//        viewHolder.entryId.setText(entryId);
 
         if (getItem(position).getSlika1() != null) {
             koristiSliku = getItem(position).getSlika1();

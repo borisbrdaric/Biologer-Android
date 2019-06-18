@@ -58,29 +58,35 @@ public class UpdateLicenses extends Service {
                 call.enqueue(new Callback<UserDataResponse>() {
                     @Override
                     public void onResponse(Call<UserDataResponse> call, Response<UserDataResponse> response) {
-                        UserDataSer user = response.body().getData();
-                        final String email = user.getEmail();
-                        String name = user.getFullName();
-                        int server_data_license = user.getSettings().getDataLicense();
-                        int server_image_license = user.getSettings().getImageLicense();
+                        if (response.isSuccessful()) {
+                            if (response.body().getData() != null) {
+                                UserDataSer user = response.body().getData();
+                                final String email = user.getEmail();
+                                String name = user.getFullName();
+                                int server_data_license = user.getSettings().getDataLicense();
+                                int server_image_license = user.getSettings().getImageLicense();
 
-                        // If both data and image licence should be retrieved from server
-                        if (data_license.equals("0") && image_license.equals("0")) {
-                            UserData uData = new UserData(getUserID(), email, name, server_data_license, server_image_license);
-                            App.get().getDaoSession().getUserDataDao().insertOrReplace(uData);
-                            Log.d(TAG, "Image and data licenses updated from the server.");
-                        }
-                        // If only Data License should be retrieved from server
-                        if (data_license.equals("0") && !image_license.equals("0")) {
-                            UserData uData = new UserData(getUserID(), email, name, server_data_license, Integer.valueOf(image_license));
-                            App.get().getDaoSession().getUserDataDao().insertOrReplace(uData);
-                            Log.d(TAG, "Data licenses updated from the server. Image licence set by user to: " + image_license);
-                        }
-                        // If only Image License should be retrieved from server
-                        if (!data_license.equals("0") && image_license.equals("0")) {
-                            UserData uData = new UserData(getUserID(), email, name, Integer.valueOf(data_license), server_image_license);
-                            App.get().getDaoSession().getUserDataDao().insertOrReplace(uData);
-                            Log.d(TAG, "Image licenses updated from the server. Data license set by user to: " + data_license);
+                                // If both data and image licence should be retrieved from server
+                                if (data_license.equals("0") && image_license.equals("0")) {
+                                    UserData uData = new UserData(getUserID(), email, name, server_data_license, server_image_license);
+                                    App.get().getDaoSession().getUserDataDao().insertOrReplace(uData);
+                                    Log.d(TAG, "Image and data licenses updated from the server.");
+                                }
+                                // If only Data License should be retrieved from server
+                                if (data_license.equals("0") && !image_license.equals("0")) {
+                                    UserData uData = new UserData(getUserID(), email, name, server_data_license, Integer.valueOf(image_license));
+                                    App.get().getDaoSession().getUserDataDao().insertOrReplace(uData);
+                                    Log.d(TAG, "Data licenses updated from the server. Image licence set by user to: " + image_license);
+                                }
+                                // If only Image License should be retrieved from server
+                                if (!data_license.equals("0") && image_license.equals("0")) {
+                                    UserData uData = new UserData(getUserID(), email, name, Integer.valueOf(data_license), server_image_license);
+                                    App.get().getDaoSession().getUserDataDao().insertOrReplace(uData);
+                                    Log.d(TAG, "Image licenses updated from the server. Data license set by user to: " + data_license);
+                                }
+                            } else {
+                                Log.e(TAG, "Application could not get user’s licences from the server.");
+                            }
                         }
                     }
 

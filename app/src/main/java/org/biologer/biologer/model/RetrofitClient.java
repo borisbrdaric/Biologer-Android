@@ -9,11 +9,13 @@ import org.biologer.biologer.SettingsManager;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
@@ -27,9 +29,13 @@ public class RetrofitClient {
             mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
+            HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+            logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+
             OkHttpClient client = new OkHttpClient.Builder()
-                    .readTimeout(5, TimeUnit.SECONDS)
+                    .readTimeout(15, TimeUnit.SECONDS)
                     .connectTimeout(60, TimeUnit.SECONDS)
+                    .writeTimeout(5, TimeUnit.MINUTES)
                     .addInterceptor(
                             new Interceptor() {
                                 @Override
@@ -43,6 +49,7 @@ public class RetrofitClient {
                                 }
                             }
                     )
+                    .addInterceptor(logging)
                     .build();
 
             retrofit = new Retrofit.Builder()
@@ -57,7 +64,7 @@ public class RetrofitClient {
     public static RetrofitService getService(String base_url) {
         retrofit = getClient(base_url);
         RetrofitService service;
-        service = retrofit.create(RetrofitService .class);
+        service = retrofit.create(RetrofitService.class);
         return service;
     }
 }

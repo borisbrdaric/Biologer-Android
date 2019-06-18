@@ -4,6 +4,7 @@ import org.biologer.biologer.model.APIEntry;
 import org.biologer.biologer.model.LoginResponse;
 import org.biologer.biologer.model.UploadFileResponse;
 import org.biologer.biologer.model.network.APIEntryResponse;
+import org.biologer.biologer.model.network.ElevationResponse;
 import org.biologer.biologer.model.network.TaksoniResponse;
 import org.biologer.biologer.model.network.UserDataResponse;
 
@@ -47,7 +48,6 @@ public interface RetrofitService {
     @POST("api/uploads/photos")
     Call<UploadFileResponse> uploadFile( @Part MultipartBody.Part file);
 
-    //@FormUrlEncoded
     @Headers({"Accept: application/json"
     ,"content-type: application/json"})
     @POST("api/field-observations")
@@ -55,4 +55,9 @@ public interface RetrofitService {
 
     @GET("/api/my/profile")
     Call<UserDataResponse> getUserData();
+
+    @POST("/api/elevation")
+    Call<ElevationResponse> getElevation(@Query("latitude") double latitude,
+                                         @Query("longitude") double longitude);
+
 }

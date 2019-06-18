@@ -1,5 +1,6 @@
 package org.biologer.biologer;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
@@ -35,6 +36,7 @@ public class LoginActivity extends AppCompatActivity {
     TextView tv_wrongPass;
     TextView tv_wrongEmail;
     TextView tv_devDatabase;
+    Button loginButton;
     // Get the value for KEY.DATABASE_NAME
     String key_database_name = SettingsManager.getDatabaseName();
     String database_name = key_database_name;
@@ -79,7 +81,7 @@ public class LoginActivity extends AppCompatActivity {
 
         // Android 4.4 (KitKat) compatibility: Set button listener programmatically.
         // Login button.
-        Button loginButton = (Button) findViewById(R.id.btn_login);
+        loginButton = (Button) findViewById(R.id.btn_login);
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -87,7 +89,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
         // Register link.
-        CustomTextView registerTextView = (CustomTextView) findViewById(R.id.ctv_register);
+        TextView registerTextView = (TextView) findViewById(R.id.ctv_register);
         registerTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -95,7 +97,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
         // Forgot password link.
-        CustomTextView forgotPassTextView = (CustomTextView) findViewById(R.id.ctv_forgotPass);
+        TextView forgotPassTextView = (TextView) findViewById(R.id.ctv_forgotPass);
         forgotPassTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -124,9 +126,16 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
+    // Run when user click the login button
     public void onLogin(View view) {
+        loginButton.setEnabled(false);
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(et_username.getText().toString());
+
+        final ProgressDialog progressDialog = new ProgressDialog(LoginActivity.this);
+        progressDialog.setIndeterminate(true);
+        progressDialog.setMessage(getString(R.string.logging_in));
+        progressDialog.show();
 
         // On new login clear the previous error messages.
         tv_wrongPass.setText("");
@@ -136,11 +145,15 @@ public class LoginActivity extends AppCompatActivity {
         if (!(matcher.matches()))
         {
             tv_wrongEmail.setText(R.string.valid_email);
+            loginButton.setEnabled(true);
+            progressDialog.dismiss();
             return;
         }
         if (!(et_password.getText().length() > 3))
         {
             tv_wrongPass.setText(R.string.valid_pass);
+            loginButton.setEnabled(true);
+            progressDialog.dismiss();
             return;
         }
 
@@ -167,12 +180,16 @@ public class LoginActivity extends AppCompatActivity {
                 }
                 else {
                     tv_wrongPass.setText(R.string.wrong_creds);
+                    loginButton.setEnabled(true);
+                    progressDialog.dismiss();
                     Log.d(TAG, String.valueOf(response.body()));
                 }
             }
             @Override
             public void onFailure(Call<LoginResponse> login, Throwable t) {
-                Toast.makeText(LoginActivity.this, "Cannot get response from the server (token)", Toast.LENGTH_LONG).show();
+                Toast.makeText(LoginActivity.this, getString(R.string.cannot_connect_token), Toast.LENGTH_LONG).show();
+                loginButton.setEnabled(true);
+                progressDialog.dismiss();
                 Log.e(TAG, "Cannot get response from the server (token)");
             }
         });

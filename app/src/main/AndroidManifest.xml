@@ -35,7 +35,7 @@
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyDsLjNreiHg47Mif-CheIYB3uGtXQekTtY" />
+            android:value="AIzaSyBGj0mLw3Zby0Vhf3DeWQTgsOVbLa4b9kw" />
 
         <provider
             android:name="android.support.v4.content.FileProvider"
@@ -83,13 +83,6 @@
                     android:scheme="https"
                     android:host="biologer.org" />
             </intent-filter>
-        </activity>
-        <activity
-            android:name=".DetailActivity"
-            android:windowSoftInputMode="stateAlwaysHidden|adjustResize">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="org.biologer.biologer.LandingActivity" />
         </activity>
         <activity android:name=".IntroActivity" />
 

@@ -24,12 +24,12 @@
     <string name="more">More…</string>
     <string name="naziv_taksona">Taxon name</string>
     <string name="pleaseSelect">Please select</string>
-    <string name="broj_jedinki">Number</string>
+    <string name="broj_jedinki">Number of individuals</string>
     <string name="pol">Sex</string>
     <string name="M">Male</string>
     <string name="Z">Female</string>
     <string name="razvojni_stadijum">Stage</string>
-    <string name="stage_hint">Please select taxon first</string>
+    <string name="stage_hint">Developemental stage of the taxon</string>
     <string name="jedinka_je">Found dead?</string>
     <string name="ziva">live</string>
     <string name="mrtva">dead</string>
@@ -97,13 +97,13 @@
 
     <!--First time run-->
     <string name="Slide1_title">Database options</string>
-    <string name="first_slide">This appliation can connect to multiple Biologer databases. You can start by choosing your preferred database and registering online.</string>
+    <string name="first_slide">Biologer appliation can connect to multiple databases. You should start by choosing your preferred database and registering online.</string>
     <string name="Slide2_title">Navigation is easy</string>
-    <string name="second_slide">Side panel provides all the shortcuts you need and setup your application.</string>
+    <string name="second_slide">Side panel provides all the shortcuts and settings you need. Just swipe the screen to the right and you are ready to go.</string>
     <string name="Slide3_title">The main screen</string>
     <string name="third_slide">From the main screen you can add, edit or delete your observations and send the data to one of our servers.</string>
     <string name="Slide4_title">New observations</string>
-    <string name="fourth_slide">Adding data is easy! Select the species or photos and Biologer will do the rest. Here you can also tune the location with the map or better describe your finding.</string>
+    <string name="fourth_slide">Adding data is easy! Suggest the species, add some photos and Biologer will do the rest. Advanced options can also be unlocked from the Preferences.</string>
     <string name="unprecise_coordinates">The coordate precision is less than 25 m. Would you like to wait for precise location?</string>
     <string name="save_anyway">Save anyway</string>
     <string name="database_empty">Biologer’s taxa database is not downloaded from the server yet. Ensure that you have a stabile internet connection to continue.</string>
@@ -163,4 +163,22 @@
     <string name="notify_desc_taxa_paused">Downloading new taxonomic database from the server is paused.</string>
     <string name="notify_title_taxa_canceled">Update canceled</string>
     <string name="notify_desc_taxa_canceled">Downloading new taxonomic database is canceled by the user.</string>
+    <string name="invalid_taxon_name">It looks like you selected an unknown taxon. Do you wont biologer to save this taxon anyway?</string>
+    <string name="image_frame">Image frame</string>
+    <string name="camera">Camera</string>
+    <string name="gallery">Gallery</string>
+    <string name="map">Map</string>
+    <string name="advanced_entry">Advanced observation entry</string>
+    <string name="advanced_entry_desc">Enables advanced options that could be entered with your occurrence (i.e. number of individuals, stage, sex).</string>
+    <string name="select_sex">Sex of the individual</string>
+    <string name="stage_egg">Egg</string>
+    <string name="stage_larva">Larva</string>
+    <string name="stage_pupa">Pupa</string>
+    <string name="stage_adult">Adult</string>
+    <string name="Biologer">Biologer</string>
+    <string name="logging_in">Logging in…</string>
+    <string name="cannot_connect_token">Cannot get response (token) from the server. Check the internet connection.</string>
+    <string name="database">Database</string>
+    <string name="User">User</string>
+    <string name="stage_juvenile">Juvenile</string>
 </resources>
