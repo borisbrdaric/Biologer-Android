@@ -108,7 +108,7 @@ public class LandingFragment extends Fragment {
                 long l = entry.getId();
                 Activity activity = getActivity();
                 if (activity != null) {
-                    Intent intent = new Intent(activity.getApplicationContext(), EntryActivity.class);
+                    Intent intent = new Intent(activity.getApplicationContext(), EntryActivityOtis.class);
                     intent.putExtra("IS_NEW_ENTRY", "NO");
                     intent.putExtra("ENTRY_ID", l);
                     startActivity(intent);
@@ -120,7 +120,7 @@ public class LandingFragment extends Fragment {
         fbtn_add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getActivity(), EntryActivity.class);
+                Intent intent = new Intent(getActivity(), EntryActivityOtis.class);
                 intent.putExtra("IS_NEW_ENTRY", "YES");
                 startActivityForResult(intent, REQ_CODE_NEW_ENTRY);
             }

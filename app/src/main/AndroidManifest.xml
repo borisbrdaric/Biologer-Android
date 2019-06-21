@@ -52,10 +52,10 @@
             android:label="@string/title_activity_map">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="org.biologer.biologer.EntryActivity" />
+                android:value="org.biologer.biologer.EntryActivityOtis" />
         </activity>
         <activity
-            android:name=".EntryActivity"
+            android:name=".EntryActivityOtis"
             android:windowSoftInputMode="stateAlwaysHidden|adjustResize">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

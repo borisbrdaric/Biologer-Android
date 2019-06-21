@@ -15,6 +15,8 @@
     <string name="devDatabase">This is only for developers!</string>
 
     <!--  Unos  -->
+    <string name="observer_coordinates">Observer coordinates:</string>
+    <string name="specimen_coordinates">Specimen coordinates:</string>
     <string name="GPSaccuracy">Coordinate accuracy:</string>
     <string name="latitude">Latitude:</string>
     <string name="longitude">Longitude:</string>
@@ -34,6 +36,8 @@
     <string name="ziva">live</string>
     <string name="mrtva">dead</string>
     <string name="razlog_smrti">Cause of death</string>
+    <string name="observation_length">Observation lenght</string>
+    <string name="habitat">Habitat</string>
     <string name="komentar">Comment</string>
     <string name="cancel">Cancel</string>
     <string name="sacuvaj">Save</string>
