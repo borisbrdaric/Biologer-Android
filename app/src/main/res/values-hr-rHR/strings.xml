@@ -158,4 +158,8 @@
     <string name="database">Baza podataka</string>
     <string name="User">Korisnik</string>
     <string name="stage_juvenile">Mladunac</string>
+    <string name="observation_length">Duljina posmatranja</string>
+    <string name="observer_coordinates">Koordinate posmatrača</string>
+    <string name="specimen_coordinates">Koordinate jedinke</string>
+    <string name="habitat">Stanište</string>
 </resources>
