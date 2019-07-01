@@ -75,7 +75,6 @@ import java.util.regex.Pattern;
 public class EntryActivityOtis extends AppCompatActivity implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
 
     private static final String TAG = "Biologer.EntryOtis";
-    private static final String TAXON_NAME = "Otis tarda";
 
     /**
      * Regular expression used to parse CSV string found in comment field.
@@ -142,7 +141,7 @@ public class EntryActivityOtis extends AppCompatActivity implements View.OnClick
         setSupportActionBar(toolbar);
         ActionBar actionbar = getSupportActionBar();
         if (actionbar != null) {
-            actionbar.setTitle(getString(R.string.entry_title) + ": " + TAXON_NAME);
+            actionbar.setTitle(getString(R.string.entry_title) + ": " + SettingsManager.PREFERRED_TAXON_NAME);
             actionbar.setDisplayHomeAsUpEnabled(true);
             actionbar.setDisplayShowHomeEnabled(true);
         }
@@ -1307,7 +1306,7 @@ public class EntryActivityOtis extends AppCompatActivity implements View.OnClick
     private String getLatinName() {
 //        String entered_taxon_name = acTextView.getText().toString();
 //        return entered_taxon_name.split(" \\(")[0];
-        return TAXON_NAME;
+        return SettingsManager.PREFERRED_TAXON_NAME;
     }
 
     /**

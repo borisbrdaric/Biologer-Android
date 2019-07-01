@@ -11,6 +11,13 @@ public class SettingsManager {
 
     private static final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(App.get());
 
+    /**
+     * Biologer Otis application is using this taxon name as preferred.
+     * Special processing is applied for this taxon, e.g. there is specific
+     * window for data entry.
+     */
+    public static final String PREFERRED_TAXON_NAME = "Otis tarda";
+
     public enum KEY {
         token, FIRST_LAUNCH, DATABASE_NAME, DATABASE_VERSION, GOOGLE_MAP_TYPE, PROJECT_NAME, TAXA_LAST_PAGE_UPDATED
     }

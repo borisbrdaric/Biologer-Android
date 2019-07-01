@@ -251,7 +251,11 @@ public class FetchTaxa extends Service {
             return;
         }
 
-        Call<TaksoniResponse> call = RetrofitClient.getService(SettingsManager.getDatabaseName()).getTaxons(page, 100);
+        // Reverse page order to find 'Otis tarda' taxon as soon as possible.
+        // Note: page 1 must be loaded first.
+        int reversePage = page == 1 ? 1 : totalPages - page + 2;
+
+        Call<TaksoniResponse> call = RetrofitClient.getService(SettingsManager.getDatabaseName()).getTaxons(reversePage, 100);
 
         call.enqueue(new CallbackWithRetry<TaksoniResponse>(call) {
             @Override
@@ -275,6 +279,9 @@ public class FetchTaxa extends Service {
                         }
                     }
 
+                    // Search for preferred taxon.
+                    boolean taxonFound = false;
+
                     if (response.body() != null) {
                         List<Taxa> taxa = response.body().getData();
 
@@ -286,6 +293,9 @@ public class FetchTaxa extends Service {
                         for (Taxa taxon : taxa) {
                             App.get().getDaoSession().getTaxonDao().insertOrReplace(taxon.toTaxon());
 
+                            if (SettingsManager.PREFERRED_TAXON_NAME.equals(taxon.getName())) {
+                                taxonFound = true;
+                            }
                             List<Stage6> stages = taxon.getStages();
                             List<Translation> translations = taxon.getTranslations();
 
@@ -313,7 +323,7 @@ public class FetchTaxa extends Service {
 
                     // If we just finished fetching taxa data for the last page, we can stop showing
                     // loader. Otherwise we continue fetching taxa from the API on the next page.
-                    if (isLastPage(page)) {
+                    if (isLastPage(page) || taxonFound) {
                         // Inform the user of success
                         Log.i(TAG, "All taxa were successfully updated from the server!");
                         // Stop the foreground service and update notification
