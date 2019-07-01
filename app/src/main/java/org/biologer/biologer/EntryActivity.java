@@ -547,7 +547,7 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
             Entry entry1 = new Entry(null, taxon_id, taxon_name, year, month, day,
                     komentar, brojJedinki, maleFemale(), selectedStage, String.valueOf(!check_dead.isChecked()), razlogSmrti,
                     nLokacija.latitude, nLokacija.longitude, acc, elev, "", slika1, slika2, slika3,
-                    project_name, "", String.valueOf(getGreenDaoDataLicense()), getGreenDaoImageLicense(), time);
+                    project_name, "", String.valueOf(getGreenDaoDataLicense()), getGreenDaoImageLicense(), time, "");
             App.get().getDaoSession().getEntryDao().insertOrReplace(entry1);
             Toast.makeText(this, getString(R.string.saved), Toast.LENGTH_SHORT).show();
             setResult(RESULT_OK);

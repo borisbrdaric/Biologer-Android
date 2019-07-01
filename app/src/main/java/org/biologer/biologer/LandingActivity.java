@@ -344,6 +344,7 @@ public class LandingActivity extends AppCompatActivity
             photos.add(p);
         }
         apiEntry.setPhotos(photos);
+        apiEntry.setHabitat(entry.getHabitat());
 
         ObjectMapper mapper = new ObjectMapper();
         try {

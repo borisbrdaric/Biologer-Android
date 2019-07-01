@@ -55,6 +55,8 @@ public class APIEntry {
     private String time;
     @JsonProperty("observation_types_ids")
     private int[] observation_types_ids;
+    @JsonProperty("habitat")
+    private String habitat;
 
     @JsonProperty("taxon_id")
     public Integer getTaxonId() {
@@ -306,4 +308,13 @@ public class APIEntry {
 
     }
 
+    @JsonProperty("habitat")
+    public String getHahitat() {
+        return habitat;
+    }
+
+    @JsonProperty("habitat")
+    public void setHabitat(String habitat) {
+        this.habitat = habitat;
+    }
 }

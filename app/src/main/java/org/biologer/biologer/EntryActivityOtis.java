@@ -69,19 +69,33 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class EntryActivityOtis extends AppCompatActivity implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
 
     private static final String TAG = "Biologer.EntryOtis";
     private static final String TAXON_NAME = "Otis tarda";
 
-    private static final String COMMENT_DELIMITER = ";";
-    private static final String COMMENT_VALUE_DELIMITER = " ";
-    private static final String USER_COMMENT = "USER_COMMENT";
-    private static final String HABITAT = "HABITAT";
-    private static final String OBSERVATION_LENGTH = "OBSERVATION_LENGTH";
-    private static final String OBSERVER_LON = "OBSERVER_LON";
-    private static final String OBSERVER_LAT = "OBSERVER_LAT";
+    /**
+     * Regular expression used to parse CSV string found in comment field.
+     * Consists of three alternations: the first matches a quoted field, the second unquoted and the
+     * third a null field.
+     */
+    private static final String CSV_PATTERN = "(?:^|,)(\\\"(?:[^\\\"]+|\\\"\\\")*\\\"|[^,]*)";
+
+    /**
+     * {@link Pattern} instance used to parse CSV string.
+     */
+    private static final Pattern csvPattern = Pattern.compile(CSV_PATTERN);
+    /**
+     * A character used to separate fields in CSV string.
+     */
+    private static final String CSV_DELIMITER = ",";
+    /**
+     * A character used to "quote" fields in CSV string (used when field contains separator character).
+     */
+    private static final String CSV_ENCLOSING = "\"";
 
     private static final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL = 1005;
     private static final int MY_PERMISSIONS_REQUEST_CAMERA = 1006;
@@ -397,25 +411,24 @@ public class EntryActivityOtis extends AppCompatActivity implements View.OnClick
             if (currentItem.getCauseOfDeath().length() != 0) {
                 et_razlogSmrti.setText(currentItem.getCauseOfDeath());
             }
-            String observerLongitude = getObserverLon(currentItem);
-            if (observerLongitude != null && !observerLongitude.isEmpty()) {
-                tv_observer_longitude.setText(observerLongitude);
+            // Multiple fields are stored in comment string in CSV format.
+            CsvComment csvComment = new CsvComment();
+            csvComment.parse(currentItem.getComment());
+            String userComment = csvComment.getComment();
+            if (userComment != null && !userComment.isEmpty()) {
+                et_komentar.setText(userComment);
             }
-            String observerLatitude = getObserverLat(currentItem);
-            if (observerLatitude != null && !observerLatitude.isEmpty()) {
-                tv_observer_latitude.setText(observerLatitude);
-            }
-            String observationLength = getObservationLength(currentItem);
+            String observationLength = csvComment.getObservationLength();
             if (observationLength != null && !observationLength.isEmpty()) {
                 et_observation_length.setText(observationLength);
             }
-            String habitat = getHabitat(currentItem);
-            if (habitat != null && !habitat.isEmpty()) {
-                et_habitat.setText(habitat);
+            String observerLongitude = csvComment.getObserverLongitude();
+            if (observerLongitude != null && !observerLongitude.isEmpty()) {
+                tv_observer_longitude.setText(observerLongitude);
             }
-            String userComment = getUserComment(currentItem);
-            if (userComment != null && !userComment.isEmpty()) {
-                et_komentar.setText(userComment);
+            String observerLatitude = csvComment.getObserverLatitude();
+            if (observerLatitude != null && !observerLatitude.isEmpty()) {
+                tv_observer_latitude.setText(observerLatitude);
             }
             if (currentItem.getNumber() != null) {
                 et_brojJedinki.setText(String.valueOf(currentItem.getNumber()));
@@ -463,6 +476,10 @@ public class EntryActivityOtis extends AppCompatActivity implements View.OnClick
                 disablePhotoButtons(false);
             } else {
                 disablePhotoButtons(true);
+            }
+
+            if (currentItem.getHabitat() != null) {
+                et_habitat.setText(currentItem.getHabitat());
             }
         }
     }
@@ -592,10 +609,16 @@ public class EntryActivityOtis extends AppCompatActivity implements View.OnClick
     private void entrySaver(final Taxon taxon) {
         Stage stage = (tvStage.getTag() != null) ? (Stage) tvStage.getTag() : null;
 //        String komentar = (et_komentar.getText().toString() != null) ? et_komentar.getText().toString() : "";
-        String comment = createComment();
+        CsvComment csvComment = new CsvComment();
+        csvComment.setComment(et_komentar.getText() != null ? et_komentar.getText().toString() : "");
+        csvComment.setObservationLength(et_observation_length.getText() != null ? et_observation_length.getText().toString() : "");
+        csvComment.setObserverLongitude(tv_observer_longitude.getText() != null ? tv_observer_longitude.getText().toString() : "");
+        csvComment.setObserverLatitude(tv_observer_latitude.getText() != null ? tv_observer_latitude.getText().toString() : "");
+        String comment = csvComment.create();
         Integer brojJedinki = (et_brojJedinki.getText().toString().trim().length() > 0) ? Integer.valueOf(et_brojJedinki.getText().toString()) : null;
         Long selectedStage = (stage != null) ? stage.getStageId() : null;
         String razlogSmrti = (et_razlogSmrti.getText() != null) ? et_razlogSmrti.getText().toString() : "";
+        String habitat = et_habitat.getText() != null ? et_habitat.getText().toString() : "";
 
         if (isNewEntry()) {
             calendar = Calendar.getInstance();
@@ -613,7 +636,7 @@ public class EntryActivityOtis extends AppCompatActivity implements View.OnClick
             Entry entry1 = new Entry(null, taxon_id, taxon_name, year, month, day,
                     comment, brojJedinki, maleFemale(), selectedStage, String.valueOf(!check_dead.isChecked()), razlogSmrti,
                     nLokacija.latitude, nLokacija.longitude, acc, elev, "", slika1, slika2, slika3,
-                    project_name, "", String.valueOf(getGreenDaoDataLicense()), getGreenDaoImageLicense(), time);
+                    project_name, "", String.valueOf(getGreenDaoDataLicense()), getGreenDaoImageLicense(), time, habitat);
             App.get().getDaoSession().getEntryDao().insertOrReplace(entry1);
             Toast.makeText(this, getString(R.string.saved), Toast.LENGTH_SHORT).show();
             setResult(RESULT_OK);
@@ -636,6 +659,7 @@ public class EntryActivityOtis extends AppCompatActivity implements View.OnClick
             currentItem.setSlika1(slika1);
             currentItem.setSlika2(slika2);
             currentItem.setSlika3(slika3);
+            currentItem.setHabitat(habitat);
 
             // Now just update the database with new data...
             App.get().getDaoSession().getEntryDao().updateInTx(currentItem);
@@ -1287,79 +1311,122 @@ public class EntryActivityOtis extends AppCompatActivity implements View.OnClick
     }
 
     /**
-     * Extracts string part from string returned by {@link Entry#getComment()} method.<br>
-     * Since Otis tarda entry requires additional data, comment attribute is used to avoid database
-     * extension. Following format is used:
-     * COMMENT User comment;HABITAT Habitat;OBSERVATION_LENGTH Observation minutes;OBSERVER_LAT Latitude;OBSERVER_LON Longitude;
-     * @param entry Entry object containing specimen data.
-     * @param id Identifier of the string part.
-     * @return String part extracted from string returned by {@link Entry#getComment()} method.
+     * This class is used to parse and create CSV string returned by {@link Entry#getComment()} method.
      */
-    private String parseComment(Entry entry, String id) {
-        String comment = entry.getComment();
-        if (comment == null || comment.isEmpty() || !comment.contains(id)) {
-            return "";
+    private class CsvComment {
+
+        /** Comment entered by the user. */
+        private String comment;
+
+        /** Number of minutes used to observe the specimen. */
+        private String observationLength;
+
+        /** Latitude of the observer. */
+        private String observerLatitude;
+
+        /** Longitude of the observer. */
+        private String observerLongitude;
+
+        /**
+         * Parse CSV string returned by {@link Entry#getComment()} method.<br>
+         * Field values are obtained using corresponding get methods.
+         * @param csvString CSV string returned by {@link Entry#getComment()} method.
+         */
+        public void parse(String csvString) {
+            Matcher matcher = csvPattern.matcher(csvString);
+            int index = 0;
+            while (matcher.find()) {
+                String match = matcher.group();
+                if (match == null || match.isEmpty()) {
+                    break;
+                } else if (match.startsWith(",")) {  // trim trailing ,
+                    match = match.substring(1);
+                } else if (match.startsWith("\"") && match.endsWith("\"")) { // trim enclosing ""
+                    match = match.substring(1, match.length() - 1);
+                } else {
+                    // Invalid match.
+                    match = "";
+                }
+                match = match.replaceAll("\"\"", "\"");
+                switch(index) {
+                    case 0:
+                        comment = match;
+                        break;
+                    case 1:
+                        observationLength = match;
+                        break;
+                    case 2:
+                        observerLatitude = match;
+                        break;
+                    case 3:
+                        observerLongitude = match;
+                        break;
+                    default:
+                        Log.w(TAG,"Wrong number of CSV values found: " + index);
+                        return;
+                }
+                index++;
+            }
         }
-        int startIndex = comment.indexOf(id) + id.length() + COMMENT_VALUE_DELIMITER.length();
-        int endIndex = comment.indexOf(COMMENT_DELIMITER, startIndex);
-        return comment.substring(startIndex, endIndex);
-    }
 
-    private String createComment() {
-        return  USER_COMMENT + COMMENT_VALUE_DELIMITER + et_komentar.getText()+ COMMENT_DELIMITER +
-                HABITAT + COMMENT_VALUE_DELIMITER + et_habitat.getText() + COMMENT_DELIMITER +
-                OBSERVATION_LENGTH + COMMENT_VALUE_DELIMITER + et_observation_length.getText() + COMMENT_DELIMITER +
-                OBSERVER_LAT + COMMENT_VALUE_DELIMITER + tv_observer_latitude.getText() + COMMENT_DELIMITER +
-                OBSERVER_LON + COMMENT_VALUE_DELIMITER + tv_observer_longitude.getText() + COMMENT_DELIMITER;
-    }
+        /**
+         * Creates CSV string used to store multiple fields in comment attribute of {@link Entry} class.<br>
+         * Field values are set using corresponding set methods.
+         * @return CSV string.
+         */
+        public String create() {
+            return  createCsvField(comment) + CSV_DELIMITER +
+                    createCsvField(observationLength) + CSV_DELIMITER +
+                    createCsvField(observerLatitude) + CSV_DELIMITER +
+                    createCsvField(observerLongitude);
+        }
 
-    /**
-     * Extracts user comment from string returned by {@link Entry#getComment()} method.
-     * @see #parseComment(Entry, String)
-     * @param entry Entry object containing specimen data.
-     * @return User comment extracted from string returned by {@link Entry#getComment()} method.
-     */
-    private String getUserComment(Entry entry) {
-        return parseComment(entry, USER_COMMENT);
-    }
+        public String getComment() {
+            return comment;
+        }
 
-    /**
-     * Extracts habitat from string returned by {@link Entry#getComment()} method.
-     * @see #parseComment(Entry, String)
-     * @param entry Entry object containing specimen data.
-     * @return Habitat extracted from string returned by {@link Entry#getComment()} method.
-     */
-    private String getHabitat(Entry entry) {
-        return parseComment(entry, HABITAT);
-    }
+        public void setComment(String comment) {
+            this.comment = comment;
+        }
 
-    /**
-     * Extracts observation length from string returned by {@link Entry#getComment()} method.
-     * @see #parseComment(Entry, String)
-     * @param entry Entry object containing specimen data.
-     * @return Observation length extracted from string returned by {@link Entry#getComment()} method.
-     */
-    private String getObservationLength(Entry entry) {
-        return parseComment(entry, OBSERVATION_LENGTH );
-    }
+        public String getObservationLength() {
+            return observationLength;
+        }
 
-    /**
-     * Extracts observer longitude from string returned by {@link Entry#getComment()} method.
-     * @see #parseComment(Entry, String)
-     * @param entry Entry object containing specimen data.
-     * @return Observer longitude extracted from string returned by {@link Entry#getComment()} method.
-     */
-    private String getObserverLon(Entry entry) {
-        return parseComment(entry, OBSERVER_LON );
-    }
+        public void setObservationLength(String observationLength) {
+            this.observationLength = observationLength;
+        }
 
-    /**
-     * Extracts observer latitude from string returned by {@link Entry#getComment()} method.
-     * @see #parseComment(Entry, String)
-     * @param entry Entry object containing specimen data.
-     * @return Observer latitude extracted from string returned by {@link Entry#getComment()} method.
-     */
-    private String getObserverLat(Entry entry) {
-        return parseComment(entry, OBSERVER_LAT );
+        public String getObserverLatitude() {
+            return observerLatitude;
+        }
+
+        public void setObserverLatitude(String observerLatitude) {
+            this.observerLatitude = observerLatitude;
+        }
+
+        public String getObserverLongitude() {
+            return observerLongitude;
+        }
+
+        public void setObserverLongitude(String observerLongitude) {
+            this.observerLongitude = observerLongitude;
+        }
+
+        /**
+         * Applies CSV rules to parameter string.
+         * @param field String which will be processed.
+         * @return String which matches CSV rules.
+         */
+        private String createCsvField(String field) {
+            String csvField = field;
+            if (field.contains(CSV_ENCLOSING)) {
+                csvField = csvField.replaceAll("\"", "\"\"");
+            }
+            if (field.contains(CSV_ENCLOSING) || field.contains(CSV_DELIMITER)) {
+                csvField = CSV_ENCLOSING + csvField + CSV_ENCLOSING;
+            }
+            return csvField;
+        }
     }
 }
