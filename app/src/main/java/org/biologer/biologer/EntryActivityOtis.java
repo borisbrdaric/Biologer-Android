@@ -1152,7 +1152,7 @@ public class EntryActivityOtis extends AppCompatActivity implements View.OnClick
                 .setPositiveButton(getString(R.string.save_anyway), new DialogInterface.OnClickListener() {
                     public void onClick(final DialogInterface dialog, final int id) {
                         // Save custom taxon with no ID
-                        Taxon taxon = new Taxon(null, acTextView.getText().toString());
+                        Taxon taxon = new Taxon(null, getLatinName());
                         entrySaver(taxon);
                         dialog.dismiss();
                     }
