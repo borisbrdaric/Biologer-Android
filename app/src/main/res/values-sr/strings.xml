@@ -48,6 +48,7 @@
     <string name="ziva">жива</string>
     <string name="mrtva">мртва</string>
     <string name="razlog_smrti">Узрок смрти</string>
+    <string name="habitat">Станиште</string>
     <string name="komentar">Белешка</string>
     <string name="gps_update"><b>Упозорење:</b> Ова радња ће уписати нове податке о локацији уместо оригиналних података. Да ли сте сигурни да то желите?</string>
     <string name="nav_open_drawer">Отвори навигациону површ</string>
@@ -162,5 +163,4 @@
     <string name="observation_length">Дужина посмнатрања</string>
     <string name="observer_coordinates">Координате посматрача</string>
     <string name="specimen_coordinates">Координате јединке</string>
-    <string name="habitat">Станиште</string>
 </resources>

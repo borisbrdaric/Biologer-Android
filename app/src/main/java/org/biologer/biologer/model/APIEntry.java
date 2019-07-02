@@ -278,6 +278,16 @@ public class APIEntry {
         this.observation_types_ids = observation_types_ids;
     }
 
+    @JsonProperty("habitat")
+    public String getHahitat() {
+        return habitat;
+    }
+
+    @JsonProperty("habitat")
+    public void setHabitat(String habitat) {
+        this.habitat = habitat;
+    }
+
     public static class Photo {
 
         @JsonProperty("path")
@@ -306,15 +316,5 @@ public class APIEntry {
             this.license = license;
         }
 
-    }
-
-    @JsonProperty("habitat")
-    public String getHahitat() {
-        return habitat;
-    }
-
-    @JsonProperty("habitat")
-    public void setHabitat(String habitat) {
-        this.habitat = habitat;
     }
 }
