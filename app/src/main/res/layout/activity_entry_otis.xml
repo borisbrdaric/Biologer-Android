@@ -395,7 +395,7 @@
                                         android:id="@+id/et_observation_length"
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
-                                        android:maxLength="1000"
+                                        android:maxLength="10"
                                         android:hint="@string/observation_length"/>
                                 </android.support.design.widget.TextInputLayout>
 
@@ -408,7 +408,7 @@
                                         android:id="@+id/et_habitat"
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
-                                        android:maxLength="1000"
+                                        android:maxLength="100"
                                         android:hint="@string/habitat"/>
                                 </android.support.design.widget.TextInputLayout>
 
@@ -421,7 +421,7 @@
                                     android:id="@+id/et_komentar"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:maxLength="1000"
+                                    android:maxLength="800"
                                     android:hint="@string/komentar"/>
                             </android.support.design.widget.TextInputLayout>
 
