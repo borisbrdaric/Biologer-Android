@@ -46,6 +46,7 @@
     <string name="ziva">živa</string>
     <string name="mrtva">mrtva</string>
     <string name="razlog_smrti">Uzrok smrti</string>
+    <string name="habitat">Stanište</string>
     <string name="komentar">Bilješka</string>
     <string name="gps_update"><b>Upozorenje:</b> Ovaj potez će upisati nove podatke o lokaciji umjesto originalnih podataka. Jeste li sigurni da to želite?</string>
     <string name="nav_open_drawer">Otvori navigacijsku površinu</string>
