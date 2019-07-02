@@ -34,6 +34,7 @@
     <string name="ziva">live</string>
     <string name="mrtva">dead</string>
     <string name="razlog_smrti">Cause of death</string>
+    <string name="habitat">Habitat</string>
     <string name="komentar">Comment</string>
     <string name="cancel">Cancel</string>
     <string name="sacuvaj">Save</string>

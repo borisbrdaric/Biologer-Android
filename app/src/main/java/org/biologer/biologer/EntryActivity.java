@@ -89,7 +89,7 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
     private Double acc = 0.0;
     private int GALLERY = 1, CAMERA = 2, MAP = 3;
     private TextView tvTakson, tv_gps, tvStage, tv_latitude, tv_longitude, select_sex;
-    private EditText et_razlogSmrti, et_komentar, et_brojJedinki;
+    private EditText et_razlogSmrti, et_komentar, et_brojJedinki, et_habitat;
     AutoCompleteTextView acTextView;
     FrameLayout ib_pic1_frame, ib_pic2_frame, ib_pic3_frame;
     ImageView ib_pic1, ib_pic1_del, ib_pic2, ib_pic2_del, ib_pic3, ib_pic3_del, iv_map, iconTakePhotoCamera, iconTakePhotoGallery;
@@ -137,6 +137,7 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
         et_razlogSmrti = (EditText) findViewById(R.id.edit_text_death_comment);
         et_komentar = (EditText) findViewById(R.id.et_komentar);
         et_brojJedinki = (EditText) findViewById(R.id.et_brojJedinki);
+        et_habitat = (EditText) findViewById(R.id.et_habitat);
         // In order not to use spinner to choose sex, we will put this into EditText
         select_sex = findViewById(R.id.text_view_sex);
         select_sex.setOnClickListener(this);
@@ -402,6 +403,9 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
             } else {
                 disablePhotoButtons(true);
             }
+            if (currentItem.getHabitat() != null) {
+                et_habitat.setText(currentItem.getHabitat());
+            }
         }
     }
 
@@ -530,6 +534,7 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
         Integer brojJedinki = (et_brojJedinki.getText().toString().trim().length() > 0) ? Integer.valueOf(et_brojJedinki.getText().toString()) : null;
         Long selectedStage = (stage != null) ? stage.getStageId() : null;
         String razlogSmrti = (et_razlogSmrti.getText() != null) ? et_razlogSmrti.getText().toString() : "";
+        String habitat = et_habitat.getText() != null ? et_habitat.getText().toString() : "";
 
         if (isNewEntry()) {
             calendar = Calendar.getInstance();
@@ -547,7 +552,7 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
             Entry entry1 = new Entry(null, taxon_id, taxon_name, year, month, day,
                     komentar, brojJedinki, maleFemale(), selectedStage, String.valueOf(!check_dead.isChecked()), razlogSmrti,
                     nLokacija.latitude, nLokacija.longitude, acc, elev, "", slika1, slika2, slika3,
-                    project_name, "", String.valueOf(getGreenDaoDataLicense()), getGreenDaoImageLicense(), time);
+                    project_name, "", String.valueOf(getGreenDaoDataLicense()), getGreenDaoImageLicense(), time, habitat);
             App.get().getDaoSession().getEntryDao().insertOrReplace(entry1);
             Toast.makeText(this, getString(R.string.saved), Toast.LENGTH_SHORT).show();
             setResult(RESULT_OK);
@@ -570,6 +575,7 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
             currentItem.setSlika1(slika1);
             currentItem.setSlika2(slika2);
             currentItem.setSlika3(slika3);
+            currentItem.setHabitat(habitat);
 
             // Now just update the database with new data...
             App.get().getDaoSession().getEntryDao().updateInTx(currentItem);
