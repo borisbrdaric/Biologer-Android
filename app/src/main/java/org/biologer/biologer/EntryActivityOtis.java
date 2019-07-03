@@ -429,6 +429,11 @@ public class EntryActivityOtis extends AppCompatActivity implements View.OnClick
             if (observerLatitude != null && !observerLatitude.isEmpty()) {
                 tv_observer_latitude.setText(observerLatitude);
             }
+            try {
+                observerLocation = new LatLng(Double.parseDouble(observerLatitude), Double.parseDouble(observerLongitude));
+            } catch (NumberFormatException e) {
+                Log.e(TAG, "Could not parse observer coordinates: " + e.toString());
+            }
             if (currentItem.getNumber() != null) {
                 et_brojJedinki.setText(String.valueOf(currentItem.getNumber()));
             }
