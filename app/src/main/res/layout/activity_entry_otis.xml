@@ -102,7 +102,7 @@
                                     android:layout_height="wrap_content"
                                     android:text="@string/GPSaccuracy"/>
                                 <TextView
-                                    android:id="@+id/tv_gps"
+                                    android:id="@+id/tv_observer_gps"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:paddingStart="10dp"
@@ -169,6 +169,22 @@
                                     android:paddingStart="10dp"
                                     android:paddingEnd="0dp"
                                     android:text="@string/unknown" />
+                            </LinearLayout>
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:orientation="horizontal">
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/GPSaccuracy"/>
+                                <TextView
+                                    android:id="@+id/tv_gps"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:paddingStart="10dp"
+                                    android:paddingEnd="0dp"
+                                    android:text="@string/unknown"/>
                             </LinearLayout>
                         </GridLayout>
 

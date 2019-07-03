@@ -111,7 +111,7 @@ public class EntryActivityOtis extends AppCompatActivity implements View.OnClick
     private Double acc = 0.0;
     private LatLng observerLocation = new LatLng(0.0, 0.0);
     private int GALLERY = 1, CAMERA = 2, MAP = 3, MAP_OBSERVER = 4;
-    private TextView tvTakson, tv_gps, tvStage, tv_latitude, tv_longitude, select_sex;
+    private TextView tvTakson, tv_gps, tv_observer_gps, tvStage, tv_latitude, tv_longitude, select_sex;
     private TextView tv_observer_latitude, tv_observer_longitude;
     private EditText et_razlogSmrti, et_komentar, et_brojJedinki, et_habitat, et_observation_length;
     AutoCompleteTextView acTextView;
@@ -158,6 +158,7 @@ public class EntryActivityOtis extends AppCompatActivity implements View.OnClick
         tv_gps = findViewById(R.id.tv_gps);
         tv_observer_latitude = findViewById(R.id.tv_observer_latitude);
         tv_observer_longitude = findViewById(R.id.tv_observer_longitude);
+        tv_observer_gps = findViewById(R.id.tv_observer_gps);
         tvStage = findViewById(R.id.text_view_stages);
         tvStage.setOnClickListener(this);
         et_razlogSmrti = (EditText) findViewById(R.id.edit_text_death_comment);
@@ -298,7 +299,7 @@ public class EntryActivityOtis extends AppCompatActivity implements View.OnClick
                 setLocationValues(location.getLatitude(), location.getLongitude());
                 elev = location.getAltitude();
                 acc = Double.valueOf(location.getAccuracy());
-//                tv_gps.setText(String.format(Locale.ENGLISH, "%.0f", acc));
+                tv_gps.setText(String.format(Locale.ENGLISH, "%.0f", acc));
             }
 
             @Override
@@ -326,7 +327,7 @@ public class EntryActivityOtis extends AppCompatActivity implements View.OnClick
                 setObserverLocationValues(location.getLatitude(), location.getLongitude());
                 elev = location.getAltitude();
                 acc = Double.valueOf(location.getAccuracy());
-                tv_gps.setText(String.format(Locale.ENGLISH, "%.0f", acc));
+                tv_observer_gps.setText(String.format(Locale.ENGLISH, "%.0f", acc));
             }
 
             @Override
@@ -433,6 +434,10 @@ public class EntryActivityOtis extends AppCompatActivity implements View.OnClick
                 observerLocation = new LatLng(Double.parseDouble(observerLatitude), Double.parseDouble(observerLongitude));
             } catch (NumberFormatException e) {
                 Log.e(TAG, "Could not parse observer coordinates: " + e.toString());
+            }
+            String observerAccuracy = csvComment.getObserverAccuracy();
+            if (observerAccuracy != null && !observerAccuracy.isEmpty()) {
+                tv_observer_gps.setText(observerAccuracy);
             }
             if (currentItem.getNumber() != null) {
                 et_brojJedinki.setText(String.valueOf(currentItem.getNumber()));
@@ -618,6 +623,7 @@ public class EntryActivityOtis extends AppCompatActivity implements View.OnClick
         csvComment.setObservationLength(et_observation_length.getText() != null ? et_observation_length.getText().toString() : "");
         csvComment.setObserverLongitude(tv_observer_longitude.getText() != null ? tv_observer_longitude.getText().toString() : "");
         csvComment.setObserverLatitude(tv_observer_latitude.getText() != null ? tv_observer_latitude.getText().toString() : "");
+        csvComment.setObserverAccuracy(tv_observer_gps.getText() != null ? tv_observer_gps.getText().toString() : "");
         String comment = csvComment.create();
         Integer brojJedinki = (et_brojJedinki.getText().toString().trim().length() > 0) ? Integer.valueOf(et_brojJedinki.getText().toString()) : null;
         Long selectedStage = (stage != null) ? stage.getStageId() : null;
@@ -895,6 +901,11 @@ public class EntryActivityOtis extends AppCompatActivity implements View.OnClick
                     elev = Double.valueOf(elevString);
                 }
             }
+            if (data.getExtras().getString("google_map_accuracy").equals("0.0")) {
+                tv_gps.setText(R.string.not_available);
+            } else {
+                tv_gps.setText(String.format(Locale.ENGLISH, "%.0f", acc));
+            }
         }
         else if (requestCode == MAP_OBSERVER) {
             observerLocationManager.removeUpdates(observerLocationListener);
@@ -911,9 +922,9 @@ public class EntryActivityOtis extends AppCompatActivity implements View.OnClick
                 }
             }
             if (data.getExtras().getString("google_map_accuracy").equals("0.0")) {
-                tv_gps.setText(R.string.not_available);
+                tv_observer_gps.setText(R.string.not_available);
             } else {
-                tv_gps.setText(String.format(Locale.ENGLISH, "%.0f", acc));
+                tv_observer_gps.setText(String.format(Locale.ENGLISH, "%.0f", acc));
             }
         }
     }
@@ -1331,6 +1342,9 @@ public class EntryActivityOtis extends AppCompatActivity implements View.OnClick
         /** Longitude of the observer. */
         private String observerLongitude;
 
+        /** Accuracy of the observer location. */
+        private String observerAccuracy;
+
         /**
          * Parse CSV string returned by {@link Entry#getComment()} method.<br>
          * Field values are obtained using corresponding get methods.
@@ -1406,6 +1420,9 @@ public class EntryActivityOtis extends AppCompatActivity implements View.OnClick
                     case 3:
                         observerLongitude = match;
                         break;
+                    case 4:
+                        observerAccuracy = match;
+                        break;
                     default:
                         Log.w(TAG,"Wrong number of CSV values found: " + field);
                         return;
@@ -1423,7 +1440,8 @@ public class EntryActivityOtis extends AppCompatActivity implements View.OnClick
             return  createCsvField(comment) + CSV_DELIMITER +
                     createCsvField(observationLength) + CSV_DELIMITER +
                     createCsvField(observerLatitude) + CSV_DELIMITER +
-                    createCsvField(observerLongitude);
+                    createCsvField(observerLongitude) + CSV_DELIMITER +
+                    createCsvField(observerAccuracy);
         }
 
         public String getComment() {
@@ -1456,6 +1474,14 @@ public class EntryActivityOtis extends AppCompatActivity implements View.OnClick
 
         public void setObserverLongitude(String observerLongitude) {
             this.observerLongitude = observerLongitude;
+        }
+
+        public String getObserverAccuracy() {
+            return observerAccuracy;
+        }
+
+        public void setObserverAccuracy(String observerAccuracy) {
+            this.observerAccuracy = observerAccuracy;
         }
 
         /**
