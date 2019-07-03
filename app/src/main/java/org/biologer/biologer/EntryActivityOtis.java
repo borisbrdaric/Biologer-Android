@@ -90,11 +90,11 @@ public class EntryActivityOtis extends AppCompatActivity implements View.OnClick
     /**
      * A character used to separate fields in CSV string.
      */
-    private static final String CSV_DELIMITER = ",";
+    private static final char CSV_DELIMITER = ',';
     /**
      * A character used to "quote" fields in CSV string (used when field contains separator character).
      */
-    private static final String CSV_ENCLOSING = "\"";
+    private static final char CSV_ENCLOSING = '"';
 
     private static final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL = 1005;
     private static final int MY_PERMISSIONS_REQUEST_CAMERA = 1006;
@@ -1332,22 +1332,63 @@ public class EntryActivityOtis extends AppCompatActivity implements View.OnClick
          * @param csvString CSV string returned by {@link Entry#getComment()} method.
          */
         public void parse(String csvString) {
-            Matcher matcher = csvPattern.matcher(csvString);
-            int index = 0;
-            while (matcher.find()) {
-                String match = matcher.group();
-                if (match == null || match.isEmpty()) {
-                    break;
-                } else if (match.startsWith(",")) {  // trim trailing ,
-                    match = match.substring(1);
-                } else if (match.startsWith("\"") && match.endsWith("\"")) { // trim enclosing ""
-                    match = match.substring(1, match.length() - 1);
+            // Reset field values.
+            clear();
+            // Ignore invalid values.
+            if (csvString == null || csvString.isEmpty()) {
+                return;
+            }
+            // Try to find fields in CSV string.
+            int i = 0; // character index
+            int field = 0; // field index
+            while (i < csvString.length()) {
+                int startIndex = i;
+                int endIndex = -1;
+                String match;
+                if (csvString.charAt(i) == CSV_ENCLOSING) {
+                    // This field is enclosed, search for end character.
+                    i++;
+                    while (endIndex < 0 && i < csvString.length()) {
+                        if (csvString.charAt(i) == CSV_ENCLOSING) {
+                            // This might be an end, but check if this is escape character.
+                            if (i == csvString.length() - 1) {
+                                endIndex = i;
+                            } else if (csvString.charAt(i+1) == CSV_ENCLOSING) {
+                                // This is escape character, skip it and continue.
+                                i++;
+                            } else if (csvString.charAt(i+1) == CSV_DELIMITER) {
+                                endIndex = i+1;
+                                // Skip delimiter for the next field.
+                                i++;
+                            } else {
+                                Log.w(TAG,"CSV string is invalid.");
+                                return;
+                            }
+                        }
+                        i++;
+                    }
+                    // Trim enclosing characters.
+                    startIndex++;
+                    endIndex--;
                 } else {
-                    // Invalid match.
-                    match = "";
+                    while (endIndex < 0 && i < csvString.length()) {
+                        if (i == csvString.length() - 1) {
+                            endIndex = i+1;
+                        } else if (csvString.charAt(i) == CSV_DELIMITER) {
+                            endIndex = i;
+                        }
+                        i++;
+                    }
                 }
+
+                if (endIndex < 0) {
+                    Log.w(TAG,"CSV string is invalid.");
+                    return;
+                }
+                match = csvString.substring(startIndex, endIndex);
                 match = match.replaceAll("\"\"", "\"");
-                switch(index) {
+
+                switch(field) {
                     case 0:
                         comment = match;
                         break;
@@ -1361,10 +1402,10 @@ public class EntryActivityOtis extends AppCompatActivity implements View.OnClick
                         observerLongitude = match;
                         break;
                     default:
-                        Log.w(TAG,"Wrong number of CSV values found: " + index);
+                        Log.w(TAG,"Wrong number of CSV values found: " + field);
                         return;
                 }
-                index++;
+                field++;
             }
         }
 
@@ -1413,16 +1454,26 @@ public class EntryActivityOtis extends AppCompatActivity implements View.OnClick
         }
 
         /**
+         * Resets the field values.
+         */
+        private void clear() {
+            comment = "";
+            observationLength = "";
+            observerLatitude = "";
+            observerLongitude = "";
+        }
+
+        /**
          * Applies CSV rules to parameter string.
          * @param field String which will be processed.
          * @return String which matches CSV rules.
          */
         private String createCsvField(String field) {
             String csvField = field;
-            if (field.contains(CSV_ENCLOSING)) {
+            if (field.contains(Character.toString(CSV_ENCLOSING))) {
                 csvField = csvField.replaceAll("\"", "\"\"");
             }
-            if (field.contains(CSV_ENCLOSING) || field.contains(CSV_DELIMITER)) {
+            if (field.contains(Character.toString(CSV_ENCLOSING)) || field.contains(Character.toString(CSV_DELIMITER))) {
                 csvField = CSV_ENCLOSING + csvField + CSV_ENCLOSING;
             }
             return csvField;
