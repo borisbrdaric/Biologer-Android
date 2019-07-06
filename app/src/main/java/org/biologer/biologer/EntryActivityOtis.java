@@ -103,12 +103,12 @@ public class EntryActivityOtis extends AppCompatActivity implements View.OnClick
     private String mCurrentPhotoPath;
     private LocationManager locationManager;
     private LocationListener locationListener;
-    private LocationManager observerLocationManager;
-    private LocationListener observerLocationListener;
 //    String latitude = "0", longitude = "0";
     private double elev = 0.0;
     private LatLng nLokacija = new LatLng(0.0, 0.0);
     private Double acc = 0.0;
+    private double observerElev = 0.0;
+    private Double observerAcc = 0.0;
     private LatLng observerLocation = new LatLng(0.0, 0.0);
     private int GALLERY = 1, CAMERA = 2, MAP = 3, MAP_OBSERVER = 4;
     private TextView tvTakson, tv_gps, tv_observer_gps, tvStage, tv_latitude, tv_longitude, select_sex;
@@ -130,6 +130,18 @@ public class EntryActivityOtis extends AppCompatActivity implements View.OnClick
     // Get the data from the GreenDao database
     List<UserData> userDataList = App.get().getDaoSession().getUserDataDao().loadAll();
     List<Stage> stageList = App.get().getDaoSession().getStageDao().loadAll();
+
+    /**
+     * If <code>true</code> specimen location was set by the user. Otherwise, specimen location can
+     * be determined by the {@link #locationManager}.
+     */
+    private boolean specimenLocationSet = false;
+
+    /**
+     * If <code>true</code> observer location was set by the user. Otherwise, observer location can
+     * be determined by the {@link #locationManager}.
+     */
+    private boolean observerLocationSet = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -295,11 +307,20 @@ public class EntryActivityOtis extends AppCompatActivity implements View.OnClick
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
-                nLokacija = new LatLng(location.getLatitude(), location.getLongitude());
-                setLocationValues(location.getLatitude(), location.getLongitude());
-                elev = location.getAltitude();
-                acc = Double.valueOf(location.getAccuracy());
-                tv_gps.setText(String.format(Locale.ENGLISH, "%.0f", acc));
+                if (!specimenLocationSet) {
+                    nLokacija = new LatLng(location.getLatitude(), location.getLongitude());
+                    setLocationValues(location.getLatitude(), location.getLongitude(), tv_latitude, tv_longitude);
+                    elev = location.getAltitude();
+                    acc = Double.valueOf(location.getAccuracy());
+                    tv_gps.setText(String.format(Locale.ENGLISH, "%.0f", acc));
+                }
+                if (!observerLocationSet) {
+                    observerLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                    setLocationValues(location.getLatitude(), location.getLongitude(), tv_observer_latitude, tv_observer_longitude);
+                    observerElev = location.getAltitude();
+                    observerAcc = Double.valueOf(location.getAccuracy());
+                    tv_observer_gps.setText(String.format(Locale.ENGLISH, "%.0f", observerAcc));
+                }
             }
 
             @Override
@@ -318,34 +339,6 @@ public class EntryActivityOtis extends AppCompatActivity implements View.OnClick
         };
 
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-
-        // Set observer location listener and manager.
-        observerLocationListener = new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-                observerLocation = new LatLng(location.getLatitude(), location.getLongitude());
-                setObserverLocationValues(location.getLatitude(), location.getLongitude());
-                elev = location.getAltitude();
-                acc = Double.valueOf(location.getAccuracy());
-                tv_observer_gps.setText(String.format(Locale.ENGLISH, "%.0f", acc));
-            }
-
-            @Override
-            public void onStatusChanged(String s, int i, Bundle bundle) {
-            }
-
-            @Override
-            public void onProviderEnabled(String s) {
-            }
-
-            @Override
-            public void onProviderDisabled(String s) {
-                //buildAlertMessageNoGps();
-                startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-            }
-        };
-
-        observerLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
         // Finally to start the gathering of data...
         startEntryActivity();
@@ -435,9 +428,13 @@ public class EntryActivityOtis extends AppCompatActivity implements View.OnClick
             } catch (NumberFormatException e) {
                 Log.e(TAG, "Could not parse observer coordinates: " + e.toString());
             }
-            String observerAccuracy = csvComment.getObserverAccuracy();
-            if (observerAccuracy != null && !observerAccuracy.isEmpty()) {
-                tv_observer_gps.setText(observerAccuracy);
+            try {
+                observerAcc = Double.parseDouble(csvComment.getObserverAccuracy());
+            } catch (NumberFormatException e) {
+                Log.e(TAG, "Could not parse observer accuracy: " + e.toString());
+            }
+            if (observerAcc != null) {
+                tv_observer_gps.setText(String.format(Locale.ENGLISH, "%.0f", observerAcc));
             }
             if (currentItem.getNumber() != null) {
                 et_brojJedinki.setText(String.valueOf(currentItem.getNumber()));
@@ -592,6 +589,7 @@ public class EntryActivityOtis extends AppCompatActivity implements View.OnClick
         if (taxonID == null) {
             buildAlertMessageInvalidTaxon();
         } else {
+            // TODO Validate observer coordinates
             // If the location is not loaded, warn the user and
             // don’t send crappy data into the online database!
             if (nLokacija.latitude == 0) {
@@ -888,10 +886,14 @@ public class EntryActivityOtis extends AppCompatActivity implements View.OnClick
 
         // Get data from Google MapActivity.java and save it as local variables
         else if (requestCode == MAP) {
-            locationManager.removeUpdates(locationListener);
-            if(data != null) {
+            specimenLocationSet = true;
+            if (observerLocationSet) {
+                // Both specimen and observer location are set by the user so no need to listen for location updates.
+                locationManager.removeUpdates(locationListener);
+            }
+            if (data != null) {
                 nLokacija = data.getParcelableExtra("google_map_latlong");
-                setLocationValues(nLokacija.latitude, nLokacija.longitude);
+                setLocationValues(nLokacija.latitude, nLokacija.longitude, tv_latitude, tv_longitude);
                 String accString = data.getExtras().getString("google_map_accuracy");
                 if (accString != null && !accString.isEmpty() && !accString.equals("null")) {
                     acc = Double.valueOf(accString);
@@ -908,23 +910,27 @@ public class EntryActivityOtis extends AppCompatActivity implements View.OnClick
             }
         }
         else if (requestCode == MAP_OBSERVER) {
-            observerLocationManager.removeUpdates(observerLocationListener);
-            if(data != null) {
+            observerLocationSet = true;
+            if (specimenLocationSet) {
+                // Both specimen and observer location are set by the user so no need to listen for location updates.
+                locationManager.removeUpdates(locationListener);
+            }
+            if (data != null) {
                 observerLocation = data.getParcelableExtra("google_map_latlong");
-                setObserverLocationValues(observerLocation.latitude, observerLocation.longitude);
+                setLocationValues(observerLocation.latitude, observerLocation.longitude, tv_observer_latitude, tv_observer_longitude);
                 String accString = data.getExtras().getString("google_map_accuracy");
                 if (accString != null && !accString.isEmpty() && !accString.equals("null")) {
-                    acc = Double.valueOf(accString);
+                    observerAcc = Double.valueOf(accString);
                 }
                 String elevString = data.getExtras().getString("google_map_elevation");
                 if (elevString != null && !elevString.isEmpty() && !elevString.equals("null")) {
-                    elev = Double.valueOf(elevString);
+                    observerElev = Double.valueOf(elevString);
                 }
             }
             if (data.getExtras().getString("google_map_accuracy").equals("0.0")) {
                 tv_observer_gps.setText(R.string.not_available);
             } else {
-                tv_observer_gps.setText(String.format(Locale.ENGLISH, "%.0f", acc));
+                tv_observer_gps.setText(String.format(Locale.ENGLISH, "%.0f", observerAcc));
             }
         }
     }
@@ -1120,23 +1126,17 @@ public class EntryActivityOtis extends AppCompatActivity implements View.OnClick
                 }
             }, 10000);
         } else {
+            specimenLocationSet = false;
+            observerLocationSet = false;
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, time, distance, locationListener);
-            observerLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, time, distance, observerLocationListener);
         }
     }
 
-    private void setLocationValues(double latti, double longi) {
+    private void setLocationValues(double latti, double longi, TextView tvLatitude, TextView tvLongitude) {
         String latitude = String.format(Locale.ENGLISH, "%.4f", (latti));
         String longitude = String.format(Locale.ENGLISH, "%.4f", (longi));
-        tv_latitude.setText(latitude);
-        tv_longitude.setText(longitude);
-    }
-
-    private void setObserverLocationValues(double latti, double longi) {
-        String latitude = String.format(Locale.ENGLISH, "%.4f", (latti));
-        String longitude = String.format(Locale.ENGLISH, "%.4f", (longi));
-        tv_observer_latitude.setText(latitude);
-        tv_observer_longitude.setText(longitude);
+        tvLatitude.setText(latitude);
+        tvLongitude.setText(longitude);
     }
 
     /*
