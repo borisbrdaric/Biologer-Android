@@ -28,8 +28,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.Toolbar;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -53,8 +51,6 @@ import org.biologer.biologer.model.Stage;
 import org.biologer.biologer.model.StageDao;
 import org.biologer.biologer.model.Taxon;
 import org.biologer.biologer.model.TaxonDao;
-import org.biologer.biologer.model.TaxonLocalization;
-import org.biologer.biologer.model.TaxonLocalizationDao;
 import org.biologer.biologer.model.UserData;
 
 import java.io.File;
@@ -69,13 +65,17 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class EntryActivityOtis extends AppCompatActivity implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
 
     private static final String TAG = "Biologer.EntryOtis";
 
+    /**
+     * Limit for the precise location. If coordinate is less than this constant, it is considered
+     * precise. Otherwise, it is considered as imprecise.
+     */
+    private static final int PRECISE_LOCATION_LIMIT = 25;
     /**
      * Regular expression used to parse CSV string found in comment field.
      * Consists of three alternations: the first matches a quoted field, the second unquoted and the
@@ -104,9 +104,9 @@ public class EntryActivityOtis extends AppCompatActivity implements View.OnClick
     private LocationManager locationManager;
     private LocationListener locationListener;
 //    String latitude = "0", longitude = "0";
-    private double elev = 0.0;
-    private LatLng nLokacija = new LatLng(0.0, 0.0);
-    private Double acc = 0.0;
+    private double specimenElev = 0.0;
+    private LatLng specimenLocation = new LatLng(0.0, 0.0);
+    private Double specimenAcc = 0.0;
     private double observerElev = 0.0;
     private Double observerAcc = 0.0;
     private LatLng observerLocation = new LatLng(0.0, 0.0);
@@ -308,11 +308,11 @@ public class EntryActivityOtis extends AppCompatActivity implements View.OnClick
             @Override
             public void onLocationChanged(Location location) {
                 if (!specimenLocationSet) {
-                    nLokacija = new LatLng(location.getLatitude(), location.getLongitude());
+                    specimenLocation = new LatLng(location.getLatitude(), location.getLongitude());
                     setLocationValues(location.getLatitude(), location.getLongitude(), tv_latitude, tv_longitude);
-                    elev = location.getAltitude();
-                    acc = Double.valueOf(location.getAccuracy());
-                    tv_gps.setText(String.format(Locale.ENGLISH, "%.0f", acc));
+                    specimenElev = location.getAltitude();
+                    specimenAcc = Double.valueOf(location.getAccuracy());
+                    tv_gps.setText(String.format(Locale.ENGLISH, "%.0f", specimenAcc));
                 }
                 if (!observerLocationSet) {
                     observerLocation = new LatLng(location.getLatitude(), location.getLongitude());
@@ -380,9 +380,9 @@ public class EntryActivityOtis extends AppCompatActivity implements View.OnClick
             currentItem = App.get().getDaoSession().getEntryDao().load(existing_entry_id);
             Log.i(TAG, "Opening existing entry with ID: " + String.valueOf(existing_entry_id) + ".");
             // Get the latitude, longitude, coordinate precision and elevation...
-            nLokacija = new LatLng(currentItem.getLattitude(), currentItem.getLongitude());
-            elev = currentItem.getElevation();
-            acc = currentItem.getAccuracy();
+            specimenLocation = new LatLng(currentItem.getLattitude(), currentItem.getLongitude());
+            specimenElev = currentItem.getElevation();
+            specimenAcc = currentItem.getAccuracy();
             tv_latitude.setText(String.format(Locale.ENGLISH, "%.4f", currentItem.getLattitude()));
             tv_longitude.setText(String.format(Locale.ENGLISH, "%.4f", currentItem.getLongitude()));
             tv_gps.setText(String.format(Locale.ENGLISH, "%.0f", currentItem.getAccuracy()));
@@ -589,21 +589,18 @@ public class EntryActivityOtis extends AppCompatActivity implements View.OnClick
         if (taxonID == null) {
             buildAlertMessageInvalidTaxon();
         } else {
-            // TODO Validate observer coordinates
             // If the location is not loaded, warn the user and
             // don’t send crappy data into the online database!
-            if (nLokacija.latitude == 0) {
+            if (specimenLocation.latitude == 0 || observerLocation.latitude == 0) {
                 buildAlertMessageNoCoordinates();
-            } else {
-                // If the location is not precise ask the user to
-                // wait for a precise location, or to go for it anyhow...
-                if (nLokacija.latitude > 0 && acc >= 25) {
-                    buildAlertMessageUnpreciseCoordinates();
-                }
             }
-
-            if (nLokacija.latitude > 0 && (acc <= 25)) {
-                // Save the taxon
+            // If the location is not precise ask the user to
+            // wait for a precise location, or to go for it anyhow...
+            else if (specimenAcc >= PRECISE_LOCATION_LIMIT || observerAcc >= PRECISE_LOCATION_LIMIT) {
+                buildAlertMessageImpreciseCoordinates();
+            }
+            // Save the taxon
+            else {
                 Taxon taxon = App.get().getDaoSession().getTaxonDao().queryBuilder()
                         .where(TaxonDao.Properties.Id.eq(taxonID))
                         .unique();
@@ -643,7 +640,7 @@ public class EntryActivityOtis extends AppCompatActivity implements View.OnClick
             // Get the data structure and save it into a database Entry
             Entry entry1 = new Entry(null, taxon_id, taxon_name, year, month, day,
                     comment, brojJedinki, maleFemale(), selectedStage, String.valueOf(!check_dead.isChecked()), razlogSmrti,
-                    nLokacija.latitude, nLokacija.longitude, acc, elev, "", slika1, slika2, slika3,
+                    specimenLocation.latitude, specimenLocation.longitude, specimenAcc, specimenElev, "", slika1, slika2, slika3,
                     project_name, "", String.valueOf(getGreenDaoDataLicense()), getGreenDaoImageLicense(), time, habitat);
             App.get().getDaoSession().getEntryDao().insertOrReplace(entry1);
             Toast.makeText(this, getString(R.string.saved), Toast.LENGTH_SHORT).show();
@@ -660,10 +657,10 @@ public class EntryActivityOtis extends AppCompatActivity implements View.OnClick
             currentItem.setStage(selectedStage);
             currentItem.setDeadOrAlive(String.valueOf(!check_dead.isChecked()));
             currentItem.setCauseOfDeath(razlogSmrti);
-            currentItem.setLattitude(nLokacija.latitude);
-            currentItem.setLongitude(nLokacija.longitude);
-            currentItem.setElevation(elev);
-            currentItem.setAccuracy(acc);
+            currentItem.setLattitude(specimenLocation.latitude);
+            currentItem.setLongitude(specimenLocation.longitude);
+            currentItem.setElevation(specimenElev);
+            currentItem.setAccuracy(specimenAcc);
             currentItem.setSlika1(slika1);
             currentItem.setSlika2(slika2);
             currentItem.setSlika3(slika3);
@@ -768,7 +765,7 @@ public class EntryActivityOtis extends AppCompatActivity implements View.OnClick
 
     private void showMap() {
         Intent intent = new Intent(this, MapActivity.class);
-        intent.putExtra("latlong", nLokacija);
+        intent.putExtra("latlong", specimenLocation);
         startActivityForResult(intent, MAP);
     }
 
@@ -892,21 +889,21 @@ public class EntryActivityOtis extends AppCompatActivity implements View.OnClick
                 locationManager.removeUpdates(locationListener);
             }
             if (data != null) {
-                nLokacija = data.getParcelableExtra("google_map_latlong");
-                setLocationValues(nLokacija.latitude, nLokacija.longitude, tv_latitude, tv_longitude);
+                specimenLocation = data.getParcelableExtra("google_map_latlong");
+                setLocationValues(specimenLocation.latitude, specimenLocation.longitude, tv_latitude, tv_longitude);
                 String accString = data.getExtras().getString("google_map_accuracy");
                 if (accString != null && !accString.isEmpty() && !accString.equals("null")) {
-                    acc = Double.valueOf(accString);
+                    specimenAcc = Double.valueOf(accString);
                 }
                 String elevString = data.getExtras().getString("google_map_elevation");
                 if (elevString != null && !elevString.isEmpty() && !elevString.equals("null")) {
-                    elev = Double.valueOf(elevString);
+                    specimenElev = Double.valueOf(elevString);
                 }
             }
             if (data.getExtras().getString("google_map_accuracy").equals("0.0")) {
                 tv_gps.setText(R.string.not_available);
             } else {
-                tv_gps.setText(String.format(Locale.ENGLISH, "%.0f", acc));
+                tv_gps.setText(String.format(Locale.ENGLISH, "%.0f", specimenAcc));
             }
         }
         else if (requestCode == MAP_OBSERVER) {
@@ -1201,9 +1198,11 @@ public class EntryActivityOtis extends AppCompatActivity implements View.OnClick
         alert.show();
     }
 
-    protected void buildAlertMessageUnpreciseCoordinates() {
-        final AlertDialog.Builder builder_unprecise_coords = new AlertDialog.Builder(this);
-        builder_unprecise_coords.setMessage(getString(R.string.unprecise_coordinates))
+    protected void buildAlertMessageImpreciseCoordinates() {
+        final AlertDialog.Builder builder_imprecise_coords = new AlertDialog.Builder(this);
+        // TODO Add parameterized string (see PRECISE_LOCATION_LIMIT).
+        // TODO Rename unprecise -> imprecise.
+        builder_imprecise_coords.setMessage(getString(R.string.unprecise_coordinates))
                 .setCancelable(false)
                 .setPositiveButton(getString(R.string.wait), new DialogInterface.OnClickListener() {
                     public void onClick(final DialogInterface dialog, final int id) {
@@ -1220,7 +1219,7 @@ public class EntryActivityOtis extends AppCompatActivity implements View.OnClick
                         entrySaver(taxon);
                     }
                 });
-        final AlertDialog alert = builder_unprecise_coords.create();
+        final AlertDialog alert = builder_imprecise_coords.create();
         alert.show();
     }
 
