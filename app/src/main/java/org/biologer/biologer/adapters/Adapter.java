@@ -91,7 +91,8 @@ public class Adapter extends BaseAdapter {
         if (taxon_entry.getStage() != null) {
             long i = taxon_entry.getStage();
             Stage s = App.get().getDaoSession().getStageDao().queryBuilder().where(StageDao.Properties.StageId.eq(i)).limit(1).unique();
-            viewHolder.stage.setText(s.getName());
+            String stageName = s != null ? s.getName() : "";
+            viewHolder.stage.setText(stageName);
         } else {
             viewHolder.stage.setText("");
         }
