@@ -131,7 +131,10 @@ public class LandingActivity extends AppCompatActivity
                             buildAlertMessageEmptyTaxaDb();
                         } else {
                             // If the online database is more recent...
-                            buildAlertMessageNewerTaxaDb();
+                            // 'Taxa' database update is disabled for Biologer Otis - one time
+                            // download should be sufficient to get taxon ID for Otis tarda.
+                            // TODO Disable taxa database update - download Otis tarda ID only.
+                            // buildAlertMessageNewerTaxaDb();
                         }
                     }
                 }
